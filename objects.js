@@ -44,11 +44,13 @@ class Circle {
      * @param {float} radius (m)
      * @param {Vector2D} position (m)
      * @param {Vector2D} velocity (m/s)
+     * @param {string} color (#XXXXXX)
      */
-    constructor(radius,position,velocity){
+    constructor(radius,position,velocity,color){
         this.radius = radius;
         this.position = position;
         this.velocity = velocity;
+        this.color = color;
     }
 
     /**
@@ -58,6 +60,15 @@ class Circle {
     updatePosition(deltaTime){
         this.position = this.position.add(this.velocity.multiply(deltaTime));
 
+        // NEGATIVE WRAPAROUND
+        if(this.position.x < 0){
+            this.position.x += W;
+        }
+        if(this.position.y < 0){
+            this.position.y += H;
+        }
+
+        // POSITIVE WRAPAROUND
         this.position.x = this.position.x % W;
         this.position.y = this.position.y % H;
     }

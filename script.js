@@ -3,14 +3,14 @@ let gameObjectDict = {}
 let vZero = new Vector2D(0,0);
 
 // create random circles
-let numCircles = 50;
+let numCircles = 5;
 for(let i = 0;i < numCircles; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
     let speed = 0.2;
-    let randomVel = new Vector2D(Math.random()*speed,Math.random()*speed);
+    let randomVel = new Vector2D((Math.random()-0.5)*speed,(Math.random()-0.5)*speed);
 
-    const circle = new Circle(10.0,randomPos,randomVel)
+    const circle = new Circle(30.0,randomPos,randomVel,"#FFFFFF")
     gameObjectDict[i] = circle;
 }
 
@@ -50,49 +50,61 @@ function updateField(){
     });
 
     // sort by x position
-    circleArray.sort(function(a,b){return a.position.x - b.position.x})
+    circleArray.sort(function(a,b){return (a.position.x + a.radius) - (b.position.x + b.radius)})
 
     // TODO: wraparound collision detection in X axis
-    // TODO: QUADTREE COLLISIONS
     // https://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
-    // loop through and pair possible collisions
+
+    // NAIVE N**2 COLLISION DETECTION
     let i = 1;
-    let lastPos = circleArray[0].position.x + circleArray[0].radius;
-    let pairs = []
+    // let pairs = []
 
     while (i < circleArray.length) {
-        let tempCircle = circleArray[i];
 
-        // check if there is a possibility that the two circles intersect
-        if ((tempCircle.position.x - lastPos) < tempCircle.radius){
-            pairs.push([circleArray[i],circleArray[i-1]])
+        let c1 = circleArray[i];
+        let j = 0;
+
+        //CHECK ALL OTHER BEFORE THIS ONE
+        while (j < i){
+
+            let c2 = circleArray[j]
+            let dist = c1.position.subtract(c2.position).magnitude
+
+            //check for collision
+            if (dist <= (c1.radius + c2.radius)){
+                let newVelocities = collide(c1.position,c2.position,c1.velocity,c2.velocity) 
+                c1.velocity = newVelocities[0]
+                c2.velocity = newVelocities[1]
+                c1.color = "#FF0000"
+                c2.color = "#FF0000"
+            }
+
+            j++
         }
-
-        lastPos = circleArray[i].position.x + circleArray[0].radius;
-
+        
         i++;
     }
 
-    e = 0.5;
+    // loop through all possible collision pairs
+    // i = 0;
+    // while (i < pairs.length){
 
-    // loop through all possible collisions
-    i = 0;
-    while (i < pairs.length){
+    //     let c1 = pairs[i][0]
+    //     let c2 = pairs[i][1]
+    //     let dist = c1.position.subtract(c2.position).magnitude
 
-        let c1 = pairs[i][0]
-        let c2 = pairs[i][1]
-        let dist = c1.position.subtract(c2.position).magnitude
+    //     //check for collision
+    //     if (dist < (c1.radius + c2.radius)){
 
-        //check for collision
-        if (dist < (c1.radius + c2.radius)){
+    //         let newVelocities = collide(c1.position,c2.position,c1.velocity,c2.velocity) 
+    //         c1.velocity = newVelocities[0]
+    //         c2.velocity = newVelocities[1]
+    //         c1.color = "#FF0000"
+    //         c2.color = "#FF0000"
+    //     }
 
-            let newVelocities = collide(c1.position,c2.position,c1.velocity,c2.velocity) 
-            c1.velocity = newVelocities[0]
-            c2.velocity = newVelocities[1]
-        }
-
-        i++;
-    }
+    //     i++;
+    // }
 }
 
 function render(){
@@ -101,14 +113,13 @@ function render(){
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, W, H);
 
-    ctx.fillStyle = "#FFFFFF";
-    ctx.strokeStyle = "#FFFFFF";
-
     for (const [key,value] of Object.entries(gameObjectDict)){
 
         const tempCircle = value;
         const pos = tempCircle.position;
         const radius = tempCircle.radius;
+
+        ctx.fillStyle = tempCircle.color;
 
         ctx.beginPath();
         ctx.arc(pos.x,pos.y,radius,0,2* Math.PI);
@@ -144,6 +155,8 @@ function render(){
             ctx.arc(newX,newY,radius,0,2* Math.PI);
             ctx.fill();
         }
+
+        tempCircle.color = "#FFFFFF"
     }
 
 }
