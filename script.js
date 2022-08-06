@@ -3,14 +3,14 @@ let gameObjectDict = {}
 let vZero = new Vector2D(0,0);
 
 // create random circles
-let numCircles = 5;
+let numCircles = 300;
 for(let i = 0;i < numCircles; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
     let speed = 0.2;
     let randomVel = new Vector2D((Math.random()-0.5)*speed,(Math.random()-0.5)*speed);
 
-    const circle = new Circle(30.0,randomPos,randomVel,"#FFFFFF")
+    const circle = new Circle(10.0,randomPos,randomVel,"#FFFFFF")
     gameObjectDict[i] = circle;
 }
 
@@ -32,6 +32,7 @@ function step(){
     render()
 
     let elapsed = performance.now() - frameStart
+    // console.log(elapsed)
     sleep(MS - elapsed)
     window.requestAnimationFrame(step);
 
@@ -39,44 +40,54 @@ function step(){
 
 function updateField(){
 
-    // Create array of circle objects
+    // CREATE ARRAY OF CIRCLE OBJECTS AND UPDATE POSITION
     let circleArray = Object.keys(gameObjectDict).map(function(key){
         let tempCircle = gameObjectDict[key]
 
         // update position
+        // WARNING: SIDE EFFECTS ARE BAD, MMMKAY?
         tempCircle.updatePosition(MS)
 
         return gameObjectDict[key];
     });
 
-    // sort by x position
+    // SORT BY X
     circleArray.sort(function(a,b){return (a.position.x + a.radius) - (b.position.x + b.radius)})
 
-    // TODO: wraparound collision detection in X axis
-    // https://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
-
-    // NAIVE N**2 COLLISION DETECTION
+    // nlogn collision detection
     let i = 1;
-    // let pairs = []
+    let pairs = []
 
     while (i < circleArray.length) {
 
         let c1 = circleArray[i];
-        let j = 0;
+        let j = 1;
 
         //CHECK ALL OTHER BEFORE THIS ONE
-        while (j < i){
+        let collision = true
+        while (collision){
 
-            let c2 = circleArray[j]
-            let dist = c1.position.subtract(c2.position).magnitude
+            collision = false
+            let index = i - j
 
-            //check for collision
-            if (dist <= (c1.radius + c2.radius)){
-                let newVelocities = collide(c1.position,c2.position,c1.velocity,c2.velocity) 
-                c1.velocity = newVelocities[0]
-                c2.velocity = newVelocities[1]
-                c1.color = "#FF0000"
-                c2.color = "#FF0000"
+            if (index < 0){
+                index += circleArray.length
+            }
+
+            let c2 = circleArray[index]
+
+            let dist = 100000;
+
+            // normal collision
+            if (index < i){
+                dist = c1.position.x - c2.position.x
+            } else {
+                dist = c1.position.x + W - c2.position.x
+            }
+
+            if (dist < (c1.radius + c2.radius)){
+                pairs.push([c1,c2])
+                collision = true
             }
 
             j++
@@ -86,25 +97,27 @@ function updateField(){
     }
 
     // loop through all possible collision pairs
-    // i = 0;
-    // while (i < pairs.length){
+    i = 0;
+    while (i < pairs.length){
 
-    //     let c1 = pairs[i][0]
-    //     let c2 = pairs[i][1]
-    //     let dist = c1.position.subtract(c2.position).magnitude
+        let c1 = pairs[i][0]
+        let c2 = pairs[i][1]
+        let dist = c1.position.subtract(c2.position).magnitude
 
-    //     //check for collision
-    //     if (dist < (c1.radius + c2.radius)){
+        //check for collision
+        if (dist < (c1.radius + c2.radius)){
 
-    //         let newVelocities = collide(c1.position,c2.position,c1.velocity,c2.velocity) 
-    //         c1.velocity = newVelocities[0]
-    //         c2.velocity = newVelocities[1]
-    //         c1.color = "#FF0000"
-    //         c2.color = "#FF0000"
-    //     }
+            let newVelocities = collide(c1.position,c2.position,c1.velocity,c2.velocity) 
+            c1.velocity = newVelocities[0]
+            c2.velocity = newVelocities[1]
+            c1.color = "#FF0000"
+            c2.color = "#FF0000"
+        }
 
-    //     i++;
-    // }
+        i++;
+    }
+
+    // console.log("Detection checks: " + pairs.length)
 }
 
 function render(){
