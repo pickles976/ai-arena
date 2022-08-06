@@ -100,7 +100,6 @@ function updateField(){
     }
 }
 
-// TODO: wraparound rendering
 function render(){
 
     // Drawing loop
@@ -118,8 +117,38 @@ function render(){
 
         ctx.beginPath();
         ctx.arc(pos.x,pos.y,radius,0,2* Math.PI);
-        // ctx.stroke();
         ctx.fill();
+
+        // WRAPAROUND RENDERING
+        let newX = pos.x;
+        let newY = pos.y;
+        let wraparound = false;
+
+        // check x bounds
+        if (pos.x + radius > W){
+            newX = pos.x - W
+            wraparound = true
+        }
+        else if (pos.x - radius < 0){
+            newX = pos.x + W
+            wraparound = true
+        }
+
+        // check y bounds
+        if (pos.y + radius > H){
+            newY = pos.y - H
+            wraparound = true
+        }
+        else if (pos.y - radius < 0){
+            newY = pos.y + H
+            wraparound = true
+        }
+
+        if (wraparound){
+            ctx.beginPath();
+            ctx.arc(newX,newY,radius,0,2* Math.PI);
+            ctx.fill();
+        }
     }
 
 }
