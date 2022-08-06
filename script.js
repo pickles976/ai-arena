@@ -3,14 +3,14 @@ let gameObjectDict = {}
 let vZero = new Vector2D(0,0);
 
 // create random circles
-let numCircles = 5;
+let numCircles = 50;
 for(let i = 0;i < numCircles; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
     let speed = 0.2;
     let randomVel = new Vector2D(Math.random()*speed,Math.random()*speed);
 
-    const circle = new Circle(20.0,randomPos,randomVel)
+    const circle = new Circle(10.0,randomPos,randomVel)
     gameObjectDict[i] = circle;
 }
 
@@ -52,7 +52,9 @@ function updateField(){
     // sort by x position
     circleArray.sort(function(a,b){return a.position.x - b.position.x})
 
-    // TODO: wraparound collision detection
+    // TODO: wraparound collision detection in X axis
+    // TODO: QUADTREE COLLISIONS
+    // https://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
     // loop through and pair possible collisions
     let i = 1;
     let lastPos = circleArray[0].position.x + circleArray[0].radius;
@@ -73,27 +75,20 @@ function updateField(){
 
     e = 0.5;
 
+    // loop through all possible collisions
     i = 0;
     while (i < pairs.length){
-        // check for collisions
+
         let c1 = pairs[i][0]
         let c2 = pairs[i][1]
         let dist = c1.position.subtract(c2.position).magnitude
 
+        //check for collision
         if (dist < (c1.radius + c2.radius)){
 
-            console.log("collision!")
-            let collisionNormal = c1.position.subtract(c2.position).normal()
-            let vRel = c1.velocity.subtract(c2.velocity)
-            let tVel = -collisionNormal.dot(vRel.multiply(1+e))
-
-            let delta = collisionNormal.multiply(tVel / 2)
-
-            // TODO: impulse calculations
-            // https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
-            // IMPULSE CALCULATIONS WHEN adding mass
-            c1.velocity = c1.velocity.add(delta)
-            c2.velocity = c2.velocity.subtract(delta)
+            let newVelocities = collide(c1.position,c2.position,c1.velocity,c2.velocity) 
+            c1.velocity = newVelocities[0]
+            c2.velocity = newVelocities[1]
         }
 
         i++;
@@ -156,3 +151,20 @@ function render(){
 console.log(gameCanvas)
 
 window.requestAnimationFrame(step);
+
+function collide(p1,p2,v1,v2){
+    // console.log("collision!")
+    let e = 0.2;
+    let oomf = 0.025;
+    let collisionNormal = p1.subtract(p2).normal()
+    let vRel = v1.subtract(v2)
+    let tVel = -collisionNormal.dot(vRel.multiply(1+e))
+
+    let delta = collisionNormal.multiply((tVel / 2) + oomf)
+
+    // TODO: impulse calculations
+    // https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
+    // IMPULSE CALCULATIONS WHEN adding mass
+    
+    return [v1.add(delta),v2.subtract(delta)]
+}
