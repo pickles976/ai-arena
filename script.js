@@ -3,7 +3,7 @@ let gameObjectDict = {}
 let vZero = new Vector2D(0,0);
 
 // create random circles
-let numCircles = 300;
+let numCircles = 100;
 for(let i = 0;i < numCircles; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
@@ -34,7 +34,7 @@ function step(){
     render()
 
     let elapsed = performance.now() - frameStart
-    console.log(elapsed)
+    // console.log(elapsed)
     sleep(MS - elapsed)
     window.requestAnimationFrame(step);
 
@@ -46,11 +46,9 @@ function updateField(){
 
     // CREATE ARRAY OF CIRCLE OBJECTS AND UPDATE POSITION
     let circleArray = Object.keys(gameObjectDict).map(function(key){
-        let tempCircle = gameObjectDict[key]
-
         // update position
         // WARNING: SIDE EFFECTS ARE BAD, MMMKAY?
-        tempCircle.updatePosition(MS)
+        gameObjectDict[key].updatePosition(MS)
 
         return gameObjectDict[key];
     });
@@ -58,103 +56,8 @@ function updateField(){
     // SORT BY X
     circleArray.sort(function(a,b){return (a.position.x + a.radius) - (b.position.x + b.radius)})
 
-    // nlogn collision detection
-    let i = 0;
-    let pairs = []
+    checkForCollisions(circleArray)
 
-    while (i < circleArray.length) {
-
-        let c1 = circleArray[i];
-        let j = 1;
-
-        //CHECK ALL OTHER BEFORE THIS ONE
-        let collision = true
-        while (collision){
-
-            collision = false
-            let index = i - j
-
-            if (index < 0){
-                index += circleArray.length
-            }
-
-            let c2 = circleArray[index]
-
-            let dist = 100000;
-
-            // normal collision
-            if (index < i){
-                dist = c1.position.x - c2.position.x
-            } else {
-                dist = c1.position.x + W - c2.position.x
-            }
-
-            if (dist < (c1.radius + c2.radius)){
-
-                // the checking object will always be first in the pair
-                pairs.push([c1,c2])
-                collision = true
-            }
-
-            j++
-        }
-        
-        i++;
-    }
-
-    // loop through all possible collision pairs
-    i = 0;
-    while (i < pairs.length){
-
-        let c1 = pairs[i][0]
-        let c2 = pairs[i][1]
-
-        // drawLine(c1.position,c2.position)
-
-        let c1Pos = c1.position
-        let c2Pos = c2.position
-        
-        // check if it's a wraparound collision in the X direction
-        if (c1.position.x < c2.position.x){
-            c2Pos = new Vector2D(c2.position.x - W,c2.position.y)
-        }
-
-        let dist = c1Pos.subtract(c2Pos).magnitude
-
-        // check for wraparound collision in the Y direction
-        if (dist > (c1.radius + c2.radius)){
-
-            let tempC2 = c2Pos.copy()
-
-            // shift the C2 up or down
-            if (c1.position.y < c2.position.y){
-                tempC2.y -= H
-            }else{
-                tempC2.y += H
-            }
-
-            // check if there is collision after the shift
-            let tempDist = c1Pos.subtract(tempC2).magnitude
-            if (tempDist < (c1.radius + c2.radius)){
-                dist = tempDist // update with shift
-                c2Pos = tempC2
-            }
-        }
-
-        //check for collision
-        if (dist < (c1.radius + c2.radius)){
-
-            let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity) 
-            c1.velocity = newVelocities[0]
-            c2.velocity = newVelocities[1]
-            c1.color = "#FF0000"
-            c2.color = "#FF0000"
-        }
-
-        i++;
-    }
-
-    // console.log("Detection checks: " + pairs.length)
 }
 
 function render(){
@@ -215,23 +118,6 @@ console.log(gameCanvas)
 
 window.requestAnimationFrame(step);
 
-function collide(p1,p2,v1,v2){
-    // console.log("collision!")
-    let e = 0.2;
-    let oomf = 0.025;
-    let collisionNormal = p1.subtract(p2).normal()
-    let vRel = v1.subtract(v2)
-    let tVel = -collisionNormal.dot(vRel.multiply(1+e))
-
-    let delta = collisionNormal.multiply((tVel / 2) + oomf)
-
-    // TODO: impulse calculations
-    // https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
-    // IMPULSE CALCULATIONS WHEN adding mass
-    
-    return [v1.add(delta),v2.subtract(delta)]
-}
-
 function togglePause(){
 
     if(PAUSED){
@@ -250,4 +136,126 @@ function drawLine(start,end){
     ctx.moveTo(start.x,start.y)
     ctx.lineTo(end.x,end.y)
     ctx.stroke()
+}
+
+/**
+ * nlog(n) collision detection for sorted array of circular objects
+ * @param {Array<Circle>} circleArray 
+ */
+function checkForCollisions(circleArray){
+
+    let i = 0;
+    let pairs = []
+
+    while (i < circleArray.length) {
+
+        let c1 = circleArray[i];
+        let j = 1;
+
+        //ITERATE BACKWARDS IN CIRCLEARRAY
+        let collision = true
+        while (collision){
+
+            collision = false
+            let index = i - j
+
+            // IF WE HAVE LOOPED AROUND
+            if (index < 0){
+                index += circleArray.length
+            }
+
+            let c2 = circleArray[index]
+            let dist = 100000;
+
+            // normal collision
+            if (index < i){
+                dist = c1.position.x - c2.position.x
+            } else {
+                dist = c1.position.x + W - c2.position.x
+            }
+
+            // POSSIBLE COLLISION
+            if (dist < (c1.radius + c2.radius)){
+                // the checking object will always be first in the pair
+                pairs.push([c1,c2])
+                collision = true
+            }
+
+            j++
+        }
+        
+        i++;
+    }
+
+    // loop through all possible collision pairs
+    i = 0;
+    while (i < pairs.length){
+
+        let c1 = pairs[i][0]
+        let c2 = pairs[i][1]
+        let c1Pos = c1.position
+        let c2Pos = c2.position
+        
+        // check if it's a wraparound collision in the X direction
+        if (c1.position.x < c2.position.x){
+            c2Pos = new Vector2D(c2.position.x - W,c2.position.y)
+        }
+
+        // temporary distance calculation
+        let dist = c1Pos.subtract(c2Pos).magnitude
+
+        // check for wraparound collision in the Y direction
+        if (dist > (c1.radius + c2.radius)){
+
+            let tempC2 = c2Pos.copy()
+
+            // shift the C2 up or down
+            if (c1.position.y < c2.position.y){
+                tempC2.y -= H
+            }else{
+                tempC2.y += H
+            }
+
+            // check if there is collision after the shift
+            let tempDist = c1Pos.subtract(tempC2).magnitude
+            if (tempDist < (c1.radius + c2.radius)){
+                dist = tempDist // update with shift
+                c2Pos = tempC2
+            }
+        }
+
+        //check for collision
+        if (dist < (c1.radius + c2.radius)){
+            let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity) 
+            c1.velocity = newVelocities[0]
+            c2.velocity = newVelocities[1]
+        }
+
+        i++;
+    }
+}
+
+/**
+ * Perform collision calculations between to objects and returns their respective vectors
+ * @param {Vector2D} p1
+ * @param {Vector2D} p2 
+ * @param {Vector2D} v1 
+ * @param {Vector2D} v2 
+ * @returns [v1,v2]
+ */
+ function collide(p1,p2,v1,v2){
+    // console.log("collision!")
+    let e = 0.2;
+    let oomf = 0.025;
+    let collisionNormal = p1.subtract(p2).normal()
+    let vRel = v1.subtract(v2)
+    let tVel = -collisionNormal.dot(vRel.multiply(1+e))
+
+    let delta = collisionNormal.multiply((tVel / 2) + oomf)
+
+    // TODO: impulse calculations
+    // https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
+    // IMPULSE CALCULATIONS WHEN adding mass
+    
+    return [v1.add(delta),v2.subtract(delta)]
 }
