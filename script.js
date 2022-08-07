@@ -3,14 +3,14 @@ let gameObjectDict = {}
 let vZero = new Vector2D(0,0);
 
 // create random circles
-let numCircles = 100;
+let numCircles = 20;
 for(let i = 0;i < numCircles; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
     let speed = 0.2;
     let randomVel = new Vector2D((Math.random()-0.5)*speed,(Math.random()-0.5)*speed);
 
-    const circle = new Circle(10.0,randomPos,randomVel,"#FFFFFF")
+    const circle = new Circle(40.0 + Math.random() * 860,randomPos,randomVel,"#FFFFFF")
     gameObjectDict[i] = circle;
 }
 
@@ -226,7 +226,7 @@ function checkForCollisions(circleArray){
 
         //check for collision
         if (dist < (c1.radius + c2.radius)){
-            let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity) 
+            let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity,c1.mass,c2.mass) 
             c1.velocity = newVelocities[0]
             c2.velocity = newVelocities[1]
         }
@@ -237,25 +237,25 @@ function checkForCollisions(circleArray){
 
 /**
  * Perform collision calculations between to objects and returns their respective vectors
+ * https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
  * @param {Vector2D} p1
  * @param {Vector2D} p2 
  * @param {Vector2D} v1 
  * @param {Vector2D} v2 
  * @returns [v1,v2]
  */
- function collide(p1,p2,v1,v2){
+ function collide(p1,p2,v1,v2,m1,m2){
     // console.log("collision!")
     let e = 0.2;
-    let oomf = 0.025;
+    let oomf = 0.01;
     let collisionNormal = p1.subtract(p2).normal()
-    let vRel = v1.subtract(v2)
-    let tVel = -collisionNormal.dot(vRel.multiply(1+e))
+    let vRel = v1.subtract(v2) // relative velocity
+    let tVel = -collisionNormal.dot(vRel.multiply(1+e)) // total velocity of system
 
-    let delta = collisionNormal.multiply((tVel / 2) + oomf)
-
-    // TODO: impulse calculations
-    // https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
-    // IMPULSE CALCULATIONS WHEN adding mass
+    // let delta = collisionNormal.multiply((tVel / 2) + oomf)
+    let impulse = tVel / ((1.0/m1) + (1.0/m2))
+    let delta1 = collisionNormal.multiply((impulse/m1) + oomf)
+    let delta2 = collisionNormal.multiply((impulse/m2) + oomf)
     
-    return [v1.add(delta),v2.subtract(delta)]
+    return [v1.add(delta1),v2.subtract(delta2)]
 }

@@ -38,6 +38,10 @@ class Vector2D {
     copy(){
         return new Vector2D(this.x,this.y)
     }
+
+    toString(){
+        return "{ x : " + this.x + ", y : " + this.y + " }"
+    }
 }
 
 // TODO: add mass, color, 
@@ -45,16 +49,17 @@ class Circle {
 
     /**
      * 
-     * @param {float} radius (m)
+     * @param {float} mass (m)
      * @param {Vector2D} position (m)
      * @param {Vector2D} velocity (m/s)
      * @param {string} color (#XXXXXX)
      */
-    constructor(radius,position,velocity,color){
-        this.radius = radius;
+    constructor(mass,position,velocity,color){
+        this.mass = mass;
         this.position = position;
         this.velocity = velocity;
         this.color = color;
+        this.radius = Math.sqrt(mass)
     }
 
     /**
