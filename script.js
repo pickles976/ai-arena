@@ -10,7 +10,7 @@ for(let i = 0;i < numCircles; i++){
     let speed = 0.2;
     let randomVel = new Vector2D((Math.random()-0.5)*speed,(Math.random()-0.5)*speed);
 
-    const circle = new Circle(40.0 + Math.random() * 860,randomPos,randomVel,"#FFFFFF")
+    const circle = new Circle(50.0 + Math.random() * 350,randomPos,randomVel,"#FFFFFF")
     gameObjectDict[i] = circle;
 }
 
