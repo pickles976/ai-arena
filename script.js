@@ -26,15 +26,19 @@ let frameStart = performance.now();
 // 16.66ms/frame
 function step(){
 
+    if(!PAUSED){
+
     frameStart = performance.now()
 
     updateField()
     render()
 
     let elapsed = performance.now() - frameStart
-    // console.log(elapsed)
+    console.log(elapsed)
     sleep(MS - elapsed)
     window.requestAnimationFrame(step);
+
+    }
 
 }
 
@@ -55,7 +59,7 @@ function updateField(){
     circleArray.sort(function(a,b){return (a.position.x + a.radius) - (b.position.x + b.radius)})
 
     // nlogn collision detection
-    let i = 1;
+    let i = 0;
     let pairs = []
 
     while (i < circleArray.length) {
@@ -86,6 +90,8 @@ function updateField(){
             }
 
             if (dist < (c1.radius + c2.radius)){
+
+                // the checking object will always be first in the pair
                 pairs.push([c1,c2])
                 collision = true
             }
@@ -102,12 +108,43 @@ function updateField(){
 
         let c1 = pairs[i][0]
         let c2 = pairs[i][1]
-        let dist = c1.position.subtract(c2.position).magnitude
+
+        // drawLine(c1.position,c2.position)
+
+        let c1Pos = c1.position
+        let c2Pos = c2.position
+        
+        // check if it's a wraparound collision in the X direction
+        if (c1.position.x < c2.position.x){
+            c2Pos = new Vector2D(c2.position.x - W,c2.position.y)
+        }
+
+        let dist = c1Pos.subtract(c2Pos).magnitude
+
+        // check for wraparound collision in the Y direction
+        if (dist > (c1.radius + c2.radius)){
+
+            let tempC2 = c2Pos.copy()
+
+            // shift the C2 up or down
+            if (c1.position.y < c2.position.y){
+                tempC2.y -= H
+            }else{
+                tempC2.y += H
+            }
+
+            // check if there is collision after the shift
+            let tempDist = c1Pos.subtract(tempC2).magnitude
+            if (tempDist < (c1.radius + c2.radius)){
+                dist = tempDist // update with shift
+                c2Pos = tempC2
+            }
+        }
 
         //check for collision
         if (dist < (c1.radius + c2.radius)){
 
-            let newVelocities = collide(c1.position,c2.position,c1.velocity,c2.velocity) 
+            let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity) 
             c1.velocity = newVelocities[0]
             c2.velocity = newVelocities[1]
             c1.color = "#FF0000"
@@ -193,4 +230,24 @@ function collide(p1,p2,v1,v2){
     // IMPULSE CALCULATIONS WHEN adding mass
     
     return [v1.add(delta),v2.subtract(delta)]
+}
+
+function togglePause(){
+
+    if(PAUSED){
+        PAUSED = false
+        console.log("Unpaused!")
+        window.requestAnimationFrame(step);
+    }else{
+        PAUSED = true
+        console.log("Paused!")
+    }
+}
+
+function drawLine(start,end){
+    ctx.strokeStyle = "#FFFF00"
+    ctx.beginPath()
+    ctx.moveTo(start.x,start.y)
+    ctx.lineTo(end.x,end.y)
+    ctx.stroke()
 }

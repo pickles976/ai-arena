@@ -34,6 +34,10 @@ class Vector2D {
     normal(){
         return new Vector2D(this.x/this.magnitude,this.y/this.magnitude)
     }
+
+    copy(){
+        return new Vector2D(this.x,this.y)
+    }
 }
 
 // TODO: add mass, color, 
