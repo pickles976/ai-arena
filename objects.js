@@ -1,3 +1,7 @@
+/**
+ * ALL GAME OBJECT CLASSES WILL LIVE HERE FOR NOW
+ */
+
 class Vector2D {
 
     /**
@@ -44,7 +48,72 @@ class Vector2D {
     }
 }
 
-// TODO: add mass, color, 
+/**
+ * 
+ */
+class Renderer{
+
+    constructor(canvas){
+        this.H = canvas.height
+        this.W = canvas.width
+        this.ctx = canvas.getContext("2d")
+    }
+
+    newFrame(){
+        this.ctx.fillStyle = "#000000";
+        this.ctx.fillRect(0, 0, W, H);
+    }
+
+    /**
+     * 
+     * @param {Number} radius
+     * @param {String} color 
+     */
+    drawCircle(pos,radius,color)
+    {
+        this.ctx.fillStyle = color;
+ 
+        this.ctx.beginPath();
+        this.ctx.arc(pos.x,pos.y,radius,0,2* Math.PI);
+        this.ctx.fill();
+ 
+        // WRAPAROUND RENDERING
+        let newX = pos.x;
+        let newY = pos.y;
+        let wraparound = false;
+
+        // check x bounds
+        if (pos.x + radius > W){
+            newX = pos.x - W
+            wraparound = true
+        }
+        else if (pos.x - radius < 0){
+            newX = pos.x + W
+            wraparound = true
+        }
+
+        // check y bounds
+        if (pos.y + radius > H){
+            newY = pos.y - H
+            wraparound = true
+        }
+        else if (pos.y - radius < 0){
+            newY = pos.y + H
+            wraparound = true
+        }
+
+        if (wraparound){
+        this.ctx.beginPath();
+        this.ctx.arc(newX,newY,radius,0,2* Math.PI);
+        this.ctx.fill();
+        }
+    }
+}
+
+/**
+ * This entire physics sim uses circles for colliders, since they are extremely easy to
+ * program for and I am stupid/lazy. Think of the Circle as the base class that every game object inherits from.
+ */
 class Circle {
 
     /**
@@ -54,11 +123,10 @@ class Circle {
      * @param {Vector2D} velocity (m/s)
      * @param {string} color (#XXXXXX)
      */
-    constructor(mass,position,velocity,color){
+    constructor(mass,position,velocity){
         this.mass = mass;
         this.position = position;
         this.velocity = velocity;
-        this.color = color;
         this.radius = Math.sqrt(mass)
     }
 
@@ -66,7 +134,7 @@ class Circle {
      * 
      * @param {float} deltaTime 
      */
-    updatePosition(deltaTime){
+    simulate(deltaTime){
         this.position = this.position.add(this.velocity.multiply(deltaTime));
 
         // NEGATIVE WRAPAROUND
@@ -81,9 +149,51 @@ class Circle {
         this.position.x = this.position.x % W;
         this.position.y = this.position.y % H;
     }
-
 }
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+/**
+ * The resources contained in any object
+ */
+class Resources {
+
+    constructor(metal,water,energy){
+        this.metal = metal
+        this.water = water
+        this.energy = energy
+        this.sum = metal + water + energy
+        this.ratio = [metal/this.sum, water/this.sum, energy/this.sum]
+        this.colors = ["#666666","#ADD8E6", "#FFFF00"]
+    }
+}
+
+/**
+ * Asteroid object is composed of a circle object, it calls the circle object's simulate and render functions
+ * to simulate and render itself.
+ */
+class Asteroid {
+
+    constructor(circle,resources){
+        this.circle = circle
+        this.resources = resources
+    }
+
+    simulate(deltaTime){
+        this.circle.simulate(deltaTime)
+    }
+
+    render(renderer){
+
+        let total = 1.0
+        const ratio = this.resources.ratio
+        const colors = this.resources.colors
+
+        // draw the resources in the asteroid as colored rings
+        for(let i = 0; i < 3; i++){
+            if (total > 0){
+                renderer.drawCircle(this.circle.position,total*this.circle.radius,colors[i])
+                total -= ratio[i]
+            }
+        }
+    }
+
 }

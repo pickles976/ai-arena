@@ -3,15 +3,18 @@ let gameObjectDict = {}
 let vZero = new Vector2D(0,0);
 
 // create random circles
-let numCircles = 20;
-for(let i = 0;i < numCircles; i++){
+let numAsteroids = 20;
+for(let i = 0;i < numAsteroids; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
     let speed = 0.2;
     let randomVel = new Vector2D((Math.random()-0.5)*speed,(Math.random()-0.5)*speed);
 
-    const circle = new Circle(50.0 + Math.random() * 350,randomPos,randomVel,"#FFFFFF")
-    gameObjectDict[i] = circle;
+    const circle = new Circle(50.0 + Math.random() * 350,randomPos,randomVel)
+    const resources = new Resources(Math.random(),Math.random(),0.0)
+    const gameObject = new Asteroid(circle,resources)
+
+    gameObjectDict[i] = gameObject;
 }
 
 // get the canvas
@@ -19,6 +22,8 @@ gameCanvas = document.getElementById("game-canvas")
 gameCanvas.width = W;
 gameCanvas.height = H;
 ctx = gameCanvas.getContext("2d");
+
+GlobalRender = new Renderer(gameCanvas)
 
 let frameStart = performance.now();
 
@@ -45,71 +50,33 @@ function step(){
 function updateField(){
 
     // CREATE ARRAY OF CIRCLE OBJECTS AND UPDATE POSITION
-    let circleArray = Object.keys(gameObjectDict).map(function(key){
+    let gameObjArray = Object.keys(gameObjectDict).map(function(key){
         // update position
         // WARNING: SIDE EFFECTS ARE BAD, MMMKAY?
-        gameObjectDict[key].updatePosition(MS)
+        gameObjectDict[key].simulate(MS)
 
         return gameObjectDict[key];
     });
 
     // SORT BY X
-    circleArray.sort(function(a,b){return (a.position.x + a.radius) - (b.position.x + b.radius)})
+    gameObjArray.sort(function(a,b){
+        a = a.circle
+        b = b.circle
+        return (a.position.x + a.radius) - (b.position.x + b.radius)
+    })
 
-    checkForCollisions(circleArray)
+    checkForCollisions(gameObjArray)
 
 }
 
 function render(){
 
-    // Drawing loop
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, W, H);
+    GlobalRender.newFrame()
 
     for (const [key,value] of Object.entries(gameObjectDict)){
 
-        const tempCircle = value;
-        const pos = tempCircle.position;
-        const radius = tempCircle.radius;
+        value.render(GlobalRender)
 
-        ctx.fillStyle = tempCircle.color;
-
-        ctx.beginPath();
-        ctx.arc(pos.x,pos.y,radius,0,2* Math.PI);
-        ctx.fill();
-
-        // WRAPAROUND RENDERING
-        let newX = pos.x;
-        let newY = pos.y;
-        let wraparound = false;
-
-        // check x bounds
-        if (pos.x + radius > W){
-            newX = pos.x - W
-            wraparound = true
-        }
-        else if (pos.x - radius < 0){
-            newX = pos.x + W
-            wraparound = true
-        }
-
-        // check y bounds
-        if (pos.y + radius > H){
-            newY = pos.y - H
-            wraparound = true
-        }
-        else if (pos.y - radius < 0){
-            newY = pos.y + H
-            wraparound = true
-        }
-
-        if (wraparound){
-            ctx.beginPath();
-            ctx.arc(newX,newY,radius,0,2* Math.PI);
-            ctx.fill();
-        }
-
-        tempCircle.color = "#FFFFFF"
     }
 
 }
@@ -117,18 +84,6 @@ function render(){
 console.log(gameCanvas)
 
 window.requestAnimationFrame(step);
-
-function togglePause(){
-
-    if(PAUSED){
-        PAUSED = false
-        console.log("Unpaused!")
-        window.requestAnimationFrame(step);
-    }else{
-        PAUSED = true
-        console.log("Paused!")
-    }
-}
 
 function drawLine(start,end){
     ctx.strokeStyle = "#FFFF00"
@@ -142,14 +97,14 @@ function drawLine(start,end){
  * nlog(n) collision detection for sorted array of circular objects
  * @param {Array<Circle>} circleArray 
  */
-function checkForCollisions(circleArray){
+function checkForCollisions(gameObjArray){
 
     let i = 0;
     let pairs = []
 
-    while (i < circleArray.length) {
+    while (i < gameObjArray.length) {
 
-        let c1 = circleArray[i];
+        let c1 = gameObjArray[i].circle;
         let j = 1;
 
         //ITERATE BACKWARDS IN CIRCLEARRAY
@@ -161,10 +116,10 @@ function checkForCollisions(circleArray){
 
             // IF WE HAVE LOOPED AROUND
             if (index < 0){
-                index += circleArray.length
+                index += gameObjArray.length
             }
 
-            let c2 = circleArray[index]
+            let c2 = gameObjArray[index].circle
             let dist = 100000;
 
             // normal collision
