@@ -156,13 +156,20 @@ class Circle {
  */
 class Resources {
 
+    static colors = ["#666666","#ADD8E6", "#FFFF00"]
+
+    /**
+     * The sum of metal, water, and energy will determine the mass of an object
+     * @param {Number} metal 
+     * @param {Number} water 
+     * @param {Number} energy 
+     */
     constructor(metal,water,energy){
         this.metal = metal
         this.water = water
         this.energy = energy
         this.sum = metal + water + energy
         this.ratio = [metal/this.sum, water/this.sum, energy/this.sum]
-        this.colors = ["#666666","#ADD8E6", "#FFFF00"]
     }
 
     getResources(){
@@ -193,11 +200,10 @@ class Asteroid {
 
         let total = 1.0
         const ratio = this.resources.ratio
-        const colors = this.resources.colors
 
         // draw the resources in the asteroid as colored rings
         for(let i = 0; i < 2; i++){
-            renderer.drawCircle(this.circle.position,total*this.circle.radius,colors[i])
+            renderer.drawCircle(this.circle.position,total*this.circle.radius,Resources.colors[i])
             total -= ratio[i]
         }
     }
@@ -221,7 +227,7 @@ class EnergyCell {
 
     render(renderer){
         // draw the resources in the asteroid as colored rings
-        renderer.drawCircle(this.circle.position,this.circle.radius,this.resources.colors[2])
+        renderer.drawCircle(this.circle.position,this.circle.radius,Resources.colors[2])
     }
 
     getResources(){
