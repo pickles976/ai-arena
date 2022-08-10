@@ -10,9 +10,18 @@ for(let i = 0;i < numAsteroids; i++){
     let speed = 0.2;
     let randomVel = new Vector2D((Math.random()-0.5)*speed,(Math.random()-0.5)*speed);
 
-    const circle = new Circle(50.0 + Math.random() * 350,randomPos,randomVel)
-    const resources = new Resources(Math.random(),Math.random(),0.0)
-    const gameObject = new Asteroid(circle,resources)
+    let gameObject = {}
+
+    if (Math.random() > 0.85){
+        const energy = 20 + (Math.random() * 100)
+        gameObject = new EnergyCell(randomPos,randomVel,energy)
+    } 
+    else 
+    { 
+        const metal = 10 + (Math.random() * 100)
+        const water = 10 + (Math.random() * 100)
+        gameObject = new Asteroid(randomPos,randomVel,metal,water)
+    }
 
     gameObjectDict[i] = gameObject;
 }

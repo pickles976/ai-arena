@@ -164,6 +164,14 @@ class Resources {
         this.ratio = [metal/this.sum, water/this.sum, energy/this.sum]
         this.colors = ["#666666","#ADD8E6", "#FFFF00"]
     }
+
+    getResources(){
+        return {
+            "metal" : this.metal,
+            "water" : this.water,
+            "energy" : this.energy,
+        }
+    }
 }
 
 /**
@@ -172,9 +180,9 @@ class Resources {
  */
 class Asteroid {
 
-    constructor(circle,resources){
-        this.circle = circle
-        this.resources = resources
+    constructor(position,velocity,metal,water){
+        this.circle = new Circle(metal+water,position,velocity)
+        this.resources = new Resources(metal,water,0)
     }
 
     simulate(deltaTime){
@@ -188,12 +196,35 @@ class Asteroid {
         const colors = this.resources.colors
 
         // draw the resources in the asteroid as colored rings
-        for(let i = 0; i < 3; i++){
-            if (total > 0){
-                renderer.drawCircle(this.circle.position,total*this.circle.radius,colors[i])
-                total -= ratio[i]
-            }
+        for(let i = 0; i < 2; i++){
+            renderer.drawCircle(this.circle.position,total*this.circle.radius,colors[i])
+            total -= ratio[i]
         }
     }
 
+    getResources(){
+        return this.resources.getResources()
+    }
+
+}
+
+class EnergyCell {
+
+    constructor(position,velocity,energy){
+        this.circle = new Circle(energy,position,velocity)
+        this.resources = new Resources(0,0,energy)
+    }
+
+    simulate(deltaTime){
+        this.circle.simulate(deltaTime)
+    }
+
+    render(renderer){
+        // draw the resources in the asteroid as colored rings
+        renderer.drawCircle(this.circle.position,this.circle.radius,this.resources.colors[2])
+    }
+
+    getResources(){
+        return this.resources.getResources()
+    }
 }
