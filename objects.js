@@ -196,14 +196,14 @@ class Asteroid {
         this.circle.simulate(deltaTime)
     }
 
-    render(renderer){
+    render(){
 
         let total = 1.0
         const ratio = this.resources.ratio
 
         // draw the resources in the asteroid as colored rings
         for(let i = 0; i < 2; i++){
-            renderer.drawCircle(this.circle.position,total*this.circle.radius,Resources.colors[i])
+            GlobalRender.drawCircle(this.circle.position,total*this.circle.radius,Resources.colors[i])
             total -= ratio[i]
         }
     }
@@ -225,9 +225,9 @@ class EnergyCell {
         this.circle.simulate(deltaTime)
     }
 
-    render(renderer){
+    render(){
         // draw the resources in the asteroid as colored rings
-        renderer.drawCircle(this.circle.position,this.circle.radius,Resources.colors[2])
+        GlobalRender.drawCircle(this.circle.position,this.circle.radius,Resources.colors[2])
     }
 
     getResources(){

@@ -84,7 +84,7 @@ function render(){
 
     for (const [key,value] of Object.entries(gameObjectDict)){
 
-        value.render(GlobalRender)
+        value.render()
 
     }
 
