@@ -1,10 +1,10 @@
 let gameObjectDict = {}
 
-let vZero = new Vector2D(0,0);
-
 // create random circles
 let numAsteroids = 20;
-for(let i = 0;i < numAsteroids; i++){
+
+gameObjectDict[0] = new Ship(new Vector2D(W/2,H/2),1000)
+for(let i = 1;i < numAsteroids; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
     let speed = 0.2;
@@ -141,7 +141,7 @@ function checkForCollisions(gameObjArray){
             // POSSIBLE COLLISION
             if (dist < (c1.radius + c2.radius)){
                 // the checking object will always be first in the pair
-                pairs.push([c1,c2])
+                pairs.push([gameObjArray[i],gameObjArray[index]])
                 collision = true
             }
 
@@ -155,8 +155,10 @@ function checkForCollisions(gameObjArray){
     i = 0;
     while (i < pairs.length){
 
-        let c1 = pairs[i][0]
-        let c2 = pairs[i][1]
+        const obj1 = pairs[i][0]
+        const obj2 = pairs[i][1]
+        const c1 = obj1.circle
+        const c2 = obj2.circle
         let c1Pos = c1.position
         let c2Pos = c2.position
         
@@ -193,6 +195,8 @@ function checkForCollisions(gameObjArray){
             let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity,c1.mass,c2.mass) 
             c1.velocity = newVelocities[0]
             c2.velocity = newVelocities[1]
+            c1.collide(obj2)
+            c2.collide(obj1)
         }
 
         i++;

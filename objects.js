@@ -4,6 +4,8 @@
 
 class Vector2D {
 
+    static zero = new Vector2D(0,0)
+
     /**
      * 
      * @param {*} x 
@@ -122,12 +124,15 @@ class Circle {
      * @param {Vector2D} position (m)
      * @param {Vector2D} velocity (m/s)
      * @param {string} color (#XXXXXX)
+     * @param 
      */
-    constructor(mass,position,velocity){
+    constructor(mass,position,velocity,collisionCallback){
         this.mass = mass;
         this.position = position;
         this.velocity = velocity;
         this.radius = Math.sqrt(mass)
+        this.acceleration = Vector2D.zero
+        this.collisionCallback = collisionCallback
     }
 
     /**
@@ -135,6 +140,11 @@ class Circle {
      * @param {float} deltaTime 
      */
     simulate(deltaTime){
+
+        this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime));
+
+        this.acceleration = Vector2D.zero
+
         this.position = this.position.add(this.velocity.multiply(deltaTime));
 
         // NEGATIVE WRAPAROUND
@@ -148,6 +158,10 @@ class Circle {
         // POSITIVE WRAPAROUND
         this.position.x = this.position.x % W;
         this.position.y = this.position.y % H;
+    }
+
+    collide(otherObject){
+        this.collisionCallback(otherObject)
     }
 }
 
@@ -188,7 +202,7 @@ class Resources {
 class Asteroid {
 
     constructor(position,velocity,metal,water){
-        this.circle = new Circle(metal+water,position,velocity)
+        this.circle = new Circle(metal+water,position,velocity,this.onCollision)
         this.resources = new Resources(metal,water,0)
     }
 
@@ -212,12 +226,17 @@ class Asteroid {
         return this.resources.getResources()
     }
 
+    onCollision(otherObject){
+        // console.log("This is an Asteroid")
+        // console.log("Collided with a " + otherObject.constructor.name)
+    }
+
 }
 
 class EnergyCell {
 
     constructor(position,velocity,energy){
-        this.circle = new Circle(energy,position,velocity)
+        this.circle = new Circle(energy,position,velocity,this.onCollision)
         this.resources = new Resources(0,0,energy)
     }
 
@@ -233,4 +252,40 @@ class EnergyCell {
     getResources(){
         return this.resources.getResources()
     }
+
+    onCollision(otherObject){
+        // console.log("This is an Energy Cell")
+        // console.log("Collided with a " + otherObject.constructor.name)
+    }
+}
+
+class Ship {
+
+    constructor(position,energy){
+        this.circle = new Circle(50.0,position,Vector2D.zero,this.onCollision)
+        this.resources = new Resources(0,0,energy)
+    }
+
+    simulate(deltaTime){
+        this.move()
+        this.circle.simulate(deltaTime)
+    }
+
+    render(){
+        // draw the resources in the asteroid as colored rings
+        GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#FF0000")
+    }
+
+    getResources(){
+        return this.resources.getResources()
+    }
+
+    onCollision(otherObject){
+    }
+
+    move(){
+        // apply thrust here
+        this.circle.acceleration = new Vector2D(0.0001,0)
+    }
+
 }
