@@ -36,6 +36,17 @@
         this.queueAction(newFrameCoroutine,0,[this])
     }
 
+    drawText(text,position,size,color){
+        function* drawTextCoroutine(self,text,position,size,color){
+            const ctx = self.ctx
+            ctx.fillStyle = color;
+            ctx.font = size + 'px sans-serif'
+            ctx.fillText(text,position.x,position.y)
+        }
+
+        this.queueAction(drawTextCoroutine,5,[this,text,position,size,color])
+    }
+
     /**
      * 
      * @param {Number} radius

@@ -98,8 +98,8 @@ class Circle {
         this.position.y = this.position.y % H;
     }
 
-    collide(otherObject){
-        this.collisionCallback(otherObject)
+    collide(self,otherObject){
+        this.collisionCallback(self,otherObject)
     }
 }
 
@@ -131,6 +131,10 @@ class Resources {
             "energy" : this.energy,
         }
     }
+
+    serialize(){
+        return JSON.stringify(this.getResources())
+    }
 }
 
 /**
@@ -140,6 +144,7 @@ class Resources {
 class Asteroid {
 
     constructor(position,velocity,metal,water){
+        this.type = "ASTEROID"
         this.circle = new Circle(metal+water,position,velocity,this.onCollision)
         this.resources = new Resources(metal,water,0)
     }
@@ -164,9 +169,13 @@ class Asteroid {
         return this.resources.getResources()
     }
 
-    onCollision(otherObject){
+    collide(otherObject){
         // console.log("This is an Asteroid")
         // console.log("Collided with a " + otherObject.constructor.name)
+    }
+
+    destroy(){
+        this.type = "DEAD"
     }
 
 }
@@ -174,6 +183,7 @@ class Asteroid {
 class EnergyCell {
 
     constructor(position,velocity,energy){
+        this.type = "ENERGY_CELL"
         this.circle = new Circle(energy,position,velocity,this.onCollision)
         this.resources = new Resources(0,0,energy)
     }
@@ -191,21 +201,31 @@ class EnergyCell {
         return this.resources.getResources()
     }
 
-    onCollision(otherObject){
+    collide(otherObject){
         // console.log("This is an Energy Cell")
         // console.log("Collided with a " + otherObject.constructor.name)
+    }
+
+    destroy(){
+        this.type = "DEAD"
     }
 }
 
 class Ship {
 
     constructor(position,energy){
+        this.type = "SHIP"
         this.circle = new Circle(50.0,position,Vector2D.zero,this.onCollision)
         this.resources = new Resources(0,0,energy)
     }
 
     simulate(deltaTime){
+
+        const oldVel = this.circle.velocity.magnitude ** 2
         this.circle.simulate(deltaTime)
+        const dV = Math.abs(oldVel - (this.circle.velocity.magnitude ** 2))
+        this.resources.energy -= dV * (this.totalMass()) * 0.5
+
         this.update()
     }
 
@@ -213,7 +233,9 @@ class Ship {
 
         const acceleration = this.circle.acceleration
         const position = this.circle.position
-        const magnitude = acceleration.magnitude
+
+        // add a flickering animation
+        const magnitude = acceleration.magnitude * clamp(Math.random() + 0.6,0.5,1.0)
 
         // draw the resources in the asteroid as colored rings
         GlobalRender.drawCircle(position,this.circle.radius,"#FF0000")
@@ -245,7 +267,25 @@ class Ship {
         return this.resources.getResources()
     }
 
-    onCollision(otherObject){
+    collide(otherObject){
+
+        switch (otherObject.type){
+            case "ENERGY_CELL":
+                this.resources.energy += otherObject.resources.energy
+                otherObject.destroy()
+                break;
+            case "ASTEROID":
+                this.resources.metal += otherObject.resources.metal
+                this.resources.water += otherObject.resources.water
+                otherObject.destroy()
+                break;
+            default:
+                this.resources.energy -= otherObject.circle.mass * (this.circle.velocity.magnitude ** 2) / 2
+        }
+    }
+
+    totalMass(){
+        return this.circle.mass + this.resources.water + this.resources.metal
     }
 
     update(){
@@ -266,16 +306,21 @@ class Ship {
         else
             y = -1
         
-        let power = this.circle.position.subtract(new Vector2D(midX,midY)).magnitude / 10
+        // TODO: make thrust proportional to distance
+        const power = this.circle.position.subtract(new Vector2D(midX,midY)).magnitude / 100
         this.move(new Vector2D(x,y),power)
+
+        GlobalRender.drawText(this.resources.energy,this.circle.position,20,"#FFFFFF")
     }
 
     // move in a specific direction
     move(vector,percentage){
-        // 0.0001
-        const tempVector = vector;
-        this.circle.acceleration = vector.normal().multiply(percentage)    
-        // console.log(this.circle.acceleration.magnitude)
+        const pct = clamp(percentage,0,1)
+        this.circle.acceleration = vector.normal().multiply(pct)    
+    }
+
+    destroy(){
+        this.type = "DEAD"
     }
 
 }

@@ -1,9 +1,9 @@
 let gameObjectDict = {}
 
 // create random circles
-let numAsteroids = 20;
+let numAsteroids = 30;
 
-gameObjectDict[0] = new Ship(new Vector2D(Math.random()*W,Math.random()*H),1000)
+gameObjectDict[0] = new Ship(new Vector2D(Math.random()*W,Math.random()*H),100)
 for(let i = 1;i < numAsteroids; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
@@ -12,7 +12,7 @@ for(let i = 1;i < numAsteroids; i++){
 
     let gameObject = {}
 
-    if (Math.random() > 0.85){
+    if (Math.random() > 0.75){
         const energy = 20 + (Math.random() * 100)
         gameObject = new EnergyCell(randomPos,randomVel,energy)
     } 
@@ -60,6 +60,12 @@ function step(){
 
 function updateField(){
 
+    // COLLECT DEAD OBJECTS
+    for (const [key,value] of Object.entries(gameObjectDict)){
+        if (value.type === "DEAD")
+            delete gameObjectDict[key]
+    }
+
     // CREATE ARRAY OF CIRCLE OBJECTS AND UPDATE POSITION
     let gameObjArray = Object.keys(gameObjectDict).map(function(key){
         // update position
@@ -82,8 +88,6 @@ function updateField(){
 
 function render(){
 
-    RenderQueue = {}
-
     for (const [key,value] of Object.entries(gameObjectDict)){
         value.render()
     }
@@ -94,9 +98,10 @@ function render(){
     for (const [key,value] of Object.entries(RenderQueue)){
         for (const renderFunc of value){
             renderFunc.next()
-            // renderFunc.next()
         }
     }
+
+    RenderQueue = {}
 }
 
 console.log(gameCanvas)
@@ -202,10 +207,10 @@ function checkForCollisions(gameObjArray){
         //check for collision
         if (dist < (c1.radius + c2.radius)){
             let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity,c1.mass,c2.mass) 
+            obj1.collide(obj2)
+            obj2.collide(obj1)
             c1.velocity = newVelocities[0]
             c2.velocity = newVelocities[1]
-            c1.collide(obj2)
-            c2.collide(obj1)
         }
 
         i++;
