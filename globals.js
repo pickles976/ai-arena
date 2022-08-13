@@ -8,3 +8,4 @@ const FRAMERATE = 60.0
 const MS = 1000.0 / FRAMERATE
 let PAUSED = false
 let GlobalRender = {}
+let RenderQueue = {}

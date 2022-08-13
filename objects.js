@@ -51,84 +51,6 @@ class Vector2D {
 }
 
 /**
- * 
- */
-class Renderer{
-
-    constructor(canvas){
-        this.H = canvas.height
-        this.W = canvas.width
-        this.ctx = canvas.getContext("2d")
-    }
-
-    newFrame(){
-        this.ctx.fillStyle = "#000000";
-        this.ctx.fillRect(0, 0, W, H);
-    }
-
-    /**
-     * 
-     * @param {Number} radius
-     * @param {String} color 
-     */
-    drawCircle(pos,radius,color)
-    {
-        this.ctx.fillStyle = color;
- 
-        this.ctx.beginPath();
-        this.ctx.arc(pos.x,pos.y,radius,0,2* Math.PI);
-        this.ctx.fill();
- 
-        // WRAPAROUND RENDERING
-        let newX = pos.x;
-        let newY = pos.y;
-        let wraparound = false;
-
-        // check x bounds
-        if (pos.x + radius > W){
-            newX = pos.x - W
-            wraparound = true
-        }
-        else if (pos.x - radius < 0){
-            newX = pos.x + W
-            wraparound = true
-        }
-
-        // check y bounds
-        if (pos.y + radius > H){
-            newY = pos.y - H
-            wraparound = true
-        }
-        else if (pos.y - radius < 0){
-            newY = pos.y + H
-            wraparound = true
-        }
-
-        if (wraparound){
-        this.ctx.beginPath();
-        this.ctx.arc(newX,newY,radius,0,2* Math.PI);
-        this.ctx.fill();
-        }
-    }
-
-    drawExhaust(position,rotation,scale){
-
-        let ctx = this.ctx
-        ctx.fillStyle = "#FFFFFF";
-        ctx.save()
-        ctx.translate(position.x,position.y)
-        ctx.rotate(rotation*Math.PI/180)
-        ctx.beginPath()
-        ctx.moveTo(-5*scale,10)
-        ctx.lineTo(0,10 + (15*scale))
-        ctx.lineTo(5*scale,10)
-        ctx.fill()
-        // ctx.fillRect(0, 0, 25, 25);
-        ctx.restore()
-    }
-}
-
-/**
  * This entire physics sim uses circles for colliders, since they are extremely easy to
  * program for and I am stupid/lazy. Think of the Circle as the base class that every game object inherits from.
  */
@@ -344,7 +266,8 @@ class Ship {
         else
             y = -1
         
-        this.move(new Vector2D(x,y),1.0)
+        let power = this.circle.position.subtract(new Vector2D(midX,midY)).magnitude / 10
+        this.move(new Vector2D(x,y),power)
     }
 
     // move in a specific direction

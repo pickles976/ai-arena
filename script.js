@@ -3,11 +3,11 @@ let gameObjectDict = {}
 // create random circles
 let numAsteroids = 20;
 
-gameObjectDict[0] = new Ship(new Vector2D(W/2,H/2),1000)
+gameObjectDict[0] = new Ship(new Vector2D(Math.random()*W,Math.random()*H),1000)
 for(let i = 1;i < numAsteroids; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
-    let speed = 0.2;
+    let speed = 0.05;
     let randomVel = new Vector2D((Math.random()-0.5)*speed,(Math.random()-0.5)*speed);
 
     let gameObject = {}
@@ -25,6 +25,8 @@ for(let i = 1;i < numAsteroids; i++){
 
     gameObjectDict[i] = gameObject;
 }
+
+console.log(JSON.stringify(gameObjectDict))
 
 // get the canvas
 gameCanvas = document.getElementById("game-canvas")
@@ -44,7 +46,6 @@ function step(){
 
     frameStart = performance.now()
 
-    GlobalRender.newFrame()
     updateField()
     render()
 
@@ -81,12 +82,21 @@ function updateField(){
 
 function render(){
 
+    RenderQueue = {}
+
     for (const [key,value] of Object.entries(gameObjectDict)){
-
         value.render()
-
     }
 
+    GlobalRender.newFrame()
+
+    // render by depth
+    for (const [key,value] of Object.entries(RenderQueue)){
+        for (const renderFunc of value){
+            renderFunc.next()
+            // renderFunc.next()
+        }
+    }
 }
 
 console.log(gameCanvas)
@@ -213,8 +223,8 @@ function checkForCollisions(gameObjArray){
  */
  function collide(p1,p2,v1,v2,m1,m2){
     // console.log("collision!")
-    let e = 0.2;
-    let oomf = 0.01;
+    let e = 0.15;
+    let oomf = 0.001;
     let collisionNormal = p1.subtract(p2).normal()
     let vRel = v1.subtract(v2) // relative velocity
     let tVel = -collisionNormal.dot(vRel.multiply(1+e)) // total velocity of system
