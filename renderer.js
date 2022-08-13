@@ -27,6 +27,7 @@
         }
     }
 
+    // Draws a big black square over the background
     newFrame(){
         function* newFrameCoroutine(self){
             self.ctx.fillStyle = "#000000";
@@ -45,6 +46,20 @@
         }
 
         this.queueAction(drawTextCoroutine,5,[this,text,position,size,color])
+    }
+
+    drawLine(start,end,color){
+
+        function* drawLineCoroutine(self,start,end,color){
+            const ctx = self.ctx
+            ctx.strokeStyle = color
+            ctx.beginPath()
+            ctx.moveTo(start.x,start.y)
+            ctx.lineTo(end.x,end.y)
+            ctx.stroke()
+        }
+
+        this.queueAction(drawLineCoroutine,5,[this,start,end,color])
     }
 
     /**

@@ -40,6 +40,10 @@ let frameStart = performance.now();
 
 // 60 FPS
 // 16.66ms/frame
+
+/**
+ * CONTROLS THE LOGIC FOR EACH FRAME
+ */
 function step(){
 
     if(!PAUSED){
@@ -60,22 +64,21 @@ function step(){
 
 function updateField(){
 
-    // COLLECT DEAD OBJECTS
+    // COLLECT DEAD OBJECTS, SIMULATE ALIVE ONES
     for (const [key,value] of Object.entries(gameObjectDict)){
         if (value.type === "DEAD")
             delete gameObjectDict[key]
+        else
+            gameObjectDict[key].simulate(MS)
+        
     }
 
     // CREATE ARRAY OF CIRCLE OBJECTS AND UPDATE POSITION
     let gameObjArray = Object.keys(gameObjectDict).map(function(key){
-        // update position
-        // WARNING: SIDE EFFECTS ARE BAD, MMMKAY?
-        gameObjectDict[key].simulate(MS)
-
         return gameObjectDict[key];
     });
 
-    // SORT BY X
+    // SORT BY X POSITION
     gameObjArray.sort(function(a,b){
         a = a.circle
         b = b.circle
@@ -88,6 +91,7 @@ function updateField(){
 
 function render(){
 
+    // call drawing functions for each gameobject
     for (const [key,value] of Object.entries(gameObjectDict)){
         value.render()
     }
@@ -104,17 +108,7 @@ function render(){
     RenderQueue = {}
 }
 
-console.log(gameCanvas)
-
 window.requestAnimationFrame(step);
-
-function drawLine(start,end){
-    ctx.strokeStyle = "#FFFF00"
-    ctx.beginPath()
-    ctx.moveTo(start.x,start.y)
-    ctx.lineTo(end.x,end.y)
-    ctx.stroke()
-}
 
 /**
  * nlog(n) collision detection for sorted array of circular objects
