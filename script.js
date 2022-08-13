@@ -44,6 +44,7 @@ function step(){
 
     frameStart = performance.now()
 
+    GlobalRender.newFrame()
     updateField()
     render()
 
@@ -79,8 +80,6 @@ function updateField(){
 }
 
 function render(){
-
-    GlobalRender.newFrame()
 
     for (const [key,value] of Object.entries(gameObjectDict)){
 

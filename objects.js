@@ -110,6 +110,22 @@ class Renderer{
         this.ctx.fill();
         }
     }
+
+    drawExhaust(position,rotation,scale){
+
+        let ctx = this.ctx
+        ctx.fillStyle = "#FFFFFF";
+        ctx.save()
+        ctx.translate(position.x,position.y)
+        ctx.rotate(rotation*Math.PI/180)
+        ctx.beginPath()
+        ctx.moveTo(-5*scale,10)
+        ctx.lineTo(0,10 + (15*scale))
+        ctx.lineTo(5*scale,10)
+        ctx.fill()
+        // ctx.fillRect(0, 0, 25, 25);
+        ctx.restore()
+    }
 }
 
 /**
@@ -141,7 +157,7 @@ class Circle {
      */
     simulate(deltaTime){
 
-        this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime));
+        this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime).divide(50000));
 
         this.acceleration = Vector2D.zero
 
@@ -267,13 +283,40 @@ class Ship {
     }
 
     simulate(deltaTime){
-        this.move()
         this.circle.simulate(deltaTime)
+        this.update()
     }
 
     render(){
+
+        const acceleration = this.circle.acceleration
+        const position = this.circle.position
+        const magnitude = acceleration.magnitude
+
         // draw the resources in the asteroid as colored rings
-        GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#FF0000")
+        GlobalRender.drawCircle(position,this.circle.radius,"#FF0000")
+
+        // draw thrust effect
+        if (acceleration.y != 0){
+            if (acceleration.y > 0){
+                GlobalRender.drawExhaust(position,180,magnitude)
+            } 
+            else if (acceleration.y < 0)
+            {
+                GlobalRender.drawExhaust(position,0,magnitude)
+            }
+        }
+
+        if (acceleration.x != 0){
+            if (acceleration.x > 0){
+                GlobalRender.drawExhaust(position,90,magnitude)
+            } 
+            else if (acceleration.x < 0)
+            {
+                GlobalRender.drawExhaust(position,270,magnitude)
+            }
+        }
+
     }
 
     getResources(){
@@ -283,9 +326,33 @@ class Ship {
     onCollision(otherObject){
     }
 
-    move(){
-        // apply thrust here
-        this.circle.acceleration = new Vector2D(0.0001,0)
+    update(){
+
+        let midX = W/2
+        let midY = H/2
+
+        let x = 0
+        let y = 0
+
+        if (this.circle.position.x < midX)
+            x = 1
+        else
+            x = -1
+
+        if (this.circle.position.y < midY)
+            y = 1
+        else
+            y = -1
+        
+        this.move(new Vector2D(x,y),1.0)
+    }
+
+    // move in a specific direction
+    move(vector,percentage){
+        // 0.0001
+        const tempVector = vector;
+        this.circle.acceleration = vector.normal().multiply(percentage)    
+        // console.log(this.circle.acceleration.magnitude)
     }
 
 }
