@@ -1,5 +1,9 @@
 /**
- * The Renderer
+ * The Renderer Object is a single global renderer that creates coroutines and sends them off
+ * to the RenderQueue object. Each coroutine contains instructions for how to draw shapes in Canvas2D.
+ * The RenderQueue is structured like:
+ * { 0 : [newFrameCoroutine], 1 : [drawCircleCoroutine,...], ...}
+ * This is done so that render calls can be deferred until later, and can be executed in layers with some sort of Z ordering
  */
  class Renderer{
 
@@ -9,6 +13,12 @@
         this.ctx = canvas.getContext("2d")
     }
 
+    /**
+     * 
+     * @param {Function} action The Function to be queued
+     * @param {number} layer Layer at which to render. Zero goes first, then higher numbers
+     * @param {list} kwargs List of arguments to be spread into individual args. Always contains at least "this"
+     */
     queueAction(action,layer,kwargs){
         if (layer in RenderQueue){
             RenderQueue[layer].push(action(...kwargs))
