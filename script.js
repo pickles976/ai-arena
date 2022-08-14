@@ -1,9 +1,7 @@
-let gameObjectDict = {}
-
 // create random circles
 let numAsteroids = 30;
 
-gameObjectDict[0] = new Ship(new Vector2D(Math.random()*W,Math.random()*H),100)
+GameObjectList.push(new Ship(new Vector2D(Math.random()*W,Math.random()*H),100))
 for(let i = 1;i < numAsteroids; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
@@ -28,10 +26,10 @@ for(let i = 1;i < numAsteroids; i++){
         gameObject = new Asteroid(randomPos,randomVel,metal,water)
     }
 
-    gameObjectDict[i] = gameObject;
+    GameObjectList.push(gameObject);
 }
 
-console.log(JSON.stringify(gameObjectDict))
+console.log(JSON.stringify(GameObjectList))
 
 // get the canvas
 gameCanvas = document.getElementById("game-canvas")
@@ -70,36 +68,33 @@ function step(){
 function updateField(){
 
     // COLLECT DEAD OBJECTS, SIMULATE ALIVE ONES
-    for (const [key,value] of Object.entries(gameObjectDict)){
-        if (value.type === "DEAD")
-            delete gameObjectDict[key]
+    for(let i = GameObjectList.length - 1; i >= 0; i--){
+
+        const value = GameObjectList[i]
+
+        if(value.type === "DEAD")
+            GameObjectList.splice(i,1)
         else
-            gameObjectDict[key].simulate(MS)
-        
+            value.simulate(MS)
     }
 
-    // CREATE ARRAY OF CIRCLE OBJECTS AND UPDATE POSITION
-    let gameObjArray = Object.keys(gameObjectDict).map(function(key){
-        return gameObjectDict[key];
-    });
-
     // SORT BY X POSITION
-    gameObjArray.sort(function(a,b){
+    GameObjectList.sort(function(a,b){
         a = a.circle
         b = b.circle
-        return (a.position.x + a.radius) - (b.position.x + b.radius)
+        return a.position.x - b.position.x
     })
 
-    checkForCollisions(gameObjArray)
+    checkForCollisions(GameObjectList)
 
 }
 
 function render(){
 
-    // call drawing functions for each gameobject
-    for (const [key,value] of Object.entries(gameObjectDict)){
-        value.render()
+    for(let i = 0; i < GameObjectList.length; i++){
+        GameObjectList[i].render()
     }
+
 
     GlobalRender.newFrame()
 
@@ -209,8 +204,6 @@ function checkForCollisions(gameObjArray){
             obj1.collide(obj2)
             obj2.collide(obj1)
 
-            // TODO:
-            // handle collision internally
             c1.velocity = newVelocities[0]
             c2.velocity = newVelocities[1]
         }

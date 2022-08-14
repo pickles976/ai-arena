@@ -3,7 +3,7 @@
  */
 class Resources {
 
-    static colors = ["#666666","#ADD8E6", "#FFFF00"]
+    static colors = ["#666666","#ADD8E6", "#00FF00"]
 
     /**
      * The sum of metal, water, and energy will determine the mass of an object
@@ -202,10 +202,9 @@ class Ship {
                 otherObject.destroy()
                 break;
             case "OBSTACLE":
-                this.resources.energy -= energyScale * otherObject.circle.mass * (this.circle.velocity.magnitude ** 2) / 2
-                break;
+                // do nothing
             default:
-                this.resources.energy -= otherObject.circle.mass * (this.circle.velocity.magnitude ** 2) / 2
+                this.resources.energy -= energyDiff(this,otherObject)
         }
     }
 
@@ -236,6 +235,11 @@ class Ship {
         this.move(new Vector2D(x,y),power)
 
         GlobalRender.drawText(this.resources.energy,this.circle.position,20,"#FFFFFF")
+
+        if(Math.random() > 0.99){
+            const dir = new Vector2D(Math.random() - 0.5,Math.random() - 0.5)
+            this.shoot(dir)
+        }
     }
 
     // move in a specific direction
@@ -244,8 +248,53 @@ class Ship {
         this.circle.acceleration = vector.normal().multiply(pct)    
     }
 
+    shoot(direction){
+        // instantiate object
+        const bullet = new Bullet(this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), 25)
+        GameObjectList.push(bullet)
+    }
+
     destroy(){
         this.type = "DEAD"
     }
 
+}
+
+class Bullet {
+
+    static speed = 0.25
+    static offset = 5
+
+    constructor(position,velocity,damage){
+        this.type = "BULLET"
+        this.circle = new Circle(15,position,velocity,this.onCollision)
+        this.damage = damage
+    }
+
+    simulate(deltaTime){
+        this.circle.simulate(deltaTime)
+    }
+
+    render(){
+        // draw the resources in the asteroid as colored rings
+        GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#FFFF00")
+    }
+
+    collide(otherObject){
+        // console.log("This is an Energy Cell")
+        // console.log("Collided with a " + otherObject.constructor.name)
+
+        switch (otherObject.type){
+            case "SHIP":
+                otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
+                break;
+            default:
+                otherObject.destroy()
+        }
+        this.destroy()
+    }
+
+    destroy(){
+        this.type = "DEAD"
+    }
 }

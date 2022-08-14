@@ -26,3 +26,7 @@ function togglePause(){
 function clamp(value,min,max){
     return Math.min(Math.max(min,value),max)
 }
+
+function energyDiff(thisObject,otherObject){
+    return energyScale * otherObject.circle.mass * (thisObject.circle.velocity.subtract(otherObject.circle.velocity).magnitude ** 2) / 2
+}

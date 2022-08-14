@@ -9,6 +9,7 @@ const MS = 1000.0 / FRAMERATE
 let PAUSED = false
 let GlobalRender = {}
 let RenderQueue = {}
+const GameObjectList = []
 
 // multiplier for energy consumption
 const energyScale = 10
