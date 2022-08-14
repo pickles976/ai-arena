@@ -9,3 +9,6 @@ const MS = 1000.0 / FRAMERATE
 let PAUSED = false
 let GlobalRender = {}
 let RenderQueue = {}
+
+// multiplier for energy consumption
+const energyScale = 10

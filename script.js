@@ -12,7 +12,12 @@ for(let i = 1;i < numAsteroids; i++){
 
     let gameObject = {}
 
-    if (Math.random() > 0.75){
+    const rand = Math.random()
+    if (rand < 0.5){
+        const mass = 20 + (Math.random() * 200)
+        gameObject = new Obstacle(randomPos,randomVel,mass)
+    }
+    else if (rand > 0.75){
         const energy = 20 + (Math.random() * 100)
         gameObject = new EnergyCell(randomPos,randomVel,energy)
     } 
@@ -203,6 +208,9 @@ function checkForCollisions(gameObjArray){
             let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity,c1.mass,c2.mass) 
             obj1.collide(obj2)
             obj2.collide(obj1)
+
+            // TODO:
+            // handle collision internally
             c1.velocity = newVelocities[0]
             c2.velocity = newVelocities[1]
         }

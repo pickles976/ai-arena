@@ -75,6 +75,33 @@ class Asteroid {
 
 }
 
+class Obstacle {
+
+    constructor(position,velocity,mass){
+        this.type = "OBSTACLE"
+        this.circle = new Circle(mass,position,velocity,this.onCollision)
+    }
+
+    simulate(deltaTime){
+        this.circle.simulate(deltaTime)
+    }
+
+    render(){
+        // draw the obstacle
+        GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#A52A2A")
+    }
+
+    collide(otherObject){
+        // console.log("This is an Asteroid")
+        // console.log("Collided with a " + otherObject.constructor.name)
+    }
+
+    destroy(){
+        this.type = "DEAD"
+    }
+
+}
+
 class EnergyCell {
 
     constructor(position,velocity,energy){
@@ -119,7 +146,7 @@ class Ship {
         const oldVel = this.circle.velocity.magnitude ** 2
         this.circle.simulate(deltaTime)
         const dV = Math.abs(oldVel - (this.circle.velocity.magnitude ** 2))
-        this.resources.energy -= dV * (this.totalMass()) * 0.5
+        this.resources.energy -= dV * (this.totalMass()) * 0.5 * energyScale
 
         this.update()
     }
@@ -173,6 +200,9 @@ class Ship {
                 this.resources.metal += otherObject.resources.metal
                 this.resources.water += otherObject.resources.water
                 otherObject.destroy()
+                break;
+            case "OBSTACLE":
+                this.resources.energy -= energyScale * otherObject.circle.mass * (this.circle.velocity.magnitude ** 2) / 2
                 break;
             default:
                 this.resources.energy -= otherObject.circle.mass * (this.circle.velocity.magnitude ** 2) / 2
