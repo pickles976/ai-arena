@@ -5,6 +5,8 @@
  class Vector2D {
 
     static zero = new Vector2D(0,0)
+    static up = new Vector2D(0,1)
+    static right = new Vector2D(1,0)
 
     /**
      * 
@@ -47,6 +49,17 @@
 
     toString(){
         return "{ x : " + this.x + ", y : " + this.y + " }"
+    }
+
+    /**
+     * 
+     * @param {number} degrees degrees to rotate CCW
+     */
+    rotate(degrees){
+        const rad = Math.PI * degrees / 180
+        const rotX = this.x * Math.cos(rad) - this.y * Math.sin(rad)
+        const rotY = this.x * Math.sin(rad) + this.y * Math.cos(rad)
+        return new Vector2D(rotX,rotY)
     }
 }
 

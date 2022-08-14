@@ -92,8 +92,25 @@ class Obstacle {
     }
 
     collide(otherObject){
-        // console.log("This is an Asteroid")
-        // console.log("Collided with a " + otherObject.constructor.name)
+    }
+
+    breakUp(){
+
+        console.log(this.circle.mass)
+        if (this.circle.mass > 60.0){
+            // break into multiple pieces
+            const numPieces = Math.floor(2 + Math.random() * 3)
+            
+            for(let i = 0; i < numPieces; i++){
+                const massRatio = 0.1 + (Math.random() * 0.15)
+                const rotationOffset = (i * 360 / numPieces) + (Math.random() - 0.5) * 45
+                const offset = Vector2D.up.multiply(this.circle.radius / 1.5).rotate(rotationOffset)
+                const newChunk = new Obstacle(this.circle.position.add(offset),this.circle.velocity.rotate(-rotationOffset).add(this.circle.velocity),this.circle.mass * massRatio)
+                GameObjectList.push(newChunk)
+            }
+
+        }
+        this.destroy()
     }
 
     destroy(){
@@ -287,6 +304,9 @@ class Bullet {
         switch (otherObject.type){
             case "SHIP":
                 otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
+                break;
+            case "OBSTACLE":
+                otherObject.breakUp()
                 break;
             default:
                 otherObject.destroy()
