@@ -67,6 +67,9 @@ function step(){
 
 function updateField(){
 
+    // SORT BY X POSITION (ALLOWS US TO DO COLLISION CHECKS)
+    sortGameObjectList()
+
     // COLLECT DEAD OBJECTS, SIMULATE ALIVE ONES
     for(let i = GameObjectList.length - 1; i >= 0; i--){
 
@@ -79,11 +82,7 @@ function updateField(){
     }
 
     // SORT BY X POSITION
-    GameObjectList.sort(function(a,b){
-        a = a.circle
-        b = b.circle
-        return a.position.x - b.position.x
-    })
+    sortGameObjectList()
 
     checkForCollisions(GameObjectList)
 
@@ -235,4 +234,15 @@ function checkForCollisions(gameObjArray){
     let delta2 = collisionNormal.multiply((impulse/m2) + oomf)
     
     return [v1.add(delta1),v2.subtract(delta2)]
+}
+
+/**
+ * This mutates GameObjectList btw
+ */
+function sortGameObjectList(){
+    GameObjectList.sort(function(a,b){
+        a = a.circle
+        b = b.circle
+        return a.position.x - b.position.x
+    })
 }
