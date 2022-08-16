@@ -48,10 +48,10 @@ function binarySearch(array,k){
         let mid = Math.floor((start + end) / 2);
  
         // If K is found
-        if (arr[mid] == k)
+        if (array[mid] == k)
             return mid;
  
-        else if (arr[mid] < k)
+        else if (array[mid] < k)
             start = mid + 1;
  
         else
@@ -67,3 +67,136 @@ function binarySearch(array,k){
 // use binary search to find index to iterate over in sorted array
 // loop forwards and backwards in sorted array to detect overlap
 // return list of overlapping objects
+function overlapCircle(position,radius){
+
+    const i = binarySearch(xArray,position.x)
+    
+    const possible = []
+
+    // loop backwards and forwards through array
+    let collision = true
+    let j = 1
+
+    // iterate backwards
+    while (collision){
+
+        collision = false
+        let index = i - j
+
+        // IF WE HAVE LOOPED AROUND
+        if (index < 0){
+            index += GameObjectList.length
+        }
+
+        let c2 = GameObjectList[index].circle
+        let dist = 100000;
+
+        // normal collision
+        if (index < i){
+            dist = position.x - c2.position.x
+        } else {
+            dist = position.x + W - c2.position.x
+        }
+
+        // POSSIBLE COLLISION
+        if (Math.abs(dist) < (radius + c2.radius)){
+            // the checking object will always be first in the pair
+            possible.push(GameObjectList[index])
+            collision = true
+        }
+
+        j++
+    }
+
+    collision = true
+    j = 0
+
+    // iterate forwards
+    while (collision){
+
+        collision = false
+        let index = i + j
+
+        // IF WE HAVE LOOPED AROUND
+        if (index >= GameObjectList.length){
+            index -= GameObjectList.length
+        }
+
+        let c2 = GameObjectList[index].circle
+        let dist = 100000;
+
+        // normal collision
+        if (index >= i){
+            dist = position.x - c2.position.x
+        } else {
+            dist = position.x + W - c2.position.x
+        }
+
+        // POSSIBLE COLLISION
+        if (Math.abs(dist) < (radius + c2.radius)){
+            // the checking object will always be first in the pair
+            possible.push(GameObjectList[index])
+            collision = true
+        }
+
+        j++
+    }
+
+    const collisions = []
+    let k = 0
+    while(k < possible.length){
+
+        const obj = possible[k]
+        const c2 = obj.circle
+        let c2Pos = c2.position
+
+        // check if it's a wraparound collision in the X direction
+        if (position.x < c2.position.x){
+            c2Pos = new Vector2D(c2.position.x - W,c2.position.y)
+        }
+
+        // temporary distance calculation
+        let dist = position.subtract(c2Pos).magnitude
+
+        // check for wraparound collision in the Y direction
+        if (dist > (radius + c2.radius)){
+
+            let tempC2 = c2Pos.copy()
+
+            // shift the C2 up or down
+            if (position.y < c2.position.y){
+                tempC2.y -= H
+            }else{
+                tempC2.y += H
+            }
+
+            // check if there is collision after the shift
+            let tempDist = position.subtract(tempC2).magnitude
+            if (tempDist < (radius + c2.radius)){
+                dist = tempDist // update with shift
+                c2Pos = tempC2
+            }
+        }
+
+        //check for collision
+        if (dist < (radius + c2.radius)){
+            collisions.push(obj)
+        }
+
+        k++;
+    }
+
+    // const debug = true
+    // if (debug){
+    //     const color = "rgba(255, 255, 0, 0.5)"
+    //     GlobalRender.drawCircle(position,radius,color)
+    //     possible.map((c) => {
+    //         GlobalRender.drawLine(position,c.circle.position,"rgba(255, 255, 255, 0.5)")
+    //     })
+    //     collisions.map((c) => {
+    //         GlobalRender.drawLine(position,c.circle.position,color)
+    //     })
+    // }
+
+    return collisions
+}

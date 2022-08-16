@@ -10,6 +10,7 @@ let PAUSED = false
 let GlobalRender = {}
 let RenderQueue = {}
 const GameObjectList = []
+let xArray = []
 
 // multiplier for energy consumption
 const energyScale = 10

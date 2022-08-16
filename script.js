@@ -86,6 +86,14 @@ function updateField(){
 
     checkForCollisions(GameObjectList)
 
+    // RUN AI LOGIC
+    for(let i = GameObjectList.length - 1; i >= 0; i--){
+        const value = GameObjectList[i]
+
+        if(value.type === "SHIP")
+            value.doLogic()
+    }
+
 }
 
 function render(){
@@ -146,7 +154,7 @@ function checkForCollisions(gameObjArray){
             }
 
             // POSSIBLE COLLISION
-            if (dist < (c1.radius + c2.radius)){
+            if (Math.abs(dist) < (c1.radius + c2.radius)){
                 // the checking object will always be first in the pair
                 pairs.push([gameObjArray[i],gameObjArray[index]])
                 collision = true
@@ -221,7 +229,7 @@ function checkForCollisions(gameObjArray){
  * @returns [v1,v2]
  */
  function collide(p1,p2,v1,v2,m1,m2){
-    // console.log("collision!")
+
     let e = 0.15;
     let oomf = 0.001;
     let collisionNormal = p1.subtract(p2).normal()
@@ -245,4 +253,7 @@ function sortGameObjectList(){
         b = b.circle
         return a.position.x - b.position.x
     })
+
+    // save a cached array of X values for operations
+    xArray = GameObjectList.map((value) => value.circle.position.x)
 }

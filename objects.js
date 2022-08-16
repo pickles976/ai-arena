@@ -96,7 +96,6 @@ class Obstacle {
 
     breakUp(){
 
-        console.log(this.circle.mass)
         if (this.circle.mass > 60.0){
             // break into multiple pieces
             const numPieces = Math.floor(2 + Math.random() * 3)
@@ -159,12 +158,13 @@ class Ship {
     }
 
     simulate(deltaTime){
-
         const oldVel = this.circle.velocity.magnitude ** 2
         this.circle.simulate(deltaTime)
         const dV = Math.abs(oldVel - (this.circle.velocity.magnitude ** 2))
         this.resources.energy -= dV * (this.totalMass()) * 0.5 * energyScale
+    }
 
+    doLogic(){
         this.update()
     }
 
@@ -257,6 +257,8 @@ class Ship {
             const dir = new Vector2D(Math.random() - 0.5,Math.random() - 0.5)
             this.shoot(dir)
         }
+
+        let collisions = overlapCircle(this.circle.position,50)
     }
 
     // move in a specific direction
