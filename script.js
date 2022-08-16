@@ -1,4 +1,4 @@
-// create random circles
+// CREATE OUR SHIT
 let numAsteroids = 30;
 
 GameObjectList.push(new Ship(new Vector2D(Math.random()*W,Math.random()*H),100))
@@ -57,7 +57,7 @@ function step(){
     render()
 
     let elapsed = performance.now() - frameStart
-    // console.log(elapsed)
+    console.log(elapsed)
     sleep(MS - elapsed)
     window.requestAnimationFrame(step);
 
@@ -65,6 +65,15 @@ function step(){
 
 }
 
+/**
+ * Runs in order:
+ * 
+ * Dead object collection
+ * Point-mass simulation
+ * Collisions
+ * AI Logic
+ * 
+ */
 function updateField(){
 
     // SORT BY X POSITION (ALLOWS US TO DO COLLISION CHECKS)
@@ -96,12 +105,16 @@ function updateField(){
 
 }
 
+/**
+ * Renders a frame
+ */
 function render(){
 
+    // call the rendering functions for each object. This doesn't actually render,
+    // it queues up rendering calls in the queue
     for(let i = 0; i < GameObjectList.length; i++){
         GameObjectList[i].render()
     }
-
 
     GlobalRender.newFrame()
 
@@ -119,7 +132,8 @@ window.requestAnimationFrame(step);
 
 /**
  * nlog(n) collision detection for sorted array of circular objects
- * @param {Array<Circle>} circleArray 
+ * TODO: REMOVE gameObjArray argument, just use GameObjectList
+ * @param {list<Circle>} circleArray 
  */
 function checkForCollisions(gameObjArray){
 

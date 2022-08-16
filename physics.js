@@ -70,7 +70,7 @@
 class Circle {
 
     /**
-     * 
+     * Circle in basically a point mass with a radius for collision checking
      * @param {float} mass (m)
      * @param {Vector2D} position (m)
      * @param {Vector2D} velocity (m/s)
@@ -87,7 +87,7 @@ class Circle {
     }
 
     /**
-     * 
+     * Run the point-mass physics simulations
      * @param {float} deltaTime 
      */
     simulate(deltaTime){

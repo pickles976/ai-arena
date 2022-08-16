@@ -157,6 +157,10 @@ class Ship {
         this.resources = new Resources(0,0,energy)
     }
 
+    /**
+     * Simulate the physics and energy consumption for a given timestep
+     * @param {number} deltaTime 
+     */
     simulate(deltaTime){
         const oldVel = this.circle.velocity.magnitude ** 2
         this.circle.simulate(deltaTime)
@@ -164,6 +168,9 @@ class Ship {
         this.resources.energy -= dV * (this.totalMass()) * 0.5 * energyScale
     }
 
+    /**
+     * Run the actual "thinking" code
+     */
     doLogic(){
         this.update()
     }
@@ -258,15 +265,25 @@ class Ship {
             this.shoot(dir)
         }
 
-        let collisions = overlapCircle(this.circle.position,50)
+        // for (let i = 0; i < 100000; i++){
+        //     let collisions = overlapCircle(this.circle.position,50)
+        // }
     }
 
-    // move in a specific direction
+    /**
+     * Apply vectored thrust
+     * @param {Vector2D} vector 
+     * @param {number} percentage clamped between 0 and 1
+     */
     move(vector,percentage){
         const pct = clamp(percentage,0,1)
         this.circle.acceleration = vector.normal().multiply(pct)    
     }
 
+    /**
+     * Instantiate a bullet traveling in a certain direction
+     * @param {Vector2D} direction 
+     */
     shoot(direction){
         // instantiate object
         const bullet = new Bullet(this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), 25)

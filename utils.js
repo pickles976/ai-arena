@@ -3,8 +3,8 @@
  */
 
 /**
- * 
- * @param {*} ms 
+ * Sleeps for given amount of time. Synchronous.
+ * @param {number} ms 
  * @returns 
  */
 function sleep(ms) {
@@ -23,10 +23,24 @@ function togglePause(){
     }
 }
 
+/**
+ * What do you think this does?
+ * @param {number} value 
+ * @param {number} min 
+ * @param {number} max 
+ * @returns 
+ */
 function clamp(value,min,max){
     return Math.min(Math.max(min,value),max)
 }
 
+/**
+ * Returns the energy absorbed from a collision between one object with another object
+ * given the mass of the other object and the relative difference in velocity.
+ * @param {Object} thisObject 
+ * @param {Object} otherObject 
+ * @returns 
+ */
 function energyDiff(thisObject,otherObject){
     return energyScale * otherObject.circle.mass * (thisObject.circle.velocity.subtract(otherObject.circle.velocity).magnitude ** 2) / 2
 }
@@ -62,11 +76,15 @@ function binarySearch(array,k){
 
 }
 
-// TODO: add overlap circle utility
-// Create virtual circle object
-// use binary search to find index to iterate over in sorted array
-// loop forwards and backwards in sorted array to detect overlap
-// return list of overlapping objects
+/**
+ * Detects collisions
+ * Uses binary search to find position in array, then iterates backwards and forwards
+ * in array to detect all possible collisions. Possible collisions are filtered and
+ * returned as an array of collided with objects.
+ * @param {Vector2D} position 
+ * @param {number} radius 
+ * @returns 
+ */
 function overlapCircle(position,radius){
 
     const i = binarySearch(xArray,position.x)
@@ -186,17 +204,17 @@ function overlapCircle(position,radius){
         k++;
     }
 
-    // const debug = true
-    // if (debug){
-    //     const color = "rgba(255, 255, 0, 0.5)"
-    //     GlobalRender.drawCircle(position,radius,color)
-    //     possible.map((c) => {
-    //         GlobalRender.drawLine(position,c.circle.position,"rgba(255, 255, 255, 0.5)")
-    //     })
-    //     collisions.map((c) => {
-    //         GlobalRender.drawLine(position,c.circle.position,color)
-    //     })
-    // }
+    const debug = false
+    if (debug){
+        const color = "rgba(255, 255, 0, 0.5)"
+        GlobalRender.drawCircle(position,radius,color)
+        possible.map((c) => {
+            GlobalRender.drawLine(position,c.circle.position,"rgba(255, 255, 255, 0.5)")
+        })
+        collisions.map((c) => {
+            GlobalRender.drawLine(position,c.circle.position,color)
+        })
+    }
 
     return collisions
 }
