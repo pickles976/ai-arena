@@ -21,9 +21,9 @@ class Resources {
 
     getResources(){
         return {
-            "metal" : this.metal,
-            "water" : this.water,
-            "energy" : this.energy,
+            "metal" : this.metal.toFixed(2),
+            "water" : this.water.toFixed(2),
+            "energy" : this.energy.toFixed(2),
         }
     }
 
@@ -151,7 +151,8 @@ class EnergyCell {
 
 class Ship {
 
-    constructor(position,energy){
+    constructor(position,energy,team){
+        this.team = team
         this.type = "SHIP"
         this.circle = new Circle(50.0,position,Vector2D.zero,this.collide)
         this.resources = new Resources(0,0,energy)
@@ -218,8 +219,16 @@ class Ship {
                 this.resources.water += otherObject.resources.water
                 otherObject.destroy()
                 break;
+            case "BASE":
+                if (otherObject.team == this.team){
+                    otherObject.resources.metal += this.resources.metal
+                    otherObject.resources.water += this.resources.water
+                    this.resources.metal = 0
+                    this.resources.water = 0
+                }
             case "OBSTACLE":
                 // do nothing
+                break;
             default:
                 this.resources.energy -= energyDiff(this,otherObject)
         }
@@ -251,7 +260,7 @@ class Ship {
         const power = this.circle.position.subtract(new Vector2D(midX,midY)).magnitude / 100
         this.move(new Vector2D(x,y),power)
 
-        GlobalRender.drawText(this.resources.energy,this.circle.position,20,"#FFFFFF")
+        GlobalRender.drawText(this.resources.energy.toFixed(2),this.circle.position,20,"#FFFFFF")
 
         if(Math.random() > 0.99){
             const dir = new Vector2D(Math.random() - 0.5,Math.random() - 0.5)
@@ -336,7 +345,8 @@ class Bullet {
 
 class Base {
 
-    constructor(position,energy){
+    constructor(position,energy,team){
+        this.team = team
         this.position = position
         this.type = "BASE"
         this.circle = new Circle(300.0,position,Vector2D.zero,this.collide)
@@ -357,6 +367,7 @@ class Base {
     render(){
         // draw the resources in the asteroid as colored rings
         GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#FF0000")
+        GlobalRender.drawText(this.resources.serialize(),this.position,12,"#FFFFFF")
     }
 
     destroy(){

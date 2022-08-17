@@ -1,8 +1,8 @@
 // CREATE OUR SHIT
 let numAsteroids = 30;
 
-GameObjectList.push(new Ship(new Vector2D(Math.random()*W,Math.random()*H),100))
-GameObjectList.push(new Base(new Vector2D(W/4,H/2),250))
+GameObjectList.push(new Ship(new Vector2D(Math.random()*W,Math.random()*H),100,1))
+GameObjectList.push(new Base(new Vector2D(W/4,H/2),250,1))
 for(let i = 1;i < numAsteroids; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
