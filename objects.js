@@ -40,7 +40,7 @@ class Asteroid {
 
     constructor(position,velocity,metal,water){
         this.type = "ASTEROID"
-        this.circle = new Circle(metal+water,position,velocity,this.onCollision)
+        this.circle = new Circle(metal+water,position,velocity,this.collide)
         this.resources = new Resources(metal,water,0)
     }
 
@@ -79,7 +79,7 @@ class Obstacle {
 
     constructor(position,velocity,mass){
         this.type = "OBSTACLE"
-        this.circle = new Circle(mass,position,velocity,this.onCollision)
+        this.circle = new Circle(mass,position,velocity,this.collide)
     }
 
     simulate(deltaTime){
@@ -122,7 +122,7 @@ class EnergyCell {
 
     constructor(position,velocity,energy){
         this.type = "ENERGY_CELL"
-        this.circle = new Circle(energy,position,velocity,this.onCollision)
+        this.circle = new Circle(energy,position,velocity,this.collide)
         this.resources = new Resources(0,0,energy)
     }
 
@@ -153,7 +153,7 @@ class Ship {
 
     constructor(position,energy){
         this.type = "SHIP"
-        this.circle = new Circle(50.0,position,Vector2D.zero,this.onCollision)
+        this.circle = new Circle(50.0,position,Vector2D.zero,this.collide)
         this.resources = new Resources(0,0,energy)
     }
 
@@ -166,13 +166,6 @@ class Ship {
         this.circle.simulate(deltaTime)
         const dV = Math.abs(oldVel - (this.circle.velocity.magnitude ** 2))
         this.resources.energy -= dV * (this.totalMass()) * 0.5 * energyScale
-    }
-
-    /**
-     * Run the actual "thinking" code
-     */
-    doLogic(){
-        this.update()
     }
 
     render(){
@@ -303,7 +296,7 @@ class Bullet {
 
     constructor(position,velocity,damage){
         this.type = "BULLET"
-        this.circle = new Circle(15,position,velocity,this.onCollision)
+        this.circle = new Circle(15,position,velocity,this.collide)
         this.damage = damage
     }
 
@@ -327,6 +320,9 @@ class Bullet {
             case "OBSTACLE":
                 otherObject.breakUp()
                 break;
+            case "BASE":
+                otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
+                break;
             default:
                 otherObject.destroy()
         }
@@ -335,5 +331,35 @@ class Bullet {
 
     destroy(){
         this.type = "DEAD"
+    }
+}
+
+class Base {
+
+    constructor(position,energy){
+        this.position = position
+        this.type = "BASE"
+        this.circle = new Circle(300.0,position,Vector2D.zero,this.collide)
+        this.resources = new Resources(0,0,energy)
+    }
+
+    
+    simulate(deltaTime){
+        this.circle.velocity = Vector2D.zero
+    }
+
+    collide(otherObject){
+        const oomf = 15.0
+        const vec = otherObject.circle.position.subtract(this.circle.position).normal()
+        otherObject.circle.velocity = otherObject.circle.velocity.add(vec.multiply(oomf))
+    }
+
+    render(){
+        // draw the resources in the asteroid as colored rings
+        GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#FF0000")
+    }
+
+    destroy(){
+
     }
 }

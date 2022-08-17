@@ -2,6 +2,7 @@
 let numAsteroids = 30;
 
 GameObjectList.push(new Ship(new Vector2D(Math.random()*W,Math.random()*H),100))
+GameObjectList.push(new Base(new Vector2D(W/4,H/2),250))
 for(let i = 1;i < numAsteroids; i++){
     
     let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
@@ -100,7 +101,7 @@ function updateField(){
         const value = GameObjectList[i]
 
         if(value.type === "SHIP")
-            value.doLogic()
+            value.update()
     }
 
 }
@@ -221,6 +222,7 @@ function checkForCollisions(gameObjArray){
 
         //check for collision
         if (dist < (c1.radius + c2.radius)){
+
             let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity,c1.mass,c2.mass) 
             obj1.collide(obj2)
             obj2.collide(obj1)
