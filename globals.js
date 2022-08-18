@@ -11,6 +11,7 @@ let GlobalRender = {}
 let RenderQueue = {}
 let GameObjectManager = {}
 const GameObjectList = []
+const teamColors = ["#FF0000","#0000FF"]
 
 // Ordered x positions of GameObjectList, cached for circleOverlap
 let xArray = []

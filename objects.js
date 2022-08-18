@@ -195,7 +195,7 @@ class Ship {
         const magnitude = acceleration.magnitude * clamp(Math.random() + 0.6,0.5,1.0)
 
         // draw the resources in the asteroid as colored rings
-        GlobalRender.drawCircle(position,this.circle.radius,"#FF0000")
+        GlobalRender.drawCircle(position,this.circle.radius,teamColors[this.team])
 
         // draw thrust effect
         if (acceleration.y != 0){
@@ -262,9 +262,6 @@ class Ship {
     }
 
     update(){
-
-        console.log(this.state)
-        console.log(this.target)
         switch(this.state){
 
             case "IDLE":
@@ -463,7 +460,7 @@ class Base {
 
     render(){
         // draw the resources in the asteroid as colored rings
-        GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#FF0000")
+        GlobalRender.drawCircle(this.circle.position,this.circle.radius,teamColors[this.team])
         GlobalRender.drawText(this.resources.serialize(),this.position,12,"#FFFFFF")
     }
 
