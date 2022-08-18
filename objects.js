@@ -163,6 +163,8 @@ class Ship {
 
         // upgradeable
         this.maxEnergy = 150
+
+        this.start()
     }
 
     /**
@@ -254,38 +256,84 @@ class Ship {
         return this.circle.mass + this.resources.water + this.resources.metal
     }
 
+    start(){
+        this.target = {}
+        this.state = "IDLE"
+    }
+
     update(){
 
-        let midX = W/2
-        let midY = H/2
+        console.log(this.state)
+        console.log(this.target)
+        switch(this.state){
 
-        let x = 0
-        let y = 0
+            case "IDLE":
+            
+                const asteroids = GameObjectManager.getAsteroids()
 
-        if (this.circle.position.x < midX)
-            x = 1
-        else
-            x = -1
+                let closest = [{},100000]
 
-        if (this.circle.position.y < midY)
-            y = 1
-        else
-            y = -1
-        
-        // TODO: make thrust proportional to distance
-        const power = this.circle.position.subtract(new Vector2D(midX,midY)).magnitude / 100
-        this.move(new Vector2D(x,y),power)
+                for (const index in asteroids){
+                    const asteroid = asteroids[index]
+                    const d = dist(asteroid,this)
+                    if (d < closest[1]){
+                        closest = [asteroid,d]
+                    }
+                }
 
-        GlobalRender.drawText(this.resources.energy.toFixed(2),this.circle.position,20,"#FFFFFF")
+                if(closest[0] !== null && closest[0] !== undefined){
+                    this.target = closest[0]
+                    this.state = "MOVE_TO_ASTEROID"
+                }
 
-        if(Math.random() > 0.99){
-            const dir = new Vector2D(Math.random() - 0.5,Math.random() - 0.5)
-            this.shoot(dir)
+                break;
+
+            case "MOVE_TO_ASTEROID":
+
+                if (this.target.type === "ASTEROID"){
+                    this.moveToObject(this.target)
+                }else{
+                    this.target = GameObjectManager.getBasesByTeam(this.team)[0]
+                    this.state = "MOVE_TO_BASE"
+                }
+
+                break;
+
+            case "MOVE_TO_BASE":
+
+                if (this.resources.metal > 0 || this.resources.water > 0){
+                    this.moveToObject(this.target)
+                }else{
+                    this.state = "IDLE"
+                }
+
+                break;
         }
+
+        GlobalRender.drawText(this.resources.serialize(),this.circle.position,10,"#FFFFFF")
+        GlobalRender.drawText(this.state,this.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
+        GlobalRender.drawLine(this.circle.position,this.target.circle.position,"#00FF00")
+
+        // if(Math.random() > 0.99){
+        //     const dir = new Vector2D(Math.random() - 0.5,Math.random() - 0.5)
+        //     this.shoot(dir)
+        // }
 
         // for (let i = 0; i < 100000; i++){
         //     let collisions = overlapCircle(this.circle.position,50)
         // }
+    }
+
+    moveTo(position){
+        const vec = position.subtract(this.circle.position)
+        const power = vec.magnitude / 100
+        this.thrust(vec,power)
+    }
+
+    moveToObject(obj){
+        const vec = obj.circle.position.subtract(this.circle.position)
+        const power = vec.magnitude / 100
+        this.thrust(vec,power)
     }
 
     /**
@@ -293,7 +341,7 @@ class Ship {
      * @param {Vector2D} vector 
      * @param {number} percentage clamped between 0 and 1
      */
-    move(vector,percentage){
+    thrust(vector,percentage){
         const pct = clamp(percentage,0,1)
         this.circle.acceleration = vector.normal().multiply(pct)    
     }
@@ -404,7 +452,7 @@ class Base {
             }
         }
 
-        this.update(deltaTime)
+        this.update()
     }
 
     collide(otherObject){
@@ -419,7 +467,7 @@ class Base {
         GlobalRender.drawText(this.resources.serialize(),this.position,12,"#FFFFFF")
     }
 
-    update(deltaTime){
+    update(){
         const energy = 50
         if (this.resources.metal > this.shipcost && this.resources.energy > energy){
             this.trySpawnShip(energy)
@@ -433,7 +481,6 @@ class Base {
     healShip(deltaTime,ship){
         if (this.resources.energy > 0 && ship.resources.energy < ship.maxEnergy){
             const amount = this.healRate * deltaTime
-            console.log(amount)
             this.resources.energy -= amount
             ship.resources.energy += amount
         }
