@@ -87,6 +87,10 @@ function binarySearch(array,k){
  */
 function overlapCircle(position,radius){
 
+    if (xArray.length <= 0){
+        return []
+    }
+
     const i = binarySearch(xArray,position.x)
     
     const possible = []

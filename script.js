@@ -1,34 +1,11 @@
 // CREATE OUR SHIT
-let numAsteroids = 30;
+GameObjectManager = new ObjectManager()
 
 GameObjectList.push(new Ship(new Vector2D(Math.random()*W,Math.random()*H),100,1))
 GameObjectList.push(new Base(new Vector2D(W/4,H/2),250,1))
-for(let i = 1;i < numAsteroids; i++){
-    
-    let randomPos = new Vector2D(Math.random()*W,Math.random()*H);
-    let speed = 0.05;
-    let randomVel = new Vector2D((Math.random()-0.5)*speed,(Math.random()-0.5)*speed);
 
-    let gameObject = {}
-
-    const rand = Math.random()
-    if (rand < 0.5){
-        const mass = 20 + (Math.random() * 200)
-        gameObject = new Obstacle(randomPos,randomVel,mass)
-    }
-    else if (rand > 0.75){
-        const energy = 20 + (Math.random() * 100)
-        gameObject = new EnergyCell(randomPos,randomVel,energy)
-    } 
-    else 
-    { 
-        const metal = 10 + (Math.random() * 100)
-        const water = 10 + (Math.random() * 100)
-        gameObject = new Asteroid(randomPos,randomVel,metal,water)
-    }
-
-    GameObjectList.push(gameObject);
-}
+// populate the game field
+GameObjectManager.start()
 
 console.log(JSON.stringify(GameObjectList))
 
@@ -58,7 +35,7 @@ function step(){
     render()
 
     let elapsed = performance.now() - frameStart
-    console.log(elapsed)
+    // console.log(elapsed)
     sleep(MS - elapsed)
     window.requestAnimationFrame(step);
 
@@ -72,6 +49,7 @@ function step(){
  * Dead object collection
  * Point-mass simulation
  * Collisions
+ * Queue up "dumb" object spawning
  * AI Logic
  * 
  */
@@ -95,6 +73,9 @@ function updateField(){
     sortGameObjectList()
 
     checkForCollisions(GameObjectList)
+
+    // manage the game objects
+    GameObjectManager.update()
 
     // RUN AI LOGIC
     for(let i = GameObjectList.length - 1; i >= 0; i--){

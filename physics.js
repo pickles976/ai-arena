@@ -66,8 +66,8 @@
      * 
      * @returns A vector of length 1 in a random direction
      */
-    random(){
-        return new Vector2D(Math.random()-0.5,Math.random()-0.5).normal;
+    static random(){
+        return new Vector2D(Math.random()-0.5,Math.random()-0.5).normal();
     }
 }
 
