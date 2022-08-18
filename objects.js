@@ -241,12 +241,7 @@ class Ship {
                 break;
             case "BASE":
                 // drop off materials
-                if (otherObject.team == this.team){
-                    otherObject.resources.metal += this.resources.metal
-                    otherObject.resources.water += this.resources.water
-                    this.resources.metal = 0
-                    this.resources.water = 0
-                }
+                break;
             case "OBSTACLE":
                 // do nothing
                 break;
@@ -379,7 +374,7 @@ class Base {
         this.refiningRate = 0.01
         this.shipcost = 500
         this.healRate = 0.01
-        this.healRadius = 50
+        this.interactRadius = 50
     }
 
     
@@ -388,6 +383,7 @@ class Base {
         // stay static
         this.circle.velocity = Vector2D.zero
 
+        // refine water
         if (this.resources.water > 0){
             const newEnergy = this.refiningRate * deltaTime
             this.resources.water -= newEnergy
@@ -396,6 +392,16 @@ class Base {
 
         if (this.resources.water < 0){
             this.resources.water = 0
+        }
+
+        // heal ships
+        const teamShips = GameObjectManager.getShipsByTeam(this.team)
+        for (const index in teamShips){
+            const ship = teamShips[index]
+            if (dist(this,ship) < this.interactRadius){
+                this.healShip(deltaTime,ship)
+                this.takeResources(ship)
+            }
         }
 
         this.update(deltaTime)
@@ -418,14 +424,6 @@ class Base {
         if (this.resources.metal > this.shipcost && this.resources.energy > energy){
             this.trySpawnShip(energy)
         }
-
-        const teamShips = GameObjectManager.getShipsByTeam(this.team)
-        for (const index in teamShips){
-            const ship = teamShips[index]
-            if (dist(this,ship) < this.healRadius){
-                this.healShip(deltaTime,ship)
-            }
-        }
     }
 
     destroy(){
@@ -439,6 +437,13 @@ class Base {
             this.resources.energy -= amount
             ship.resources.energy += amount
         }
+    }
+
+    takeResources(ship){
+        this.resources.metal += ship.resources.metal
+        this.resources.water += ship.resources.water
+        ship.resources.metal = 0
+        ship.resources.water = 0
     }
 
     trySpawnShip(energy){

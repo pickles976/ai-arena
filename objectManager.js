@@ -196,4 +196,8 @@ class ObjectManager{
     getBases(){
         return this.bases
     }
+
+    getBasesByTeam(team){
+        return this.bases.filter((base) => base.team === team)
+    }
 }
