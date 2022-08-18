@@ -39,6 +39,7 @@ class Resources {
 class Asteroid {
 
     constructor(position,velocity,metal,water){
+        this.uuid = create_UUID()
         this.type = "ASTEROID"
         this.circle = new Circle(metal+water,position,velocity,this.collide)
         this.resources = new Resources(metal,water,0)
@@ -78,6 +79,7 @@ class Asteroid {
 class Obstacle {
 
     constructor(position,velocity,mass){
+        this.uuid = create_UUID()
         this.type = "OBSTACLE"
         this.circle = new Circle(mass,position,velocity,this.collide)
     }
@@ -121,6 +123,7 @@ class Obstacle {
 class EnergyCell {
 
     constructor(position,velocity,energy){
+        this.uuid = create_UUID()
         this.type = "ENERGY_CELL"
         this.circle = new Circle(energy,position,velocity,this.collide)
         this.resources = new Resources(0,0,energy)
@@ -152,10 +155,14 @@ class EnergyCell {
 class Ship {
 
     constructor(position,energy,team){
+        this.uuid = create_UUID()
         this.team = team
         this.type = "SHIP"
         this.circle = new Circle(50.0,position,Vector2D.zero,this.collide)
         this.resources = new Resources(0,0,energy)
+
+        // upgradeable
+        this.maxEnergy = 150
     }
 
     /**
@@ -167,6 +174,14 @@ class Ship {
         this.circle.simulate(deltaTime)
         const dV = Math.abs(oldVel - (this.circle.velocity.magnitude ** 2))
         this.resources.energy -= dV * (this.totalMass()) * 0.5 * energyScale
+
+        if (this.resources.energy < 0){
+            this.destroy()
+        }
+
+        if (this.resources.energy > this.maxEnergy){
+            this.resources.energy = this.maxEnergy
+        }
     }
 
     render(){
@@ -212,6 +227,11 @@ class Ship {
         switch (otherObject.type){
             case "ENERGY_CELL":
                 this.resources.energy += otherObject.resources.energy
+
+                if (this.resources.energy > this.maxEnergy){
+                    this.resources.energy = this.maxEnergy
+                }
+
                 otherObject.destroy()
                 break;
             case "ASTEROID":
@@ -220,6 +240,7 @@ class Ship {
                 otherObject.destroy()
                 break;
             case "BASE":
+                // drop off materials
                 if (otherObject.team == this.team){
                     otherObject.resources.metal += this.resources.metal
                     otherObject.resources.water += this.resources.water
@@ -304,6 +325,7 @@ class Bullet {
     static offset = 5
 
     constructor(position,velocity,damage){
+        this.uuid = create_UUID()
         this.type = "BULLET"
         this.circle = new Circle(15,position,velocity,this.collide)
         this.damage = damage
@@ -346,16 +368,37 @@ class Bullet {
 class Base {
 
     constructor(position,energy,team){
+        this.uuid = create_UUID()
         this.team = team
         this.position = position
         this.type = "BASE"
         this.circle = new Circle(300.0,position,Vector2D.zero,this.collide)
-        this.resources = new Resources(0,0,energy)
+        this.resources = new Resources(501,100,energy)
+
+        // upgradeable
+        this.refiningRate = 0.01
+        this.shipcost = 500
+        this.healRate = 0.01
+        this.healRadius = 50
     }
 
     
     simulate(deltaTime){
+
+        // stay static
         this.circle.velocity = Vector2D.zero
+
+        if (this.resources.water > 0){
+            const newEnergy = this.refiningRate * deltaTime
+            this.resources.water -= newEnergy
+            this.resources.energy += newEnergy * 2
+        }
+
+        if (this.resources.water < 0){
+            this.resources.water = 0
+        }
+
+        this.update(deltaTime)
     }
 
     collide(otherObject){
@@ -370,7 +413,49 @@ class Base {
         GlobalRender.drawText(this.resources.serialize(),this.position,12,"#FFFFFF")
     }
 
+    update(deltaTime){
+        const energy = 50
+        if (this.resources.metal > this.shipcost && this.resources.energy > energy){
+            this.trySpawnShip(energy)
+        }
+
+        const teamShips = GameObjectManager.getShipsByTeam(this.team)
+        for (const index in teamShips){
+            const ship = teamShips[index]
+            if (dist(this,ship) < this.healRadius){
+                this.healShip(deltaTime,ship)
+            }
+        }
+    }
+
     destroy(){
 
+    }
+
+    healShip(deltaTime,ship){
+        if (this.resources.energy > 0 && ship.resources.energy < ship.maxEnergy){
+            const amount = this.healRate * deltaTime
+            console.log(amount)
+            this.resources.energy -= amount
+            ship.resources.energy += amount
+        }
+    }
+
+    trySpawnShip(energy){
+
+        if (this.resources.metal > this.shipcost && this.resources.energy > energy){
+
+            // check around the base
+            const angle = 360 / 32
+            for(let i = 0; i < 32; i++){
+                let pos = new Vector2D(0,1).multiply(this.circle.radius * 1.5).rotate(angle*i).add(this.circle.position)
+                const obj = new Ship(pos,energy,this.team)
+                if (overlapCircle(pos,obj.circle.radius*1.2).length < 1){
+                    GameObjectList.push(obj)
+                    this.resources.metal -= this.shipcost
+                    return true
+                }
+            }
+        }
     }
 }

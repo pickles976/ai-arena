@@ -226,3 +226,17 @@ function overlapCircle(position,radius){
 function randomInRange(min,max){
     return min + Math.random() * (max-min)
 }
+
+function create_UUID(){
+    var dt = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (dt + Math.random()*16)%16 | 0;
+        dt = Math.floor(dt/16);
+        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+}
+
+function dist(obj1,obj2){
+    return Vector2D.dist(obj1.circle.position,obj2.circle.position)
+}

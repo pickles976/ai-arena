@@ -56,22 +56,22 @@ class ObjectManager{
 
             switch (gameObj.type){
                 case "ASTEROID":
-                    this.asteroids.push(this.gameObj)
+                    this.asteroids.push(gameObj)
                     break;
                 case "OBSTACLE":
-                    this.obstacles.push(this.gameObj)
+                    this.obstacles.push(gameObj)
                     break;
                 case "ENERGY_CELL":
-                    this.energyCells.push(this.gameObj)
+                    this.energyCells.push(gameObj)
                     break;
                 case "SHIP":
-                    this.ships.push(this.gameObj)
+                    this.ships.push(gameObj)
                     break;
                 case "BULLET":
-                    this.bullets.push(this.gameObj)
+                    this.bullets.push(gameObj)
                     break;
                 case "BASE":
-                    this.bases.push(this.gameObj)
+                    this.bases.push(gameObj)
                     break;
                 default:
                     break;
@@ -167,5 +167,33 @@ class ObjectManager{
         }
 
         ObjectManager.spawnQueue[type].push(queueObjectCoroutine(this,type,numFrames))
+    }
+
+    getAsteroids(){
+        return this.asteroids
+    }
+
+    getObstacles(){
+        return this.obstacles
+    }
+
+    getEnergyCells(){
+        return this.energyCells
+    }
+
+    getShips(){
+        return this.ships
+    }
+
+    getShipsByTeam(team){
+        return this.ships.filter((ship) => ship.team === team)
+    }
+
+    getBullets(){
+        return this.bullets
+    }
+
+    getBases(){
+        return this.bases
     }
 }
