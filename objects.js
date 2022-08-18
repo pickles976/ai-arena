@@ -374,3 +374,172 @@ class Base {
 
     }
 }
+
+class ObjectManager{
+
+    static numAsteroids = 10
+    static numObstacles = 20
+    static numEnergyCells = 5
+
+    static obstacleMassRange = [20,200]
+    static asteroidMetalRange = [10,100]
+    static asteroidWaterRange = [10,100]
+    static energyCellRange = [20,120]
+
+    static spawnQueue = { "ASTEROID" : [], "OBSTACLE" : [], "ENERGY_CELL" : [] }
+
+    static speedRange = [0.01,0.05];
+
+    constructor(){
+        this.asteroids = []
+        this.obstacles = []
+        this.energyCells = []
+        this.ships = []
+        this.bullets = []
+        this.bases = []
+    }
+
+    /**
+     * spawn initial objects
+     */
+    start(){
+
+        for(const i = 0; i < numAsteroids; i++){
+            this.spawnObject("ASTEROID")
+        }
+
+        for(const i = 0; i < numObstacles; i++){
+            this.spawnObject("OBSTACLE")
+        }
+
+        for(const i = 0; i < numEnergyCells; i++){
+            this.spawnObject("ENERGY_CELL")
+        }
+
+        this.indexObjects()
+
+    }
+
+    indexObjects(){
+        this.asteroids = []
+        this.obstacles = []
+        this.energyCells = []
+        this.ships = []
+        this.bullets = []
+        this.bases = []
+
+        for(let i = 0; i < GameObjectList.length; i++){
+            const gameObj = GameObjectList[i]
+
+            switch (gameObj.type){
+                case "ASTEROID":
+                    this.asteroids.push(this.gameObj)
+                    break;
+                case "OBSTACLE":
+                    this.obstacles.push(this.gameObj)
+                    break;
+                case "ENERGY_CELL":
+                    this.energyCells.push(this.gameObj)
+                    break;
+                case "SHIP":
+                    this.ships.push(this.gameObj)
+                    break;
+                case "BULLET":
+                    this.bullets.push(this.gameObj)
+                    break;
+                case "BASE":
+                    this.bases.push(this.gameObj)
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    update(){
+
+        // loop through the spawn queue and count down their timers
+        for (const [key,value] of Object.entries(spawnQueue)){
+            for (let i = spawnQueue.length - 1; i > 0; i--){
+                const coroutine = spawnQueue[i]
+                const temp = coroutine.next()
+                if (temp === true){
+                    spawnQueue.splice(i,1)
+                }
+            }
+        }
+
+        // check spawnQueue and existing objects, see if new ones need to be spawned
+        if (spawnQueue["ASTEROID"] + this.asteroids.length < this.numAsteroids){
+            this.queueObject("ASTEROID", 900)
+        }
+
+        if (spawnQueue["OBSTACLE"] + this.obstacles.length < this.numObstacles){
+            this.queueObject("OBSTACLE", 600)
+        }
+
+        if (spawnQueue["ENERGY_CELL"] + this.energyCells.length < this.numEnergyCells){
+            this.queueObject("ENERGY_CELL", 1200)
+        }
+
+    }
+
+    /**
+     * Spawn the object immediately
+     * @param {string} type 
+     */
+    spawnObject(type){
+
+        const vel = Vector2D.random().multiply(randomInRange(...speedRange))
+        const obj = {}
+
+        switch (type){
+            case "ASTEROID":
+                const metal = randomInRange(...asteroidMetalRange)
+                const water = randomInRange(...asteroidWaterRange)
+                obj = new Asteroid(Vector2D.zero,vel,metal,water)
+                break;
+            case "OBSTACLE":
+                const mass = randomInRange(...obstacleMassRange)
+                obj = new Obstacle(Vector2D.zero,vel,mass)
+                break;
+            case "ENERGY_CELL":
+                const energy = randomInRange(...energyCellRange)
+                obj = new EnergyCell(Vector2D.zero,vel,energy)
+                break;
+        }
+
+        // check 32 times for a spot to place it
+        for(let i = 0; i < 32; i++){
+            const randomPos = new Vector2D(Math.random()*W,Math.random()*H)
+            if (overlapCircle(randomPos,obj.circle.mass).length <= 0){
+                GameObjectList.push(obj)
+                return randomPos
+            }
+        }
+
+        // if no spot found, re-queue it for another 180 frames
+        this.queueObject(type, 180)
+
+    }
+
+    /**
+     * Queues up an object to wait a certain number of frames before spawning
+     * @param {string} type 
+     * @param {number} numFrames 
+     */
+    queueObject(type,numFrames){
+
+        function* queueObjectCoroutine(type,numFrames){
+            for(let i = 0; i < numFrames; i++){
+                yield;
+            }
+            
+            this.spawnObject(typpe)
+            return true;
+        }
+
+        spawnQueue[type].push(queueObjectCoroutine(type,numFrames))
+
+    }
+}

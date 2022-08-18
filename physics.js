@@ -61,6 +61,14 @@
         const rotY = this.x * Math.sin(rad) + this.y * Math.cos(rad)
         return new Vector2D(rotX,rotY)
     }
+
+    /**
+     * 
+     * @returns A vector of length 1 in a random direction
+     */
+    random(){
+        return new Vector2D(Math.random()-0.5,Math.random()-0.5).normal;
+    }
 }
 
 /**

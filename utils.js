@@ -218,3 +218,7 @@ function overlapCircle(position,radius){
 
     return collisions
 }
+
+function randomInRange(min,max){
+    return min + Math.random() * (max-min)
+}
