@@ -295,7 +295,7 @@ class Ship {
             case "MOVE_TO_ASTEROID":
 
                 if (this.target.type === "ASTEROID"){
-                    this.seek(this.target)
+                    this.seekTarget(this.target)
                 }else{
                     this.target = base
                     this.state = "MOVE_TO_BASE"
@@ -315,12 +315,12 @@ class Ship {
 
             case "MOVE_TO_ENERGY":
                 if (this.target.type === "ENERGY_CELL"){
-                    this.seek(this.target)
+                    this.seekTarget(this.target)
                 }else if (this.target.type == "BASE") {
-                    if (this.resources.energy > 90 || base.resources.energy < 1){
+                    if (this.resources.energy > 90 || base.resources.energy < 1 || dist(this,base) > base.interactRadius){
                         this.state = "IDLE"
                     }else{
-                    this.seek(this.target)
+                        this.seekTarget(this.target)
                     }
                 }
                 else{
@@ -330,7 +330,7 @@ class Ship {
                 
         }
 
-        // SEEK ENERGY
+        // seekTarget ENERGY
         if (this.resources.energy < (this.maxEnergy / 4)){
             const energyCells = GameObjectManager.getEnergyCells()
 
@@ -397,12 +397,6 @@ class Ship {
         this.thrust(vec,power)
     }
 
-    seek(target){
-        const desiredVelocity = target.circle.position.subtract(this.circle.position).normal().multiply(target.circle.velocity.magnitude * 2.0)
-        const steering = desiredVelocity.subtract(this.circle.velocity)
-        this.thrust(steering,1.0)
-    }
-
     /**
      * Apply vectored thrust
      * @param {Vector2D} vector 
@@ -419,7 +413,7 @@ class Ship {
      */
     shoot(direction){
         // instantiate object
-        this.resources.energy -= this.damage / 2
+        this.resources.energy -= this.damage
         const bullet = new Bullet(this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), this.damage)
         GameObjectList.push(bullet)
     }
@@ -441,6 +435,12 @@ class Ship {
         base.resources.metal -= this.damageCost
         this.damageCost *= 2
         this.damage *= 2
+    }
+
+    seekTarget(target){
+        const desiredVelocity = target.circle.position.subtract(this.circle.position).normal().multiply(target.circle.velocity.magnitude * 2.0)
+        const steering = desiredVelocity.subtract(this.circle.velocity)
+        this.thrust(steering,1.0)
     }
 
 }

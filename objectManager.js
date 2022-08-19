@@ -173,12 +173,54 @@ class ObjectManager{
         return this.asteroids
     }
 
+    getClosestAsteroid(position){
+        const asteroids = this.getAsteroids()
+
+            let closest = [{},100000]
+            for (const i in asteroids){
+                const asteroid = asteroids[i]
+                const d = asteroid.circle.position.subtract(position).magnitude
+                if (d < closest[1]){
+                    closest = [asteroid,d]
+                }
+            }
+            return closest[0]
+    }
+
     getObstacles(){
         return this.obstacles
     }
 
+    getClosestObstacle(position){
+        const obstacles = this.getObstacles()
+
+            let closest = [{},100000]
+            for (const i in obstacles){
+                const obstacle = obstacles[i]
+                const d = obstacle.circle.position.subtract(position).magnitude
+                if (d < closest[1]){
+                    closest = [obstacle,d]
+                }
+            }
+            return closest[0]
+    }
+
     getEnergyCells(){
         return this.energyCells
+    }
+
+    getClosestEnergyCell(position){
+        const energyCells = this.getEnergyCells()
+
+            let closest = [{},100000]
+            for (const i in energyCells){
+                const energyCell = energyCells[i]
+                const d = energyCell.circle.position.subtract(position).magnitude
+                if (d < closest[1]){
+                    closest = [energyCell,d]
+                }
+            }
+            return closest[0]
     }
 
     getShips(){
@@ -198,6 +240,12 @@ class ObjectManager{
     }
 
     getBaseByTeam(team){
-        return this.bases.filter((base) => base.team === team)[0]
+        try {
+            return this.bases.filter((base) => base.team === team)[0]
+        } catch (e) {
+            console.log("Team " + team + " base has been destroyed!")
+        }
+
+        return false
     }
 }
