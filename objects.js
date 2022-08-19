@@ -165,6 +165,8 @@ class Ship {
         this.maxEnergy = 100
         this.damage = 25
 
+        // upgrade costs
+
         this.start()
     }
 
@@ -263,6 +265,8 @@ class Ship {
     }
 
     update(){
+
+        // STATE MACHINE
         switch(this.state){
 
             case "IDLE":
@@ -316,7 +320,7 @@ class Ship {
                 
         }
 
-        // if we need energy
+        // SEEK ENERGY
         if (this.resources.energy < (this.maxEnergy / 4)){
             const energyCells = GameObjectManager.getEnergyCells()
 
@@ -334,38 +338,31 @@ class Ship {
             this.state = "MOVE_TO_ENERGY"
         }
 
-        // shooting
-        const shootRadius = 200
-        const ships = GameObjectManager.getShips()
+        // COMBAT
+        if(this.resources.energy > (this.damage)){
+            const shootRadius = 200
+            const ships = GameObjectManager.getShips()
 
-        let closest = [{},100000]
+            let closest = [{},100000]
 
-        for (const index in ships){
-            const ship = ships[index]
-            if (ship.team != this.team){
-                const d = dist(ship,this)
-                if (d < closest[1]){
-                    closest = [ship,d]
+            for (const index in ships){
+                const ship = ships[index]
+                if (ship.team != this.team){
+                    const d = dist(ship,this)
+                    if (d < closest[1]){
+                        closest = [ship,d]
+                    }
                 }
             }
-        }
 
-        if (this.resources.energy > (this.damage) && closest[1] < shootRadius){
-            this.shoot(closest[0].circle.position.subtract(this.circle.position).add(closest[0].circle.velocity.multiply(60)))
+            if (closest[1] < shootRadius){
+                this.shoot(closest[0].circle.position.subtract(this.circle.position).add(closest[0].circle.velocity.multiply(60)))
+            }
         }
 
         GlobalRender.drawText(this.resources.serialize(),this.circle.position,10,"#FFFFFF")
         GlobalRender.drawText(this.state,this.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
         GlobalRender.drawLine(this.circle.position,this.target.circle.position,"#00FF00")
-
-        // if(Math.random() > 0.99){
-        //     const dir = new Vector2D(Math.random() - 0.5,Math.random() - 0.5)
-        //     this.shoot(dir)
-        // }
-
-        // for (let i = 0; i < 100000; i++){
-        //     let collisions = overlapCircle(this.circle.position,50)
-        // }
     }
 
     moveTo(position){
@@ -478,11 +475,18 @@ class Base {
         this.resources = new Resources(501,100,energy)
         this.maxEnergy = 500
 
-        // upgradeable
         this.refiningRate = 0.01
+        this.baseShipCost = 300
+
+        // upgradeable
         this.shipcost = 300
         this.healRate = 0.01
         this.interactRadius = 50
+
+        // upgrade costs
+        this.healRateCost = 250
+        this.interactRadiusCost = 250
+        this.energyCost = 250
     }
 
     
@@ -576,9 +580,26 @@ class Base {
     }
 
     upgradeHealth(){
-        if (this.resources.metal > 500){
+        if (this.resources.metal > this.energyCost){
             this.maxEnergy += 500
-            this.resources.metal -= 500
+            this.resources.metal -= this.energyCost
+            this.energyCost *= 2
+        }
+    }
+
+    upgradeHealRate(){
+        if (this.resources.metal > this.healthRateCost){
+            this.healRate *= 2
+            this.resources.metal -= this.healthRateCost
+            this.healthRateCost *= 2
+        }
+    }
+
+    upgradeInteractRadius(){
+        if (this.resources.metal > this.interactRadiusCost){
+            this.interactRadius *= 2
+            this.resources.metal -= this.interactRadiusCost
+            this.interactRadiusCost *= 2
         }
     }
 }
