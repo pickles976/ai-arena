@@ -166,7 +166,8 @@ class Ship {
         this.damage = 25
 
         // upgrade costs
-
+        this.energyCost = 100
+        this.damageCost = 100
         this.start()
     }
 
@@ -266,6 +267,8 @@ class Ship {
 
     update(){
 
+        const base = GameObjectManager.getBaseByTeam(this.team)
+
         // STATE MACHINE
         switch(this.state){
 
@@ -294,7 +297,7 @@ class Ship {
                 if (this.target.type === "ASTEROID"){
                     this.seek(this.target)
                 }else{
-                    this.target = GameObjectManager.getBasesByTeam(this.team)[0]
+                    this.target = base
                     this.state = "MOVE_TO_BASE"
                 }
 
@@ -360,6 +363,16 @@ class Ship {
             }
         }
 
+        // UPGRADES
+        if (base.resources.metal > this.energyCost && GameObjectManager.getShipsByTeam(this.team).length > 2){
+            this.upgradeMaxEnergy()
+        }
+
+        if (base.resources.metal > this.damageCost && GameObjectManager.getShipsByTeam(this.team).length > 2){
+            this.upgradeDamage()
+        }
+
+        // DEBUG DRAWING
         GlobalRender.drawText(this.resources.serialize(),this.circle.position,10,"#FFFFFF")
         GlobalRender.drawText(this.state,this.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
         GlobalRender.drawLine(this.circle.position,this.target.circle.position,"#00FF00")
@@ -409,11 +422,17 @@ class Ship {
     }
 
     upgradeMaxEnergy(){
-        // take metal from base to upgrade self
+        const base = GameObjectManager.getBaseByTeam(this.team)
+        base.resources.metal -= this.energyCost
+        this.energyCost *= 2
+        this.maxEnergy *= 2
     }
 
     upgradeDamage(){
-        // take metal from base to upgrade bullet damage
+        const base = GameObjectManager.getBaseByTeam(this.team)
+        base.resources.metal -= this.damageCost
+        this.damageCost *= 2
+        this.damage *= 2
     }
 
 }
@@ -577,6 +596,7 @@ class Base {
                 }
             }
         }
+        return false
     }
 
     upgradeHealth(){
