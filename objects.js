@@ -316,7 +316,14 @@ class Ship {
             case "MOVE_TO_ENERGY":
                 if (this.target.type === "ENERGY_CELL"){
                     this.seek(this.target)
-                }else{
+                }else if (this.target.type == "BASE") {
+                    if (this.resources.energy > 90 || base.resources.energy < 1){
+                        this.state = "IDLE"
+                    }else{
+                    this.seek(this.target)
+                    }
+                }
+                else{
                     this.state = "IDLE"
                 }
                 break;
@@ -327,7 +334,7 @@ class Ship {
         if (this.resources.energy < (this.maxEnergy / 4)){
             const energyCells = GameObjectManager.getEnergyCells()
 
-            let closest = [{},100000]
+            let closest = [base,dist(base,this)]
 
             for (const index in energyCells){
                 const energyCell = energyCells[index]
@@ -418,6 +425,7 @@ class Ship {
     }
 
     destroy(){
+        GameObjectManager.getBaseByTeam(this.team).queueShip()
         this.type = "DEAD"
     }
 
@@ -494,6 +502,8 @@ class Base {
         this.resources = new Resources(501,100,energy)
         this.maxEnergy = 500
 
+        this.shipQueue = []
+
         this.refiningRate = 0.01
         this.baseShipCost = 300
 
@@ -540,6 +550,17 @@ class Base {
         }
 
         this.update()
+
+        // loop through ship in ship queue
+        for(const i in this.shipQueue){
+            const coroutine = this.shipQueue[i]
+            const output = coroutine.next()
+            if (output.done === true){
+                this.shipQueue.splice(i,1)
+                if (output.value === false)
+                    this.queueShip()
+            }
+        }
     }
 
     collide(otherObject){
@@ -557,7 +578,7 @@ class Base {
     update(){
         const energy = 50
         if (this.resources.metal > this.shipcost && this.resources.energy > energy){
-            this.trySpawnShip(energy)
+            this.trySpawnShip(energy,false)
         }
     }
 
@@ -580,7 +601,7 @@ class Base {
         ship.resources.water = 0
     }
 
-    trySpawnShip(energy){
+    trySpawnShip(energy,respawn){
 
         if (this.resources.metal > this.shipcost && this.resources.energy > energy){
 
@@ -591,7 +612,12 @@ class Base {
                 const obj = new Ship(pos,energy,this.team)
                 if (overlapCircle(pos,obj.circle.radius*1.2).length < 1){
                     GameObjectList.push(obj)
-                    this.resources.metal -= this.shipcost
+
+                    if (!respawn){
+                        this.resources.metal -= this.shipcost
+                    }
+
+                    this.resources.energy -= energy
                     return true
                 }
             }
@@ -621,5 +647,16 @@ class Base {
             this.resources.metal -= this.interactRadiusCost
             this.interactRadiusCost *= 2
         }
+    }
+
+    queueShip(){
+        function* spawnShipCoroutine(self,numFrames){
+            for (let i = 0; i < numFrames; i++){
+                yield;
+            }
+            return self.trySpawnShip(50,true)
+        }
+
+        this.shipQueue.push(spawnShipCoroutine(this,900))
     }
 }
