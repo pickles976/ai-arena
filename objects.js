@@ -232,6 +232,9 @@ class Ship {
 
         switch (otherObject.type){
             case "ENERGY_CELL":
+
+                GameStateManager.addEnergy(this.team,otherObject.resources.energy)
+
                 this.resources.energy += otherObject.resources.energy
 
                 if (this.resources.energy > this.maxEnergy){
@@ -414,11 +417,12 @@ class Ship {
     shoot(direction){
         // instantiate object
         this.resources.energy -= this.damage
-        const bullet = new Bullet(this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), this.damage)
+        const bullet = new Bullet(this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), this.damage, this)
         GameObjectList.push(bullet)
     }
 
     destroy(){
+        GameStateManager.addDeath(this.team)
         GameObjectManager.getBaseByTeam(this.team).queueShip()
         this.type = "DEAD"
     }
@@ -443,6 +447,10 @@ class Ship {
         this.thrust(steering,1.0)
     }
 
+    recordKill(killedObj){
+        GameStateManager.addKill(this.team)
+    }
+
 }
 
 class Bullet {
@@ -450,11 +458,12 @@ class Bullet {
     static speed = 0.25
     static offset = 5
 
-    constructor(position,velocity,damage){
+    constructor(position,velocity,damage,parent){
         this.uuid = create_UUID()
         this.type = "BULLET"
         this.circle = new Circle(15,position,velocity,this.collide)
         this.damage = damage
+        this.parent = parent
     }
 
     simulate(deltaTime){
@@ -473,6 +482,9 @@ class Bullet {
         switch (otherObject.type){
             case "SHIP":
                 otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
+                if (otherObject.resources.energy < 0){
+                    this.parent.recordKill(otherObject)
+                }
                 break;
             case "OBSTACLE":
                 otherObject.breakUp()
@@ -529,6 +541,7 @@ class Base {
             const newEnergy = this.refiningRate * deltaTime
             this.resources.water -= newEnergy
             this.resources.energy += newEnergy / 2
+            GameStateManager.addEnergy(this.team,newEnergy)
         }
 
         if (this.resources.water < 0){
@@ -595,6 +608,7 @@ class Base {
     }
 
     takeResources(ship){
+        GameStateManager.addMetal(this.team,ship.resources.metal)
         this.resources.metal += ship.resources.metal
         this.resources.water += ship.resources.water
         ship.resources.metal = 0

@@ -1,3 +1,5 @@
+GameStateManager = new StateManager()
+
 // CREATE OUR SHIT
 GameObjectManager = new ObjectManager()
 
@@ -38,6 +40,7 @@ function step(){
     render()
 
     let elapsed = performance.now() - frameStart
+    console.log(GameStateManager.serialize())
     // console.log(elapsed)
     sleep(MS - elapsed)
     window.requestAnimationFrame(step);

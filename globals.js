@@ -10,6 +10,7 @@ let PAUSED = false
 let GlobalRender = {}
 let RenderQueue = {}
 let GameObjectManager = {}
+let GameStateManager = {}
 const GameObjectList = []
 const teamColors = ["#FF0000","#0000FF"]
 
