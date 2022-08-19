@@ -162,7 +162,8 @@ class Ship {
         this.resources = new Resources(0,0,energy)
 
         // upgradeable
-        this.maxEnergy = 150
+        this.maxEnergy = 100
+        this.damage = 25
 
         this.start()
     }
@@ -278,17 +279,16 @@ class Ship {
                     }
                 }
 
-                if(closest[0] !== null && closest[0] !== undefined){
-                    this.target = closest[0]
-                    this.state = "MOVE_TO_ASTEROID"
-                }
+                this.target = closest[0]
+                this.state = "MOVE_TO_ASTEROID"
+
 
                 break;
 
             case "MOVE_TO_ASTEROID":
 
                 if (this.target.type === "ASTEROID"){
-                    this.moveToObject(this.target)
+                    this.seek(this.target)
                 }else{
                     this.target = GameObjectManager.getBasesByTeam(this.team)[0]
                     this.state = "MOVE_TO_BASE"
@@ -305,6 +305,53 @@ class Ship {
                 }
 
                 break;
+
+            case "MOVE_TO_ENERGY":
+                if (this.target.type === "ENERGY_CELL"){
+                    this.seek(this.target)
+                }else{
+                    this.state = "IDLE"
+                }
+                break;
+                
+        }
+
+        // if we need energy
+        if (this.resources.energy < (this.maxEnergy / 4)){
+            const energyCells = GameObjectManager.getEnergyCells()
+
+            let closest = [{},100000]
+
+            for (const index in energyCells){
+                const energyCell = energyCells[index]
+                const d = dist(energyCell,this)
+                if (d < closest[1]){
+                    closest = [energyCell,d]
+                }
+            }
+
+            this.target = closest[0]
+            this.state = "MOVE_TO_ENERGY"
+        }
+
+        // shooting
+        const shootRadius = 200
+        const ships = GameObjectManager.getShips()
+
+        let closest = [{},100000]
+
+        for (const index in ships){
+            const ship = ships[index]
+            if (ship.team != this.team){
+                const d = dist(ship,this)
+                if (d < closest[1]){
+                    closest = [ship,d]
+                }
+            }
+        }
+
+        if (this.resources.energy > (this.damage) && closest[1] < shootRadius){
+            this.shoot(closest[0].circle.position.subtract(this.circle.position).add(closest[0].circle.velocity.multiply(60)))
         }
 
         GlobalRender.drawText(this.resources.serialize(),this.circle.position,10,"#FFFFFF")
@@ -333,6 +380,12 @@ class Ship {
         this.thrust(vec,power)
     }
 
+    seek(target){
+        const desiredVelocity = target.circle.position.subtract(this.circle.position).normal().multiply(target.circle.velocity.magnitude * 2.0)
+        const steering = desiredVelocity.subtract(this.circle.velocity)
+        this.thrust(steering,1.0)
+    }
+
     /**
      * Apply vectored thrust
      * @param {Vector2D} vector 
@@ -349,12 +402,21 @@ class Ship {
      */
     shoot(direction){
         // instantiate object
-        const bullet = new Bullet(this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), 25)
+        this.resources.energy -= this.damage / 2
+        const bullet = new Bullet(this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), this.damage)
         GameObjectList.push(bullet)
     }
 
     destroy(){
         this.type = "DEAD"
+    }
+
+    upgradeMaxEnergy(){
+        // take metal from base to upgrade self
+    }
+
+    upgradeDamage(){
+        // take metal from base to upgrade bullet damage
     }
 
 }
@@ -414,10 +476,11 @@ class Base {
         this.type = "BASE"
         this.circle = new Circle(300.0,position,Vector2D.zero,this.collide)
         this.resources = new Resources(501,100,energy)
+        this.maxEnergy = 500
 
         // upgradeable
         this.refiningRate = 0.01
-        this.shipcost = 500
+        this.shipcost = 300
         this.healRate = 0.01
         this.interactRadius = 50
     }
@@ -429,14 +492,18 @@ class Base {
         this.circle.velocity = Vector2D.zero
 
         // refine water
-        if (this.resources.water > 0){
+        if (this.resources.water > 0 && this.resources.energy < this.maxEnergy){
             const newEnergy = this.refiningRate * deltaTime
             this.resources.water -= newEnergy
-            this.resources.energy += newEnergy * 2
+            this.resources.energy += newEnergy / 2
         }
 
         if (this.resources.water < 0){
             this.resources.water = 0
+        }
+
+        if (this.resources.energy > this.maxEnergy){
+            this.resources.energy = this.maxEnergy
         }
 
         // heal ships
@@ -505,6 +572,13 @@ class Base {
                     return true
                 }
             }
+        }
+    }
+
+    upgradeHealth(){
+        if (this.resources.metal > 500){
+            this.maxEnergy += 500
+            this.resources.metal -= 500
         }
     }
 }

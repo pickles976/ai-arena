@@ -17,4 +17,4 @@ const teamColors = ["#FF0000","#0000FF"]
 let xArray = []
 
 // multiplier for energy consumption
-const energyScale = 10
+const energyScale = 25
