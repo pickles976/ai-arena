@@ -360,6 +360,15 @@ class Ship {
         this.thrust(steering,1.0)
     }
 
+    toString(){
+        return JSON.stringify({
+            "id" : this.uuid,
+            "resources" : this.resources.toString(),
+            "maxEnergy" : this.maxEnergy,
+            "damage" : this.damage
+        })
+    }
+
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
