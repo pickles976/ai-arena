@@ -10,7 +10,7 @@ class Serializer{
 
     static deserializeGameObjectList(str : string){
         const list = JSON.parse(str)
-        return list.map((item : GameObject) => Serializer.deserialize(item))
+        return list.map((item : string) => Serializer.deserialize(item))
     }
 
     static deserialize(str : string){

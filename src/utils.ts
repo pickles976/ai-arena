@@ -11,7 +11,7 @@ function sleep(ms : number) {
 
 function togglePause(){
 
-    console.log(Serializer.serializeGameObjectList(GameObjectList))
+    console.log(Serializer.deserializeGameObjectList(Serializer.serializeGameObjectList(GameObjectList)))
 
     if(PAUSED){
         PAUSED = false

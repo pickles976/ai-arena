@@ -557,7 +557,8 @@ class Base extends GameObject {
         this.update()
 
         // loop through ship in ship queue
-        for(const i in this.shipQueue){
+        for(const j in this.shipQueue){
+            const i = parseInt(j)
             const coroutine = this.shipQueue[i]
             const output = coroutine.next()
             if (output.done === true){
