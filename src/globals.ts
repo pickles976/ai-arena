@@ -8,7 +8,7 @@ const FRAMERATE : number = 60.0
 const MS : number = 1000.0 / FRAMERATE
 let PAUSED : boolean = false
 let GlobalRender : Renderer
-let RenderQueue : { [key:number] : Array<GameObject> } = {}
+let RenderQueue : { [key:number] : Array<Generator> } = {}
 let GameObjectManager : ObjectManager
 let GameStateManager : StateManager
 const GameObjectList : Array<GameObject> = []

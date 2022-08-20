@@ -66,8 +66,16 @@ class GameObject {
         this.circle.simulate(deltaTime)
     }
 
+    render(){
+
+    }
+
     collide(otherObject : GameObject){
 
+    }
+
+    serialize(){
+        
     }
 }
 
@@ -81,9 +89,6 @@ class Asteroid extends GameObject {
 
     constructor(uuid : number,position : Vector2D,velocity : Vector2D,metal : number,water : number){
         super(uuid,"ASTEROID",new Circle(metal+water,position,velocity))
-        // this.uuid = uuid
-        // this.type = "ASTEROID"
-        // this.circle = new Circle(metal+water,position,velocity)
         this.resources = new Resources(metal,water,0)
     }
 
@@ -128,9 +133,6 @@ class Obstacle extends GameObject {
 
     constructor(uuid : number,position : Vector2D,velocity : Vector2D,mass : number){
         super(uuid,"OBSTACLE",new Circle(mass,position,velocity))
-        // this.uuid = uuid
-        // this.type = "OBSTACLE"
-        // this.circle = new Circle(mass,position,velocity)
     }
 
     simulate(deltaTime : number){
@@ -180,9 +182,6 @@ class EnergyCell extends GameObject{
 
     constructor(uuid : number,position : Vector2D,velocity : Vector2D,energy : number){
         super(uuid,"ENERGY_CELL",new Circle(energy,position,velocity))
-        // this.uuid = uuid
-        // this.type = "ENERGY_CELL"
-        // this.circle = new Circle(energy,position,velocity)
         this.resources = new Resources(0,0,energy)
     }
 

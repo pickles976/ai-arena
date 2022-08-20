@@ -126,7 +126,7 @@ class ObjectManager{
         sortGameObjectList()
 
         const vel = Vector2D.random().multiply(randomInRange(...ObjectManager.speedRange))
-        let obj : GameObject = new GameObject(create_UUID(),"DEAD",new Circle(10, new Vector2D(0,0), new Vector2D(0,0)))
+        let obj : object = {}
 
         switch (type){
             case "ASTEROID":
@@ -144,13 +144,15 @@ class ObjectManager{
                 break;
         }
 
-        // check 32 times for a spot to place it
-        for(let i = 0; i < 32; i++){
-            const randomPos = new Vector2D(Math.random()*W,Math.random()*H)
-            if (overlapCircle(randomPos,obj.circle.radius*1.5).length < 1){
-                obj.circle.position = randomPos
-                GameObjectList.push(obj)
-                return true
+        if (obj instanceof GameObject){
+            // check 32 times for a spot to place it
+            for(let i = 0; i < 32; i++){
+                const randomPos = new Vector2D(Math.random()*W,Math.random()*H)
+                if (overlapCircle(randomPos,obj.circle.radius*1.5).length < 1){
+                    obj.circle.position = randomPos
+                    GameObjectList.push(obj)
+                    return true
+                }
             }
         }
 

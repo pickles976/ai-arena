@@ -1,6 +1,6 @@
 class Serializer{
 
-    static serializeGameObjectList(gol){
+    static serializeGameObjectList(gol : Array<GameObject>){
         const tempList = []
         for(const i in gol){
             tempList.push(gol[i].serialize())
@@ -8,41 +8,51 @@ class Serializer{
         return JSON.stringify(tempList)
     }
 
-    static deserializeGameObjectList(str){
+    static deserializeGameObjectList(str : string){
         const list = JSON.parse(str)
-        return list.map((item) => Serializer.deserialize(item))
+        return list.map((item : GameObject) => Serializer.deserialize(item))
     }
 
-    static deserialize(str){
+    static deserialize(str : string){
         const list = JSON.parse(str)
         return this.listToObj(list)
     }
 
-    static listToObj(list){
+    static listToObj(list : Array<any>){
         if (list.slice !== undefined){
             const args = list.slice(1)
             for(const i in args){
                 args[i] = Serializer.deserialize(args[i])
             }
 
+            /* It's fine, just trust me */
             switch(list[0]){
                 case "VECTOR2D":
+                    /* @ts-ignore */
                     return new Vector2D(...args)
                 case "CIRCLE":
+                    /* @ts-ignore */
                     return new Circle(...args)
                 case "RESOURCES":
+                    /* @ts-ignore */
                     return new Resources(...args)
                 case "ASTEROID":
+                    /* @ts-ignore */
                     return new Asteroid(...args)
                 case "OBSTACLE":
+                    /* @ts-ignore */
                     return new Obstacle(...args)
                 case "ENERGY_CELL":
+                    /* @ts-ignore */
                     return new EnergyCell(...args)
                 case "SHIP":
+                    /* @ts-ignore */
                     return new Ship(...args)
                 case "BULLET":
+                    /* @ts-ignore */
                     return new Bullet(...args)
                 case "BASE":
+                    /* @ts-ignore */
                     return new Base(...args)
                 case "DEAD":
                     return null

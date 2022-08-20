@@ -89,7 +89,7 @@ function updateField(){
     for(let i = GameObjectList.length - 1; i >= 0; i--){
         const value = GameObjectList[i]
 
-        if(value.type === "SHIP")
+        if(value.type === "SHIP" && value instanceof Ship)
             value.update()
     }
 
@@ -227,13 +227,9 @@ function checkForCollisions(gameObjArray : Array<GameObject>){
 /**
  * Perform collision calculations between to objects and returns their respective vectors
  * https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
- * @param {Vector2D} p1
- * @param {Vector2D} p2 
- * @param {Vector2D} v1 
- * @param {Vector2D} v2 
  * @returns [v1,v2]
  */
- function collide(p1,p2,v1,v2,m1,m2){
+ function collide(p1 : Vector2D,p2 : Vector2D,v1 : Vector2D,v2 : Vector2D,m1 : number,m2 : number){
 
     let e = 0.15;
     let oomf = 0.001;
@@ -254,9 +250,9 @@ function checkForCollisions(gameObjArray : Array<GameObject>){
  */
 function sortGameObjectList(){
     GameObjectList.sort(function(a,b){
-        a = a.circle
-        b = b.circle
-        return a.position.x - b.position.x
+        const circleA = a.circle
+        const circleB = b.circle
+        return circleA.position.x - circleB.position.x
     })
 
     // save a cached array of X values for operations

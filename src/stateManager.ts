@@ -1,5 +1,10 @@
 class StateManager{
 
+    deaths : [number, number]
+    kills : [number, number]
+    metal : [number, number]
+    energy : [number,number]
+
     constructor(){
         // team deaths
         this.deaths = [0,0]
@@ -11,31 +16,31 @@ class StateManager{
         this.energy = [0,0]
     }
 
-    addDeath(team){
+    addDeath(team : number){
         this.deaths[team] += 1
     }
 
-    addKill(team){
+    addKill(team : number){
         this.kills[team] += 1
     }
 
-    addMetal(team,amount){
+    addMetal(team : number,amount : number){
         this.metal[team] += amount
     }
 
-    addEnergy(team,amount){
+    addEnergy(team : number,amount : number){
         this.energy[team] += amount
     }
 
     update(){
         for(const i in this.deaths){
-            if(GameObjectManager.getBaseByTeam(i) === false) {
-                console.log(team + " has lost")
+            if(GameObjectManager.getBaseByTeam(parseInt(i)) === undefined) {
+                console.log(i + " has lost")
             }
         }
     }
 
-    getTeamInfo(team){
+    getTeamInfo(team : number){
         const teamInfo = {
             "kills" : this.kills[team],
             "deaths" : this.deaths[team],
@@ -54,9 +59,10 @@ class StateManager{
 
     }
 
-    recordKill(uuid){
+    recordKill(uuid : number){
         const killerShip = GameObjectList.find((x) => x.uuid == uuid)
-        this.addKill(killerShip.team)
+        if (killerShip instanceof Ship)
+            this.addKill(killerShip.team)
     }
 
 }

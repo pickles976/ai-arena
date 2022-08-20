@@ -4,10 +4,8 @@
 
 /**
  * Sleeps for given amount of time. Synchronous.
- * @param {number} ms 
- * @returns 
  */
-function sleep(ms) {
+function sleep(ms : number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -26,14 +24,7 @@ function togglePause(){
     
 }
 
-/**
- * What do you think this does?
- * @param {number} value 
- * @param {number} min 
- * @param {number} max 
- * @returns 
- */
-function clamp(value,min,max){
+function clamp(value : number,min : number,max : number){
     return Math.min(Math.max(min,value),max)
 }
 
@@ -42,9 +33,9 @@ function clamp(value,min,max){
  * given the mass of the other object and the relative difference in velocity.
  * @param {Object} thisObject 
  * @param {Object} otherObject 
- * @returns 
+ * @returns number
  */
-function energyDiff(thisObject,otherObject){
+function energyDiff(thisObject : GameObject,otherObject : GameObject){
     return energyScale * otherObject.circle.mass * (thisObject.circle.velocity.subtract(otherObject.circle.velocity).magnitude ** 2) / 2
 }
 
@@ -54,7 +45,7 @@ function energyDiff(thisObject,otherObject){
  * @param {list} array 
  * @param {number} k 
  */
-function binarySearch(array,k){
+function binarySearch(array : Array<number>,k : number){
 
     // Lower and upper bounds
     let start = 0;
@@ -88,7 +79,7 @@ function binarySearch(array,k){
  * @param {number} radius 
  * @returns 
  */
-function overlapCircle(position,radius){
+function overlapCircle(position : Vector2D,radius : number){
 
     if (xArray.length <= 0){
         return []
@@ -226,7 +217,7 @@ function overlapCircle(position,radius){
     return collisions
 }
 
-function randomInRange(min,max){
+function randomInRange(min : number,max : number){
     return min + Math.random() * (max-min)
 }
 
@@ -240,6 +231,6 @@ function create_UUID(){
     return parseFloat(uuid);
 }
 
-function dist(obj1,obj2){
+function dist(obj1 : GameObject,obj2 : GameObject){
     return Vector2D.dist(obj1.circle.position,obj2.circle.position)
 }
