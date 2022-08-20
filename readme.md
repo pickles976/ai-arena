@@ -30,9 +30,10 @@ circle is compared against the X array, and the indices are used to return an ar
 ## TODO:
 
 - [x] n-body physics
-- [ ] full game engine
-- [ ] Inject user AI code safely
+- [x] full game engine
+- [x] Inject user AI code
 - [ ] Convert to Typescript
+- [ ] Safely sandbox user AI code
 - [ ] Port to Node.js
 - [ ] Sync via websockets
 - [ ] Add client prediction

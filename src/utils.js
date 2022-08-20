@@ -13,6 +13,8 @@ function sleep(ms) {
 
 function togglePause(){
 
+    console.log(Serializer.serializeGameObjectList(GameObjectList))
+
     if(PAUSED){
         PAUSED = false
         console.log("Unpaused!")
