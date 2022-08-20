@@ -7,19 +7,23 @@
  */
  class Renderer{
 
-    constructor(canvas){
+    H : number
+    W : number
+    ctx : CanvasRenderingContext2D
+
+    constructor(canvas : HTMLCanvasElement){
         this.H = canvas.height
         this.W = canvas.width
-        this.ctx = canvas.getContext("2d")
+        this.ctx = canvas.getContext("2d") ?? new CanvasRenderingContext2D()
     }
 
     /**
      * 
      * @param {Function} action The Function to be queued
      * @param {number} layer Layer at which to render. Zero goes first, then higher numbers
-     * @param {list} kwargs List of arguments to be spread into individual args. Always contains at least "this"
+     * @param {Array} kwargs List of arguments to be spread into individual args. Always contains at least "this"
      */
-    queueAction(action,layer,kwargs){
+    queueAction(action : Function, layer : number, kwargs : Array<any>){
         if (layer in RenderQueue){
             RenderQueue[layer].push(action(...kwargs))
         }else{
@@ -29,7 +33,7 @@
 
     // Draws a big black square over the background
     newFrame(){
-        function* newFrameCoroutine(self){
+        function* newFrameCoroutine(self : Renderer){
             self.ctx.fillStyle = "#000000";
             self.ctx.fillRect(0, 0, W, H);
         }
@@ -37,8 +41,8 @@
         this.queueAction(newFrameCoroutine,0,[this])
     }
 
-    drawText(text,position,size,color){
-        function* drawTextCoroutine(self,text,position,size,color){
+    drawText(text : string,position : Vector2D,size : number, color : string){
+        function* drawTextCoroutine(self : Renderer,text : string,position : Vector2D,size : number,color : string){
             const ctx = self.ctx
             ctx.fillStyle = color;
             ctx.font = size + 'px sans-serif'
@@ -48,9 +52,9 @@
         this.queueAction(drawTextCoroutine,5,[this,text,position,size,color])
     }
 
-    drawLine(start,end,color){
+    drawLine(start : Vector2D,end : Vector2D,color : string){
 
-        function* drawLineCoroutine(self,start,end,color){
+        function* drawLineCoroutine(self : Renderer,start : Vector2D,end : Vector2D,color : string){
             const ctx = self.ctx
             ctx.strokeStyle = color
             ctx.beginPath()
@@ -62,14 +66,9 @@
         this.queueAction(drawLineCoroutine,5,[this,start,end,color])
     }
 
-    /**
-     * 
-     * @param {Number} radius
-     * @param {String} color 
-     */
-    drawCircle(pos,radius,color)
+    drawCircle(pos : Vector2D,radius : number,color : string)
     {
-        function* drawCircleCoroutine(self,pos,radius,color){
+        function* drawCircleCoroutine(self : Renderer,pos : Vector2D,radius : number,color : string){
 
             const ctx = self.ctx
             ctx.fillStyle = color;
@@ -113,9 +112,9 @@
         this.queueAction(drawCircleCoroutine,3,[this,pos,radius,color])
     }
 
-    drawExhaust(position,rotation,scale){
+    drawExhaust(position : Vector2D,rotation : number,scale : number){
 
-        function* drawExhaustCoroutine(self,position,rotation,scale){ 
+        function* drawExhaustCoroutine(self : Renderer,position : Vector2D,rotation : number,scale : number){ 
             const ctx = self.ctx
             ctx.fillStyle = "#FFFFFF";
             ctx.save()

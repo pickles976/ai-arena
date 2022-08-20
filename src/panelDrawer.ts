@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 function drawInfoPanels(){
     document.getElementById("team-info").innerHTML = GameStateManager.serialize()
     document.getElementById("team0-ships").innerHTML = "team 0: " + GameObjectManager.getShipsByTeam(0).filter((x) => x.toString())

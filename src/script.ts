@@ -17,10 +17,10 @@ GameObjectManager.start()
 // console.log(JSON.stringify(GameObjectList))
 
 // get the canvas
-gameCanvas = document.getElementById("game-canvas")
+// @ts-ignore
+const gameCanvas : HTMLCanvasElement = document.getElementById("game-canvas")
 gameCanvas.width = W;
 gameCanvas.height = H;
-ctx = gameCanvas.getContext("2d");
 
 GlobalRender = new Renderer(gameCanvas)
 
@@ -125,7 +125,7 @@ window.requestAnimationFrame(step);
  * TODO: REMOVE gameObjArray argument, just use GameObjectList
  * @param {list<Circle>} circleArray 
  */
-function checkForCollisions(gameObjArray){
+function checkForCollisions(gameObjArray : Array<GameObject>){
 
     let i = 0;
     let pairs = []

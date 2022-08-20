@@ -8,35 +8,40 @@
     static up = new Vector2D(0,1)
     static right = new Vector2D(1,0)
 
+    type: string
+    x : number
+    y : number
+    magnitude : number
+
     /**
      * 
      * @param {*} x 
      * @param {*} y 
      */
-    constructor(x,y){
+    constructor(x : number,y : number){
         this.type = "VECTOR2D"
         this.x = x;
         this.y = y;
         this.magnitude = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
     }
 
-    add(newVector){
+    add(newVector : Vector2D){
         return new Vector2D(this.x + newVector.x,this.y + newVector.y)
     }
 
-    subtract(newVector){
+    subtract(newVector : Vector2D){
         return new Vector2D(this.x - newVector.x,this.y - newVector.y)
     }
 
-    multiply(scalar){
+    multiply(scalar : number){
         return new Vector2D(this.x * scalar, this.y * scalar)
     }
 
-    divide(scalar){
+    divide(scalar : number){
         return new Vector2D(this.x / scalar, this.y / scalar)
     }
 
-    dot(newVector){
+    dot(newVector : Vector2D){
         return (this.x * newVector.x) + (this.y * newVector.y)
     }
 
@@ -52,11 +57,7 @@
         return "{ x : " + this.x + ", y : " + this.y + " }"
     }
 
-    /**
-     * 
-     * @param {number} degrees degrees to rotate CCW
-     */
-    rotate(degrees){
+    rotate(degrees : number){
         const rad = Math.PI * degrees / 180
         const rotX = this.x * Math.cos(rad) - this.y * Math.sin(rad)
         const rotY = this.x * Math.sin(rad) + this.y * Math.cos(rad)
@@ -71,7 +72,7 @@
         return new Vector2D(Math.random()-0.5,Math.random()-0.5).normal();
     }
 
-    static dist(v1,v2){
+    static dist(v1 : Vector2D,v2 : Vector2D){
         return v1.subtract(v2).magnitude
     }
 
@@ -86,28 +87,29 @@
  */
 class Circle {
 
+    type : string
+    mass : number
+    position : Vector2D
+    velocity : Vector2D
+    acceleration : Vector2D
+    radius : number
+
     /**
-     * Circle in basically a point mass with a radius for collision checking
+     * Circle is basically a point mass with a radius for collision checking
      * @param {float} mass (m)
      * @param {Vector2D} position (m)
      * @param {Vector2D} velocity (m/s)
-     * @param {string} color (#XXXXXX)
-     * @param 
      */
-    constructor(mass,position,velocity){
+    constructor(mass : number,position : Vector2D, velocity : Vector2D){
         this.type = "CIRCLE"
         this.mass = mass;
+        this.radius = Math.sqrt(mass)
         this.position = position;
         this.velocity = velocity;
-        this.radius = Math.sqrt(mass)
         this.acceleration = Vector2D.zero
     }
 
-    /**
-     * Run the point-mass physics simulations
-     * @param {float} deltaTime 
-     */
-    simulate(deltaTime){
+    simulate(deltaTime : number){
 
         this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime).divide(50000));
 

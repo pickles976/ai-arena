@@ -1,17 +1,23 @@
 class ObjectManager{
 
-    static numAsteroids = 10
-    static numObstacles = 20
-    static numEnergyCells = 5
+    static numAsteroids : number = 10
+    static numObstacles : number = 20
+    static numEnergyCells : number = 5
 
-    static obstacleMassRange = [20,200]
-    static asteroidMetalRange = [10,100]
-    static asteroidWaterRange = [10,100]
-    static energyCellRange = [20,120]
+    static obstacleMassRange : [number, number] = [20,200]
+    static asteroidMetalRange : [number, number] = [10,100]
+    static asteroidWaterRange : [number, number] = [10,100]
+    static energyCellRange : [number, number] = [20,120]
+    static speedRange : [number, number] = [0.01,0.05]
 
-    static spawnQueue = { "ASTEROID" : [], "OBSTACLE" : [], "ENERGY_CELL" : [] }
+    static spawnQueue : {[key: string] : Array<Generator> } = { "ASTEROID" : [], "OBSTACLE" : [], "ENERGY_CELL" : [] }
 
-    static speedRange = [0.01,0.05]
+    asteroids : Array<Asteroid>
+    obstacles : Array<Obstacle>
+    energyCells : Array<EnergyCell>
+    ships : Array<Ship>
+    bullets : Array<Bullet>
+    bases : Array<Base>
 
     constructor(){
         this.asteroids = []
@@ -56,22 +62,28 @@ class ObjectManager{
 
             switch (gameObj.type){
                 case "ASTEROID":
-                    this.asteroids.push(gameObj)
+                    if (gameObj instanceof Asteroid)
+                        this.asteroids.push(gameObj as Asteroid)
                     break;
                 case "OBSTACLE":
-                    this.obstacles.push(gameObj)
+                    if (gameObj instanceof Obstacle)
+                        this.obstacles.push(gameObj as Obstacle)
                     break;
                 case "ENERGY_CELL":
-                    this.energyCells.push(gameObj)
+                    if (gameObj instanceof EnergyCell)
+                        this.energyCells.push(gameObj as EnergyCell)
                     break;
                 case "SHIP":
-                    this.ships.push(gameObj)
+                    if (gameObj instanceof Ship)
+                        this.ships.push(gameObj as Ship)
                     break;
                 case "BULLET":
-                    this.bullets.push(gameObj)
+                    if (gameObj instanceof Bullet)
+                        this.bullets.push(gameObj as Bullet)
                     break;
                 case "BASE":
-                    this.bases.push(gameObj)
+                    if (gameObj instanceof Base)
+                        this.bases.push(gameObj as Base)
                     break;
                 default:
                     break;
@@ -94,30 +106,27 @@ class ObjectManager{
         this.indexObjects()
 
         // check spawnQueue and existing objects, see if new ones need to be spawned
-        if (ObjectManager.spawnQueue["ASTEROID"] + this.asteroids.length < ObjectManager.numAsteroids){
+        if (ObjectManager.spawnQueue["ASTEROID"].length + this.asteroids.length < ObjectManager.numAsteroids){
             this.queueObject("ASTEROID", 450)
         }
 
-        if (ObjectManager.spawnQueue["OBSTACLE"] + this.obstacles.length < ObjectManager.numObstacles){
+        if (ObjectManager.spawnQueue["OBSTACLE"].length + this.obstacles.length < ObjectManager.numObstacles){
             this.queueObject("OBSTACLE", 300)
         }
 
-        if (ObjectManager.spawnQueue["ENERGY_CELL"] + this.energyCells.length < ObjectManager.numEnergyCells){
+        if (ObjectManager.spawnQueue["ENERGY_CELL"].length + this.energyCells.length < ObjectManager.numEnergyCells){
             this.queueObject("ENERGY_CELL", 600)
         }
 
     }
 
-    /**
-     * Spawn the object immediately
-     * @param {string} type 
-     */
-    spawnObject(type){
+    // spawns the object immediately
+    spawnObject(type : string){
 
         sortGameObjectList()
 
         const vel = Vector2D.random().multiply(randomInRange(...ObjectManager.speedRange))
-        let obj = {}
+        let obj : GameObject = new GameObject(create_UUID(),"DEAD",new Circle(10, new Vector2D(0,0), new Vector2D(0,0)))
 
         switch (type){
             case "ASTEROID":
@@ -156,9 +165,9 @@ class ObjectManager{
      * @param {string} type 
      * @param {number} numFrames 
      */
-    queueObject(type,numFrames){
+    queueObject(type : string,numFrames : number){
 
-        function* queueObjectCoroutine(self,type,numFrames){
+        function* queueObjectCoroutine(self : ObjectManager,type : string,numFrames : number){
             for(let i = 0; i < numFrames; i++){
                 yield;
             }
@@ -173,7 +182,7 @@ class ObjectManager{
         return this.asteroids
     }
 
-    getClosestAsteroid(position){
+    getClosestAsteroid(position : Vector2D){
         const asteroids = this.getAsteroids()
 
             let closest = [{},100000]
@@ -191,7 +200,7 @@ class ObjectManager{
         return this.obstacles
     }
 
-    getClosestObstacle(position){
+    getClosestObstacle(position : Vector2D){
         const obstacles = this.getObstacles()
 
             let closest = [{},100000]
@@ -209,7 +218,7 @@ class ObjectManager{
         return this.energyCells
     }
 
-    getClosestEnergyCell(position){
+    getClosestEnergyCell(position: Vector2D){
         const energyCells = this.getEnergyCells()
 
             let closest = [{},100000]
@@ -227,7 +236,7 @@ class ObjectManager{
         return this.ships
     }
 
-    getShipsByTeam(team){
+    getShipsByTeam(team : number){
         return this.ships.filter((ship) => ship.team === team)
     }
 
@@ -239,13 +248,11 @@ class ObjectManager{
         return this.bases
     }
 
-    getBaseByTeam(team){
+    getBaseByTeam(team : number){
         try {
             return this.bases.filter((base) => base.team === team)[0]
         } catch (e) {
             console.log("Team " + team + " base has been destroyed!")
         }
-
-        return false
     }
 }

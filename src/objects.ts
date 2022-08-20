@@ -5,13 +5,20 @@ class Resources {
 
     static colors = ["#666666","#ADD8E6", "#00FF00"]
 
+    type : string
+    metal : number
+    water : number
+    energy : number
+    sum : number
+    ratio : Array<number> 
+
     /**
      * The sum of metal, water, and energy will determine the mass of an object
      * @param {Number} metal 
      * @param {Number} water 
      * @param {Number} energy 
      */
-    constructor(metal,water,energy){
+    constructor(metal : number,water : number,energy : number){
         this.type = "RESOURCES"
         this.metal = metal
         this.water = water
@@ -40,21 +47,49 @@ class Resources {
     }
 }
 
+class GameObject {
+    uuid : number
+    type : string
+    circle : Circle
+
+    constructor(uuid : number,type : string,circle : Circle){
+        this.uuid = uuid
+        this.type = type
+        this.circle = circle
+    }
+
+    destroy(){
+        this.type = "DEAD"
+    }
+
+    simulate(deltaTime : number){
+        this.circle.simulate(deltaTime)
+    }
+
+    collide(otherObject : GameObject){
+
+    }
+}
+
 /**
  * Asteroid object is composed of a circle object, it calls the circle object's simulate and render functions
  * to simulate and render itself.
  */
-class Asteroid {
+class Asteroid extends GameObject {
 
-    constructor(uuid,position,velocity,metal,water){
-        this.uuid = uuid
-        this.type = "ASTEROID"
-        this.circle = new Circle(metal+water,position,velocity)
+    resources : Resources
+
+    constructor(uuid : number,position : Vector2D,velocity : Vector2D,metal : number,water : number){
+        super(uuid,"ASTEROID",new Circle(metal+water,position,velocity))
+        // this.uuid = uuid
+        // this.type = "ASTEROID"
+        // this.circle = new Circle(metal+water,position,velocity)
         this.resources = new Resources(metal,water,0)
     }
 
-    simulate(deltaTime){
-        this.circle.simulate(deltaTime)
+    simulate(deltaTime : number){
+        // this.circle.simulate(deltaTime)
+        super.simulate(deltaTime)
     }
 
     render(){
@@ -73,11 +108,8 @@ class Asteroid {
         return this.resources.getResources()
     }
 
-    collide(otherObject){
-    }
-
     destroy(){
-        this.type = "DEAD"
+        super.destroy()
     }
 
     serialize(){   
@@ -92,24 +124,22 @@ class Asteroid {
 
 }
 
-class Obstacle {
+class Obstacle extends GameObject {
 
-    constructor(uuid,position,velocity,mass){
-        this.uuid = uuid
-        this.type = "OBSTACLE"
-        this.circle = new Circle(mass,position,velocity)
+    constructor(uuid : number,position : Vector2D,velocity : Vector2D,mass : number){
+        super(uuid,"OBSTACLE",new Circle(mass,position,velocity))
+        // this.uuid = uuid
+        // this.type = "OBSTACLE"
+        // this.circle = new Circle(mass,position,velocity)
     }
 
-    simulate(deltaTime){
-        this.circle.simulate(deltaTime)
+    simulate(deltaTime : number){
+        super.simulate(deltaTime)
     }
 
     render(){
         // draw the obstacle
         GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#A52A2A")
-    }
-
-    collide(otherObject){
     }
 
     breakUp(){
@@ -122,7 +152,7 @@ class Obstacle {
                 const massRatio = 0.1 + (Math.random() * 0.15)
                 const rotationOffset = (i * 360 / numPieces) + (Math.random() - 0.5) * 45
                 const offset = Vector2D.up.multiply(this.circle.radius / 1.5).rotate(rotationOffset)
-                const newChunk = new Obstacle(this.circle.position.add(offset),this.circle.velocity.rotate(-rotationOffset).add(this.circle.velocity),this.circle.mass * massRatio)
+                const newChunk = new Obstacle(create_UUID(),this.circle.position.add(offset),this.circle.velocity.rotate(-rotationOffset).add(this.circle.velocity),this.circle.mass * massRatio)
                 GameObjectList.push(newChunk)
             }
 
@@ -131,7 +161,7 @@ class Obstacle {
     }
 
     destroy(){
-        this.type = "DEAD"
+        super.destroy()
     }
 
     serialize(){   
@@ -144,17 +174,20 @@ class Obstacle {
 
 }
 
-class EnergyCell {
+class EnergyCell extends GameObject{
 
-    constructor(uuid,position,velocity,energy){
-        this.uuid = uuid
-        this.type = "ENERGY_CELL"
-        this.circle = new Circle(energy,position,velocity)
+    resources : Resources
+
+    constructor(uuid : number,position : Vector2D,velocity : Vector2D,energy : number){
+        super(uuid,"ENERGY_CELL",new Circle(energy,position,velocity))
+        // this.uuid = uuid
+        // this.type = "ENERGY_CELL"
+        // this.circle = new Circle(energy,position,velocity)
         this.resources = new Resources(0,0,energy)
     }
 
-    simulate(deltaTime){
-        this.circle.simulate(deltaTime)
+    simulate(deltaTime : number){
+        super.simulate(deltaTime)
     }
 
     render(){
@@ -166,11 +199,8 @@ class EnergyCell {
         return this.resources.getResources()
     }
 
-    collide(otherObject){
-    }
-
     destroy(){
-        this.type = "DEAD"
+        super.destroy()
     }
 
     serialize(){   
@@ -182,13 +212,19 @@ class EnergyCell {
     }
 }
 
-class Ship {
+class Ship extends GameObject{
 
-    constructor(uuid,position,energy,team){
-        this.uuid = uuid
+    team : number
+    resources : Resources
+    maxEnergy : number
+    damage : number
+    energyCost : number
+    damageCost : number
+
+    constructor(uuid : number,position : Vector2D,energy : number,team : number){
+
+        super(uuid,"SHIP",new Circle(50.0,position,Vector2D.zero))
         this.team = team
-        this.type = "SHIP"
-        this.circle = new Circle(50.0,position,Vector2D.zero)
         this.resources = new Resources(0,0,energy)
 
         // upgradeable
@@ -201,13 +237,9 @@ class Ship {
         this.start()
     }
 
-    /**
-     * Simulate the physics and energy consumption for a given timestep
-     * @param {number} deltaTime 
-     */
-    simulate(deltaTime){
+    simulate(deltaTime : number){
         const oldVel = this.circle.velocity.magnitude ** 2
-        this.circle.simulate(deltaTime)
+        super.simulate(deltaTime)
         const dV = Math.abs(oldVel - (this.circle.velocity.magnitude ** 2))
         this.resources.energy -= dV * (this.totalMass()) * 0.5 * energyScale
 
@@ -258,25 +290,30 @@ class Ship {
         return this.resources.getResources()
     }
 
-    collide(otherObject){
+    collide(otherObject : GameObject){
 
         switch (otherObject.type){
             case "ENERGY_CELL":
 
-                GameStateManager.addEnergy(this.team,otherObject.resources.energy)
+                if (otherObject instanceof EnergyCell){
 
-                this.resources.energy += otherObject.resources.energy
+                    GameStateManager.addEnergy(this.team,otherObject.resources.energy)
 
-                if (this.resources.energy > this.maxEnergy){
-                    this.resources.energy = this.maxEnergy
+                    this.resources.energy += otherObject.resources.energy
+
+                    if (this.resources.energy > this.maxEnergy){
+                        this.resources.energy = this.maxEnergy
+                    }
+
+                    otherObject.destroy()
                 }
-
-                otherObject.destroy()
                 break;
             case "ASTEROID":
-                this.resources.metal += otherObject.resources.metal
-                this.resources.water += otherObject.resources.water
-                otherObject.destroy()
+                if (otherObject instanceof Asteroid){
+                    this.resources.metal += otherObject.resources.metal
+                    this.resources.water += otherObject.resources.water
+                    otherObject.destroy()
+                }
                 break;
             case "BASE":
                 // drop off materials
@@ -294,20 +331,20 @@ class Ship {
     }
 
     start(){
-        Start.call(this)
+        // Start.call(this)
     }
 
     update(){
-        Update.call(this)
+        // Update.call(this)
     }
 
-    moveTo(position){
+    moveTo(position : Vector2D){
         const vec = position.subtract(this.circle.position)
         const power = vec.magnitude / 100
         this.thrust(vec,power)
     }
 
-    moveToObject(obj){
+    moveToObject(obj : GameObject){
         const vec = obj.circle.position.subtract(this.circle.position)
         const power = vec.magnitude / 100
         this.thrust(vec,power)
@@ -318,7 +355,7 @@ class Ship {
      * @param {Vector2D} vector 
      * @param {number} percentage clamped between 0 and 1
      */
-    thrust(vector,percentage){
+    thrust(vector : Vector2D,percentage : number){
         const pct = clamp(percentage,0,1)
         this.circle.acceleration = vector.normal().multiply(pct)    
     }
@@ -327,7 +364,7 @@ class Ship {
      * Instantiate a bullet traveling in a certain direction
      * @param {Vector2D} direction 
      */
-    shoot(direction){
+    shoot(direction : Vector2D){
         // instantiate object
         this.resources.energy -= this.damage
         const bullet = new Bullet(create_UUID(),this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), this.damage, this.uuid)
@@ -336,25 +373,29 @@ class Ship {
 
     destroy(){
         GameStateManager.addDeath(this.team)
-        GameObjectManager.getBaseByTeam(this.team).queueShip()
-        this.type = "DEAD"
+        GameObjectManager.getBaseByTeam(this.team)?.queueShip()
+        super.destroy()
     }
 
     upgradeMaxEnergy(){
         const base = GameObjectManager.getBaseByTeam(this.team)
-        base.resources.metal -= this.energyCost
-        this.energyCost *= 2
-        this.maxEnergy *= 2
+        if (base !== undefined){
+            base.resources.metal -= this.energyCost
+            this.energyCost *= 2
+            this.maxEnergy *= 2
+        }
     }
 
     upgradeDamage(){
         const base = GameObjectManager.getBaseByTeam(this.team)
-        base.resources.metal -= this.damageCost
-        this.damageCost *= 2
-        this.damage *= 2
+        if (base !== undefined){
+            base.resources.metal -= this.damageCost
+            this.damageCost *= 2
+            this.damage *= 2
+        }
     }
 
-    seekTarget(target){
+    seekTarget(target: GameObject){
         const desiredVelocity = target.circle.position.subtract(this.circle.position).normal().multiply(target.circle.velocity.magnitude * 2.0)
         const steering = desiredVelocity.subtract(this.circle.velocity)
         this.thrust(steering,1.0)
@@ -379,21 +420,22 @@ class Ship {
 
 }
 
-class Bullet {
+class Bullet extends GameObject {
 
     static speed = 0.25
     static offset = 5
+    damage : number
+    parent : number
 
-    constructor(uuid,position,velocity,damage,parent){
-        this.uuid = uuid
-        this.type = "BULLET"
-        this.circle = new Circle(15,position,velocity)
+    constructor(uuid : number,position : Vector2D,velocity : Vector2D,damage : number,parent : number){
+        super(uuid,"BULLET",new Circle(15,position,velocity))
+
         this.damage = damage
         this.parent = parent
     }
 
-    simulate(deltaTime){
-        this.circle.simulate(deltaTime)
+    simulate(deltaTime : number){
+        super.simulate(deltaTime)
     }
 
     render(){
@@ -401,20 +443,26 @@ class Bullet {
         GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#FFFF00")
     }
 
-    collide(otherObject){
+    collide(otherObject : GameObject){
 
         switch (otherObject.type){
             case "SHIP":
-                otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
-                if (otherObject.resources.energy < 0){
-                    GameStateManager.recordKill(this.parent)
+                if (otherObject instanceof Ship){
+                    otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
+                    if (otherObject.resources.energy < 0){
+                        GameStateManager.recordKill(this.parent)
+                    }
                 }
                 break;
             case "OBSTACLE":
-                otherObject.breakUp()
+                if (otherObject instanceof Obstacle){
+                    otherObject.breakUp()
+                }
                 break;
             case "BASE":
-                otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
+                if (otherObject instanceof Base){
+                    otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
+                }
                 break;
             default:
                 otherObject.destroy()
@@ -436,14 +484,26 @@ class Bullet {
     }
 }
 
-class Base {
+class Base extends GameObject {
 
-    constructor(uuid,position,energy,team){
-        this.uuid = uuid
+    team : number
+    resources : Resources
+    maxEnergy : number
+    shipQueue : Array<Generator>
+    refiningRate : number
+    baseShipCost : number
+    shipCost : number
+    healRate : number
+    interactRadius : number
+    healRateCost : number
+    interactRadiusCost : number
+    energyCost : number
+
+    constructor(uuid : number,position : Vector2D,energy : number,team : number){
+
+        super(uuid,"BASE",new Circle(300.0,position,Vector2D.zero))
+
         this.team = team
-        this.position = position
-        this.type = "BASE"
-        this.circle = new Circle(300.0,position,Vector2D.zero)
         this.resources = new Resources(501,100,energy)
         this.maxEnergy = 500
 
@@ -453,7 +513,7 @@ class Base {
         this.baseShipCost = 300
 
         // upgradeable
-        this.shipcost = 300
+        this.shipCost = 300
         this.healRate = 0.01
         this.interactRadius = 50
 
@@ -464,7 +524,7 @@ class Base {
     }
 
     
-    simulate(deltaTime){
+    simulate(deltaTime : number){
 
         // stay static
         this.circle.velocity = Vector2D.zero
@@ -509,7 +569,7 @@ class Base {
         }
     }
 
-    collide(otherObject){
+    collide(otherObject : GameObject){
         const oomf = 15.0
         const vec = otherObject.circle.position.subtract(this.circle.position).normal()
         otherObject.circle.velocity = otherObject.circle.velocity.add(vec.multiply(oomf))
@@ -518,22 +578,22 @@ class Base {
     render(){
         // draw the resources in the asteroid as colored rings
         GlobalRender.drawCircle(this.circle.position,this.circle.radius,teamColors[this.team])
-        GlobalRender.drawText(this.resources.toString(),this.position,12,"#FFFFFF")
+        GlobalRender.drawText(this.resources.toString(),this.circle.position,12,"#FFFFFF")
     }
 
     start(){
-        BaseStart.call(this)
+        // BaseStart.call(this)
     }
 
     update(){
-        BaseUpdate.call(this)
+        // BaseUpdate.call(this)
     }
 
     destroy(){
 
     }
 
-    healShip(deltaTime,ship){
+    healShip(deltaTime : number,ship : Ship){
         if (this.resources.energy > 0 && ship.resources.energy < ship.maxEnergy){
             const amount = this.healRate * deltaTime
             this.resources.energy -= amount
@@ -541,7 +601,7 @@ class Base {
         }
     }
 
-    takeResources(ship){
+    takeResources(ship : Ship){
         GameStateManager.addMetal(this.team,ship.resources.metal)
         this.resources.metal += ship.resources.metal
         this.resources.water += ship.resources.water
@@ -549,9 +609,9 @@ class Base {
         ship.resources.water = 0
     }
 
-    trySpawnShip(energy,respawn){
+    trySpawnShip(energy : number,respawn : boolean){
 
-        if (this.resources.metal > this.shipcost && this.resources.energy > energy){
+        if (this.resources.metal > this.shipCost && this.resources.energy > energy){
 
             // check around the base
             const angle = 360 / 32
@@ -562,7 +622,7 @@ class Base {
                     GameObjectList.push(obj)
 
                     if (!respawn){
-                        this.resources.metal -= this.shipcost
+                        this.resources.metal -= this.shipCost
                     }
 
                     this.resources.energy -= energy
@@ -582,10 +642,10 @@ class Base {
     }
 
     upgradeHealRate(){
-        if (this.resources.metal > this.healthRateCost){
+        if (this.resources.metal > this.healRateCost){
             this.healRate *= 2
-            this.resources.metal -= this.healthRateCost
-            this.healthRateCost *= 2
+            this.resources.metal -= this.healRateCost
+            this.healRateCost *= 2
         }
     }
 
@@ -598,7 +658,7 @@ class Base {
     }
 
     queueShip(){
-        function* spawnShipCoroutine(self,numFrames){
+        function* spawnShipCoroutine(self : Base,numFrames : number){
             for (let i = 0; i < numFrames; i++){
                 yield;
             }
