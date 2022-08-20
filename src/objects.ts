@@ -330,11 +330,11 @@ class Ship extends GameObject{
     }
 
     start(){
-        // Start.call(this)
+        Start.call(this)
     }
 
     update(){
-        // Update.call(this)
+        Update.call(this)
     }
 
     moveTo(position : Vector2D){
@@ -582,11 +582,11 @@ class Base extends GameObject {
     }
 
     start(){
-        // BaseStart.call(this)
+        BaseStart.call(this)
     }
 
     update(){
-        // BaseUpdate.call(this)
+        BaseUpdate.call(this)
     }
 
     destroy(){

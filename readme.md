@@ -32,7 +32,7 @@ circle is compared against the X array, and the indices are used to return an ar
 - [x] n-body physics
 - [x] full game engine
 - [x] Inject user AI code
-- [ ] Convert to Typescript
+- [x] Convert to Typescript
 - [ ] Safely sandbox user AI code
 - [ ] Port to Node.js
 - [ ] Sync via websockets

@@ -1,3 +1,4 @@
+//@ts-nocheck
 function BaseStart(){
     console.log("Base Start!")
 }
