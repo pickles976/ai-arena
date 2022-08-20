@@ -40,6 +40,7 @@ function step(){
 
     updateField()
     render()
+    drawInfoPanels()
 
     let elapsed = performance.now() - frameStart
     // console.log(elapsed)

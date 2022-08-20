@@ -65,7 +65,7 @@ function Update(){
         case "MOVE_TO_ENERGY":
             if (this.target.type === "ENERGY_CELL"){
                 this.seekTarget(this.target)
-            }else if (this.target.type == "BASE") {
+            }else if (this.target.type === "BASE") {
                 if (this.resources.energy > 90 || base.resources.energy < 1 || dist(this,base) > base.interactRadius){
                     this.state = "IDLE"
                 }else{

@@ -35,26 +35,22 @@ class StateManager{
         }
     }
 
+    getTeamInfo(team){
+        const teamInfo = {
+            "kills" : this.kills[team],
+            "deaths" : this.deaths[team],
+            "metal" : this.metal[team].toFixed(2),
+            "energy" : this.energy[team].toFixed(2)
+        }
+
+        return teamInfo
+    }
+
     serialize(){
-    
-        const team0 = {
-            "kills" : this.kills[0],
-            "deaths" : this.deaths[0],
-            "metal" : this.metal[0].toFixed(2),
-            "energy" : this.energy[0].toFixed(2)
-        }
 
-        const team1 = {
-            "kills" : this.kills[1],
-            "deaths" : this.deaths[1],
-            "metal" : this.metal[1].toFixed(2),
-            "energy" : this.energy[1].toFixed(2)
-        }
-
-        const obj = { "team 0" : team0, "team 1" : team1}
+        const obj = { "team 0" : this.getTeamInfo(0), "team 1" : this.getTeamInfo(1)}
 
         return JSON.stringify(obj)
-
 
     }
 
