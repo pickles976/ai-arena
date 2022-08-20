@@ -58,4 +58,9 @@ class StateManager{
 
     }
 
+    recordKill(uuid){
+        const killerShip = GameObjectList.find((x) => x.uuid == uuid)
+        this.addKill(killerShip.team)
+    }
+
 }

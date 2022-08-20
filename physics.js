@@ -14,6 +14,7 @@
      * @param {*} y 
      */
     constructor(x,y){
+        this.type = "VECTOR2D"
         this.x = x;
         this.y = y;
         this.magnitude = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
@@ -73,6 +74,10 @@
     static dist(v1,v2){
         return v1.subtract(v2).magnitude
     }
+
+    serialize(){
+        return JSON.stringify([this.type, parseFloat(this.x.toFixed(4)), parseFloat(this.y.toFixed(4))])
+    }
 }
 
 /**
@@ -89,13 +94,13 @@ class Circle {
      * @param {string} color (#XXXXXX)
      * @param 
      */
-    constructor(mass,position,velocity,collisionCallback){
+    constructor(mass,position,velocity){
+        this.type = "CIRCLE"
         this.mass = mass;
         this.position = position;
         this.velocity = velocity;
         this.radius = Math.sqrt(mass)
         this.acceleration = Vector2D.zero
-        this.collisionCallback = collisionCallback
     }
 
     /**
@@ -123,7 +128,10 @@ class Circle {
         this.position.y = this.position.y % H;
     }
 
-    collide(self,otherObject){
-        this.collisionCallback(self,otherObject)
+    serialize(){
+        return JSON.stringify([this.type,
+            this.mass,
+            this.position.serialize(),
+            this.velocity.serialize()])
     }
 }

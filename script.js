@@ -1,18 +1,20 @@
+// Serializer.test()
+
 GameStateManager = new StateManager()
 
 // CREATE OUR SHIT
 GameObjectManager = new ObjectManager()
 
-GameObjectList.push(new Ship(new Vector2D(W/4,H/4),100,0))
-GameObjectList.push(new Base(new Vector2D(W/4,H/2),250,0))
+GameObjectList.push(new Ship(create_UUID(),new Vector2D(W/4,H/4),100,0))
+GameObjectList.push(new Base(create_UUID(),new Vector2D(W/4,H/2),250,0))
 
-GameObjectList.push(new Ship(new Vector2D(3*W/4,3*H/4),100,1))
-GameObjectList.push(new Base(new Vector2D(3*W/4,H/2),250,1))
+GameObjectList.push(new Ship(create_UUID(),new Vector2D(3*W/4,3*H/4),100,1))
+GameObjectList.push(new Base(create_UUID(),new Vector2D(3*W/4,H/2),250,1))
 
 // populate the game field
 GameObjectManager.start()
 
-console.log(JSON.stringify(GameObjectList))
+// console.log(JSON.stringify(GameObjectList))
 
 // get the canvas
 gameCanvas = document.getElementById("game-canvas")
@@ -40,7 +42,6 @@ function step(){
     render()
 
     let elapsed = performance.now() - frameStart
-    console.log(GameStateManager.serialize())
     // console.log(elapsed)
     sleep(MS - elapsed)
     window.requestAnimationFrame(step);

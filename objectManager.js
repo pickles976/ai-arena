@@ -123,15 +123,15 @@ class ObjectManager{
             case "ASTEROID":
                 const metal = randomInRange(...ObjectManager.asteroidMetalRange)
                 const water = randomInRange(...ObjectManager.asteroidWaterRange)
-                obj = new Asteroid(Vector2D.zero,vel,metal,water)
+                obj = new Asteroid(create_UUID(),Vector2D.zero,vel,metal,water)
                 break;
             case "OBSTACLE":
                 const mass = randomInRange(...ObjectManager.obstacleMassRange)
-                obj = new Obstacle(Vector2D.zero,vel,mass)
+                obj = new Obstacle(create_UUID(),Vector2D.zero,vel,mass)
                 break;
             case "ENERGY_CELL":
                 const energy = randomInRange(...ObjectManager.energyCellRange)
-                obj = new EnergyCell(Vector2D.zero,vel,energy)
+                obj = new EnergyCell(create_UUID(),Vector2D.zero,vel,energy)
                 break;
         }
 

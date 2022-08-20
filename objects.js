@@ -12,6 +12,7 @@ class Resources {
      * @param {Number} energy 
      */
     constructor(metal,water,energy){
+        this.type = "RESOURCES"
         this.metal = metal
         this.water = water
         this.energy = energy
@@ -21,14 +22,21 @@ class Resources {
 
     getResources(){
         return {
-            "metal" : this.metal.toFixed(2),
-            "water" : this.water.toFixed(2),
-            "energy" : this.energy.toFixed(2),
+            "metal" : parseFloat(this.metal.toFixed(2)),
+            "water" : parseFloat(this.water.toFixed(2)),
+            "energy" : parseFloat(this.energy.toFixed(2)),
         }
     }
 
-    serialize(){
+    toString(){
         return JSON.stringify(this.getResources())
+    }
+
+    serialize(){
+        const temp = this.getResources()
+        return JSON.stringify([this.type,temp["metal"],
+        temp["water"],
+        temp["energy"]])
     }
 }
 
@@ -38,10 +46,10 @@ class Resources {
  */
 class Asteroid {
 
-    constructor(position,velocity,metal,water){
-        this.uuid = create_UUID()
+    constructor(uuid,position,velocity,metal,water){
+        this.uuid = uuid
         this.type = "ASTEROID"
-        this.circle = new Circle(metal+water,position,velocity,this.collide)
+        this.circle = new Circle(metal+water,position,velocity)
         this.resources = new Resources(metal,water,0)
     }
 
@@ -66,22 +74,30 @@ class Asteroid {
     }
 
     collide(otherObject){
-        // console.log("This is an Asteroid")
-        // console.log("Collided with a " + otherObject.constructor.name)
     }
 
     destroy(){
         this.type = "DEAD"
     }
 
+    serialize(){   
+        const temp = this.resources.getResources()
+        return JSON.stringify([this.type,
+            this.uuid,
+            this.circle.position.serialize(),
+            this.circle.velocity.serialize(),
+            temp["metal"],
+            temp["water"]])
+    }
+
 }
 
 class Obstacle {
 
-    constructor(position,velocity,mass){
-        this.uuid = create_UUID()
+    constructor(uuid,position,velocity,mass){
+        this.uuid = uuid
         this.type = "OBSTACLE"
-        this.circle = new Circle(mass,position,velocity,this.collide)
+        this.circle = new Circle(mass,position,velocity)
     }
 
     simulate(deltaTime){
@@ -118,14 +134,22 @@ class Obstacle {
         this.type = "DEAD"
     }
 
+    serialize(){   
+        return JSON.stringify([this.type,
+            this.uuid,
+            this.circle.position.serialize(),
+            this.circle.velocity.serialize(),
+            parseFloat(this.circle.mass.toFixed(2))])
+    }
+
 }
 
 class EnergyCell {
 
-    constructor(position,velocity,energy){
-        this.uuid = create_UUID()
+    constructor(uuid,position,velocity,energy){
+        this.uuid = uuid
         this.type = "ENERGY_CELL"
-        this.circle = new Circle(energy,position,velocity,this.collide)
+        this.circle = new Circle(energy,position,velocity)
         this.resources = new Resources(0,0,energy)
     }
 
@@ -143,22 +167,28 @@ class EnergyCell {
     }
 
     collide(otherObject){
-        // console.log("This is an Energy Cell")
-        // console.log("Collided with a " + otherObject.constructor.name)
     }
 
     destroy(){
         this.type = "DEAD"
     }
+
+    serialize(){   
+        return JSON.stringify([this.type,
+            this.uuid,
+            this.circle.position.serialize(),
+            this.circle.velocity.serialize(),
+            this.resources.getResources()["energy"]])
+    }
 }
 
 class Ship {
 
-    constructor(position,energy,team){
-        this.uuid = create_UUID()
+    constructor(uuid,position,energy,team){
+        this.uuid = uuid
         this.team = team
         this.type = "SHIP"
-        this.circle = new Circle(50.0,position,Vector2D.zero,this.collide)
+        this.circle = new Circle(50.0,position,Vector2D.zero)
         this.resources = new Resources(0,0,energy)
 
         // upgradeable
@@ -264,128 +294,11 @@ class Ship {
     }
 
     start(){
-        this.target = {}
-        this.state = "IDLE"
+        Start.call(this)
     }
 
     update(){
-
-        const base = GameObjectManager.getBaseByTeam(this.team)
-
-        // STATE MACHINE
-        switch(this.state){
-
-            case "IDLE":
-            
-                const asteroids = GameObjectManager.getAsteroids()
-
-                let closest = [{},100000]
-
-                for (const index in asteroids){
-                    const asteroid = asteroids[index]
-                    const d = dist(asteroid,this)
-                    if (d < closest[1]){
-                        closest = [asteroid,d]
-                    }
-                }
-
-                this.target = closest[0]
-                this.state = "MOVE_TO_ASTEROID"
-
-
-                break;
-
-            case "MOVE_TO_ASTEROID":
-
-                if (this.target.type === "ASTEROID"){
-                    this.seekTarget(this.target)
-                }else{
-                    this.target = base
-                    this.state = "MOVE_TO_BASE"
-                }
-
-                break;
-
-            case "MOVE_TO_BASE":
-
-                if (this.resources.metal > 0 || this.resources.water > 0){
-                    this.moveToObject(this.target)
-                }else{
-                    this.state = "IDLE"
-                }
-
-                break;
-
-            case "MOVE_TO_ENERGY":
-                if (this.target.type === "ENERGY_CELL"){
-                    this.seekTarget(this.target)
-                }else if (this.target.type == "BASE") {
-                    if (this.resources.energy > 90 || base.resources.energy < 1 || dist(this,base) > base.interactRadius){
-                        this.state = "IDLE"
-                    }else{
-                        this.seekTarget(this.target)
-                    }
-                }
-                else{
-                    this.state = "IDLE"
-                }
-                break;
-                
-        }
-
-        // seekTarget ENERGY
-        if (this.resources.energy < (this.maxEnergy / 4)){
-            const energyCells = GameObjectManager.getEnergyCells()
-
-            let closest = [base,dist(base,this)]
-
-            for (const index in energyCells){
-                const energyCell = energyCells[index]
-                const d = dist(energyCell,this)
-                if (d < closest[1]){
-                    closest = [energyCell,d]
-                }
-            }
-
-            this.target = closest[0]
-            this.state = "MOVE_TO_ENERGY"
-        }
-
-        // COMBAT
-        if(this.resources.energy > (this.damage)){
-            const shootRadius = 200
-            const ships = GameObjectManager.getShips()
-
-            let closest = [{},100000]
-
-            for (const index in ships){
-                const ship = ships[index]
-                if (ship.team != this.team){
-                    const d = dist(ship,this)
-                    if (d < closest[1]){
-                        closest = [ship,d]
-                    }
-                }
-            }
-
-            if (closest[1] < shootRadius){
-                this.shoot(closest[0].circle.position.subtract(this.circle.position).add(closest[0].circle.velocity.multiply(60)))
-            }
-        }
-
-        // UPGRADES
-        if (base.resources.metal > this.energyCost && GameObjectManager.getShipsByTeam(this.team).length > 2){
-            this.upgradeMaxEnergy()
-        }
-
-        if (base.resources.metal > this.damageCost && GameObjectManager.getShipsByTeam(this.team).length > 2){
-            this.upgradeDamage()
-        }
-
-        // DEBUG DRAWING
-        GlobalRender.drawText(this.resources.serialize(),this.circle.position,10,"#FFFFFF")
-        GlobalRender.drawText(this.state,this.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
-        GlobalRender.drawLine(this.circle.position,this.target.circle.position,"#00FF00")
+        Update.call(this)
     }
 
     moveTo(position){
@@ -417,7 +330,7 @@ class Ship {
     shoot(direction){
         // instantiate object
         this.resources.energy -= this.damage
-        const bullet = new Bullet(this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), this.damage, this)
+        const bullet = new Bullet(create_UUID(),this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), this.damage, this.uuid)
         GameObjectList.push(bullet)
     }
 
@@ -447,8 +360,12 @@ class Ship {
         this.thrust(steering,1.0)
     }
 
-    recordKill(killedObj){
-        GameStateManager.addKill(this.team)
+    serialize(){   
+        return JSON.stringify([this.type,
+            this.uuid,
+            this.circle.position.serialize(),
+            this.resources.getResources()["energy"],
+            this.team])
     }
 
 }
@@ -458,10 +375,10 @@ class Bullet {
     static speed = 0.25
     static offset = 5
 
-    constructor(position,velocity,damage,parent){
-        this.uuid = create_UUID()
+    constructor(uuid,position,velocity,damage,parent){
+        this.uuid = uuid
         this.type = "BULLET"
-        this.circle = new Circle(15,position,velocity,this.collide)
+        this.circle = new Circle(15,position,velocity)
         this.damage = damage
         this.parent = parent
     }
@@ -476,14 +393,12 @@ class Bullet {
     }
 
     collide(otherObject){
-        // console.log("This is an Energy Cell")
-        // console.log("Collided with a " + otherObject.constructor.name)
 
         switch (otherObject.type){
             case "SHIP":
                 otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
                 if (otherObject.resources.energy < 0){
-                    this.parent.recordKill(otherObject)
+                    GameStateManager.recordKill(this.parent)
                 }
                 break;
             case "OBSTACLE":
@@ -501,16 +416,25 @@ class Bullet {
     destroy(){
         this.type = "DEAD"
     }
+
+    serialize(){   
+        return JSON.stringify([this.type,
+            this.uuid,
+            this.circle.position.serialize(),
+            this.circle.velocity.serialize(),
+            this.damage,
+            this.parent])
+    }
 }
 
 class Base {
 
-    constructor(position,energy,team){
-        this.uuid = create_UUID()
+    constructor(uuid,position,energy,team){
+        this.uuid = uuid
         this.team = team
         this.position = position
         this.type = "BASE"
-        this.circle = new Circle(300.0,position,Vector2D.zero,this.collide)
+        this.circle = new Circle(300.0,position,Vector2D.zero)
         this.resources = new Resources(501,100,energy)
         this.maxEnergy = 500
 
@@ -585,14 +509,15 @@ class Base {
     render(){
         // draw the resources in the asteroid as colored rings
         GlobalRender.drawCircle(this.circle.position,this.circle.radius,teamColors[this.team])
-        GlobalRender.drawText(this.resources.serialize(),this.position,12,"#FFFFFF")
+        GlobalRender.drawText(this.resources.toString(),this.position,12,"#FFFFFF")
+    }
+
+    start(){
+        BaseStart.call(this)
     }
 
     update(){
-        const energy = 50
-        if (this.resources.metal > this.shipcost && this.resources.energy > energy){
-            this.trySpawnShip(energy,false)
-        }
+        BaseUpdate.call(this)
     }
 
     destroy(){
@@ -623,7 +548,7 @@ class Base {
             const angle = 360 / 32
             for(let i = 0; i < 32; i++){
                 let pos = new Vector2D(0,1).multiply(this.circle.radius * 1.5).rotate(angle*i).add(this.circle.position)
-                const obj = new Ship(pos,energy,this.team)
+                const obj = new Ship(create_UUID(),pos,energy,this.team)
                 if (overlapCircle(pos,obj.circle.radius*1.2).length < 1){
                     GameObjectList.push(obj)
 
@@ -672,5 +597,13 @@ class Base {
         }
 
         this.shipQueue.push(spawnShipCoroutine(this,900))
+    }
+
+    serialize(){   
+        return JSON.stringify([this.type,
+            this.uuid,
+            this.circle.position.serialize(),
+            this.resources.getResources()["energy"],
+            this.team])
     }
 }

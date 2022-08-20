@@ -117,6 +117,6 @@ if (base.resources.metal > this.damageCost && GameObjectManager.getShipsByTeam(t
 }
 
 // DEBUG DRAWING
-GlobalRender.drawText(this.resources.serialize(),this.circle.position,10,"#FFFFFF")
+GlobalRender.drawText(this.resources.toString(),this.circle.position,10,"#FFFFFF")
 GlobalRender.drawText(this.state,this.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
 GlobalRender.drawLine(this.circle.position,this.target.circle.position,"#00FF00")
