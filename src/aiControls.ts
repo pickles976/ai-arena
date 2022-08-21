@@ -76,7 +76,7 @@ function Update(ship, Game){
                 if (ship.resources.energy > 90 || base.resources.energy < 1 || dist(ship,base) > base.interactRadius){
                     ship.state = "IDLE"
                 }else{
-                    ship.moveToObject(ship.target)
+                    ship.seekTarget(ship.target)
                 }
             }
             else{
@@ -140,6 +140,6 @@ function Update(ship, Game){
     // DEBUG DRAWING
     ship.drawText(ship.resources.toString(),ship.circle.position,10,"#FFFFFF")
     ship.drawText(ship.state,ship.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
-    if (ship.target != undefined)
+    if (ship.target != undefined && ship.target.circle != undefined)
         ship.drawLine(ship.circle.position,ship.target.circle.position,"#00FF00")
 }

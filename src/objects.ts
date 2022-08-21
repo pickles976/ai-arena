@@ -580,7 +580,7 @@ class Base extends GameObject {
 
     constructor(uuid : number,position : Vector2D,energy : number,team : number){
 
-        super(uuid,"BASE",new Circle(300.0,position,Vector2D.zero))
+        super(uuid,"BASE",new Circle(300.0,position,new Vector2D(0,0)))
 
         this.team = team
         this.resources = new Resources(501,100,energy)
@@ -609,7 +609,7 @@ class Base extends GameObject {
     simulate(deltaTime : number){
 
         // stay static
-        this.circle.velocity = Vector2D.zero
+        this.circle.velocity = new Vector2D(0,0)
 
         // refine water
         if (this.resources.water > 0 && this.resources.energy < this.maxEnergy){
