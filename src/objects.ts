@@ -663,9 +663,8 @@ class Base extends GameObject {
     }
 
     render(){
-        // draw the resources in the asteroid as colored rings
         GlobalRender.drawCircle(this.circle.position,this.circle.radius,teamColors[this.team])
-        GlobalRender.drawText(this.resources.toString(),this.circle.position,12,"#FFFFFF")
+        GlobalRender.drawText(this.resources.toString(),this.circle.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
     }
 
     destroy(){
@@ -690,6 +689,7 @@ class Base extends GameObject {
 
     trySpawnShip(energy : number,respawn : boolean){
 
+        // THIS IS WHAT'S CAUSING THE BUG
         if (this.resources.metal > this.shipCost && this.resources.energy > energy){
 
             // check around the base
@@ -698,14 +698,17 @@ class Base extends GameObject {
                 let pos = new Vector2D(0,1).multiply(this.circle.radius * 1.5).rotate(angle*i).add(this.circle.position)
                 const obj = new Ship(create_UUID(),pos,energy,this.team)
                 if (overlapCircle(pos,obj.circle.radius*1.2).length < 1){
+
                     GameObjectList.push(obj)
 
+                    // TODO : FIGURE OUT HOW THIS IS GONNA WORK
                     if (!respawn){
-                        if(this.resources.metal > this.shipCost)
-                            this.resources.metal -= this.shipCost
+                        this.resources.metal -= this.shipCost
                     }
 
-                    this.resources.energy -= energy
+                    // const newEnergy = Math.min(energy,obj.maxEnergy)
+                    // this.resources.energy -= newEnergy
+
                     return true
                 }
             }
@@ -742,7 +745,8 @@ class Base extends GameObject {
             for (let i = 0; i < numFrames; i++){
                 yield;
             }
-            return self.trySpawnShip(50,true)
+            console.log("Ship respawning")
+            return self.trySpawnShip(self.resources.energy,true)
         }
 
         this.shipQueue.push(spawnShipCoroutine(this,900))

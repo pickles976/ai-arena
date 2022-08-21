@@ -43,7 +43,7 @@ function step(){
     drawInfoPanels()
 
     let elapsed = performance.now() - frameStart
-    console.log(elapsed)
+    // console.log(elapsed)
     sleep(MS - elapsed)
     window.requestAnimationFrame(step);
 
