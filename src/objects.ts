@@ -341,18 +341,22 @@ class Ship extends GameObject{
     upgradeMaxEnergy(){
         const base = GameObjectManager.getBaseByTeam(this.team)
         if (base !== undefined){
-            base.resources.metal -= this.energyCost
-            this.energyCost *= 2
-            this.maxEnergy *= 2
+            if (base.resources.metal > this.energyCost){
+                base.resources.metal -= this.energyCost
+                this.energyCost *= 2
+                this.maxEnergy *= 2
+            }
         }
     }
 
     upgradeDamage(){
         const base = GameObjectManager.getBaseByTeam(this.team)
         if (base !== undefined){
-            base.resources.metal -= this.damageCost
-            this.damageCost *= 2
-            this.damage *= 2
+            if (base.resources.metal > this.damageCost){
+                base.resources.metal -= this.damageCost
+                this.damageCost *= 2
+                this.damage *= 2
+            }
         }
     }
 
@@ -697,7 +701,8 @@ class Base extends GameObject {
                     GameObjectList.push(obj)
 
                     if (!respawn){
-                        this.resources.metal -= this.shipCost
+                        if(this.resources.metal > this.shipCost)
+                            this.resources.metal -= this.shipCost
                     }
 
                     this.resources.energy -= energy
