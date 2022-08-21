@@ -112,11 +112,11 @@ function Update(ship, Game){
         let closest = [{},100000]
 
         for (const index in ships){
-            const ship = ships[index]
-            if (ship.team != ship.team){
-                const d = dist(ship,ship)
+            const otherShip = ships[index]
+            if (otherShip.team != ship.team){
+                const d = dist(ship,otherShip)
                 if (d < closest[1]){
-                    closest = [ship,d]
+                    closest = [otherShip,d]
                 }
             }
         }
