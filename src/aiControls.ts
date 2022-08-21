@@ -1,5 +1,5 @@
 // @ts-nocheck
-function BaseStart(base, Game){
+function BaseStart(base){
     console.log("Base Start!")
 }
 
@@ -10,7 +10,7 @@ function BaseUpdate(base, Game){
     }
 }
 
-function Start(ship, Game){
+function Start(ship){
 
     ship.target = {}
     ship.state = "IDLE"
@@ -20,6 +20,10 @@ function Start(ship, Game){
 function Update(ship, Game){
 
     const base = Game.getBaseByTeam(ship.team)
+
+    if(ship.target != null && ship.target != undefined){
+        ship.target = Game.refreshObject(ship.target) ?? {}
+    }
 
     // STATE MACHINE
     switch(ship.state){
@@ -131,8 +135,11 @@ function Update(ship, Game){
         ship.upgradeDamage()
     }
 
+    ship.targetID = ship.target.uuid
+
     // DEBUG DRAWING
     ship.drawText(ship.resources.toString(),ship.circle.position,10,"#FFFFFF")
     ship.drawText(ship.state,ship.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
-    ship.drawLine(ship.circle.position,ship.target.circle.position,"#00FF00")
+    if (ship.target != undefined)
+        ship.drawLine(ship.circle.position,ship.target.circle.position,"#00FF00")
 }

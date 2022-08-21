@@ -417,9 +417,9 @@ class Ship extends GameObject{
      */
     start(){
 
-        const startCode = compileCode('this.Start(ship,Game,Render) \n' +
+        const startCode = compileCode('this.Start(ship) \n' +
                                 'return ship')
-        const tempMem = startCode({ship : this.createProxy(), Game : GameObjectManager, Render : GlobalRender})
+        const tempMem = startCode({ship : this.createProxy()})
         
         // add the user-created fields to our proxy memory
         var keys = Object.keys(this)
@@ -434,7 +434,7 @@ class Ship extends GameObject{
     update(){
         const updateCode = compileCode('this.Update(ship,Game,Render) \n' + 
                                     ' return ship')
-        const shipProxy = updateCode({ship : this.createProxy(), Game : GameObjectManager, Render : GlobalRender})
+        const shipProxy = updateCode({ship : this.createProxy(), Game : GameObjectManagerProxy})
 
         // update proxy with new memory
         var keys = Object.keys(this)
@@ -790,9 +790,9 @@ class Base extends GameObject {
      */
     start(){
 
-        const startCode = compileCode('this.BaseStart(ship,Game) \n' +
+        const startCode = compileCode('this.BaseStart(ship) \n' +
                                 'return base')
-        const tempMem = startCode({base : this.createProxy(), Game : GameObjectManager})
+        const tempMem = startCode({base : this.createProxy()})
         
         // add the user-created fields to our proxy memory
         var keys = Object.keys(this)
@@ -807,7 +807,7 @@ class Base extends GameObject {
     update(){
         const updateCode = compileCode('this.BaseUpdate(base,Game) \n' + 
                                     ' return base')
-        const baseProxy = updateCode({base : this.createProxy(), Game : GameObjectManager})
+        const baseProxy = updateCode({base : this.createProxy(), Game : GameObjectManagerProxy})
 
         // update proxy with new memory
         var keys = Object.keys(this)

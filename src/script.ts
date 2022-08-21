@@ -43,7 +43,7 @@ function step(){
     // drawInfoPanels()
 
     let elapsed = performance.now() - frameStart
-    // console.log(elapsed)
+    console.log(elapsed)
     sleep(MS - elapsed)
     window.requestAnimationFrame(step);
 
@@ -84,6 +84,9 @@ function updateField(){
 
     // manage the game objects
     GameObjectManager.update()
+
+    // CREATE GAMEOBJECTMANAGER PROXY
+    GameObjectManagerProxy = createGameManagerProxy(GameObjectList)
 
     // RUN AI LOGIC
     for(let i = GameObjectList.length - 1; i >= 0; i--){

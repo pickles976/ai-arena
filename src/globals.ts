@@ -10,6 +10,7 @@ let PAUSED : boolean = false
 let GlobalRender : Renderer
 let RenderQueue : { [key:number] : Array<Generator> } = {}
 let GameObjectManager : ObjectManager
+let GameObjectManagerProxy : ObjectManager
 let GameStateManager : StateManager
 const GameObjectList : Array<GameObject> = []
 const teamColors : Array<string> = ["#FF0000","#0000FF"]

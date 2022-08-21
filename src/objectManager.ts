@@ -10,7 +10,7 @@ class ObjectManager{
     static energyCellRange : [number, number] = [20,120]
     static speedRange : [number, number] = [0.01,0.05]
 
-    static spawnQueue : {[key: string] : Array<Generator> } = { "ASTEROID" : [], "OBSTACLE" : [], "ENERGY_CELL" : [] }
+    spawnQueue : {[key: string] : Array<Generator> }
 
     asteroids : Array<Asteroid>
     obstacles : Array<Obstacle>
@@ -18,6 +18,7 @@ class ObjectManager{
     ships : Array<Ship>
     bullets : Array<Bullet>
     bases : Array<Base>
+    all : Array<GameObject>
 
     constructor(){
         this.asteroids = []
@@ -26,6 +27,8 @@ class ObjectManager{
         this.ships = []
         this.bullets = []
         this.bases = []
+        this.all = []
+        this.spawnQueue = { "ASTEROID" : [], "OBSTACLE" : [], "ENERGY_CELL" : [] }
     }
 
     /**
@@ -56,44 +59,50 @@ class ObjectManager{
         this.ships = []
         this.bullets = []
         this.bases = []
+        this.all = []
 
         for(let i = 0; i < gameObjectList.length; i++){
             const gameObj = gameObjectList[i]
 
-            switch (gameObj.type){
-                case "ASTEROID":
-                    if (gameObj instanceof Asteroid)
-                        this.asteroids.push(gameObj as Asteroid)
-                    break;
-                case "OBSTACLE":
-                    if (gameObj instanceof Obstacle)
-                        this.obstacles.push(gameObj as Obstacle)
-                    break;
-                case "ENERGY_CELL":
-                    if (gameObj instanceof EnergyCell)
-                        this.energyCells.push(gameObj as EnergyCell)
-                    break;
-                case "SHIP":
-                    if (gameObj instanceof Ship)
-                        this.ships.push(gameObj as Ship)
-                    break;
-                case "BULLET":
-                    if (gameObj instanceof Bullet)
-                        this.bullets.push(gameObj as Bullet)
-                    break;
-                case "BASE":
-                    if (gameObj instanceof Base)
-                        this.bases.push(gameObj as Base)
-                    break;
-                default:
-                    break;
+            if (gameObj != undefined && gameObj != null){
+
+                this.all.push(gameObj)
+
+                switch (gameObj?.type){
+                    case "ASTEROID":
+                        if (gameObj instanceof Asteroid)
+                            this.asteroids.push(gameObj as Asteroid)
+                        break;
+                    case "OBSTACLE":
+                        if (gameObj instanceof Obstacle)
+                            this.obstacles.push(gameObj as Obstacle)
+                        break;
+                    case "ENERGY_CELL":
+                        if (gameObj instanceof EnergyCell)
+                            this.energyCells.push(gameObj as EnergyCell)
+                        break;
+                    case "SHIP":
+                        if (gameObj instanceof Ship)
+                            this.ships.push(gameObj as Ship)
+                        break;
+                    case "BULLET":
+                        if (gameObj instanceof Bullet)
+                            this.bullets.push(gameObj as Bullet)
+                        break;
+                    case "BASE":
+                        if (gameObj instanceof Base)
+                            this.bases.push(gameObj as Base)
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
 
     update(){
         // loop through the spawn queue and count down their timers
-        for (const [key,value] of Object.entries(ObjectManager.spawnQueue)){
+        for (const [key,value] of Object.entries(this.spawnQueue)){
             for (let i = value.length - 1; i >= 0; i--){
                 const co = value[i]
                 const temp = co.next()
@@ -106,22 +115,22 @@ class ObjectManager{
         this.indexObjects(GameObjectList)
 
         // check spawnQueue and existing objects, see if new ones need to be spawned
-        if (ObjectManager.spawnQueue["ASTEROID"].length + this.asteroids.length < ObjectManager.numAsteroids){
+        if (this.spawnQueue["ASTEROID"].length + this.asteroids.length < ObjectManager.numAsteroids){
             this.queueObject("ASTEROID", 450)
         }
 
-        if (ObjectManager.spawnQueue["OBSTACLE"].length + this.obstacles.length < ObjectManager.numObstacles){
+        if (this.spawnQueue["OBSTACLE"].length + this.obstacles.length < ObjectManager.numObstacles){
             this.queueObject("OBSTACLE", 300)
         }
 
-        if (ObjectManager.spawnQueue["ENERGY_CELL"].length + this.energyCells.length < ObjectManager.numEnergyCells){
+        if (this.spawnQueue["ENERGY_CELL"].length + this.energyCells.length < ObjectManager.numEnergyCells){
             this.queueObject("ENERGY_CELL", 600)
         }
 
     }
 
     // spawns the object immediately
-    spawnObject(type : string){
+    private spawnObject(type : string){
 
         sortGameObjectList()
 
@@ -167,7 +176,7 @@ class ObjectManager{
      * @param {string} type 
      * @param {number} numFrames 
      */
-    queueObject(type : string,numFrames : number){
+    private queueObject(type : string,numFrames : number){
 
         function* queueObjectCoroutine(self : ObjectManager,type : string,numFrames : number){
             for(let i = 0; i < numFrames; i++){
@@ -177,7 +186,7 @@ class ObjectManager{
             self.spawnObject(type)
         }
 
-        ObjectManager.spawnQueue[type].push(queueObjectCoroutine(this,type,numFrames))
+        this.spawnQueue[type].push(queueObjectCoroutine(this,type,numFrames))
     }
 
     getAsteroids(){
@@ -256,5 +265,19 @@ class ObjectManager{
         } catch (e) {
             console.log("Team " + team + " base has been destroyed!")
         }
+    }
+
+    getObjectFromUUID(uuid : number){
+        try {
+            return this.all.filter((obj) => obj.uuid === uuid)[0]
+        }
+        catch (e)
+        {
+            return null
+        }
+    }
+
+    refreshObject(obj : GameObject){
+        return this.getObjectFromUUID(obj.uuid)
     }
 }
