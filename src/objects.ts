@@ -1,6 +1,3 @@
-/**
- * The resources contained in any object
- */
 class Resources {
 
     static colors = ["#666666","#ADD8E6", "#00FF00"]
@@ -79,10 +76,6 @@ class GameObject {
     }
 }
 
-/**
- * Asteroid object is composed of a circle object, it calls the circle object's simulate and render functions
- * to simulate and render itself.
- */
 class Asteroid extends GameObject {
 
     resources : Resources
@@ -394,8 +387,12 @@ class Ship extends GameObject{
         }
     }
 
+    // subtracting target's velocity gives us our intercept vector in the inertial reference frame of the target
+    // multiplying by our desired speed gives us the top speed
+    // subtracting our current velocity gives us dV
     seekTarget(target: GameObject){
-        const desiredVelocity = target.circle.position.subtract(this.circle.position).normal().multiply(target.circle.velocity.magnitude * 2.0)
+        const desiredSpeed = 2.5 / FRAMERATE
+        const desiredVelocity = target.circle.position.subtract(this.circle.position).normal().multiply(desiredSpeed).add(target.circle.velocity)
         const steering = desiredVelocity.subtract(this.circle.velocity)
         this.thrust(steering,1.0)
     }
