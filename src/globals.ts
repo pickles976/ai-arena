@@ -21,3 +21,4 @@ let xArray : Array<number> = []
 const energyScale : number = 25
 
 const SHIP_MASS = 50
+const BASE_MASS = 300

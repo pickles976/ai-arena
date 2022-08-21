@@ -1,16 +1,16 @@
-//@ts-nocheck
-// function BaseStart(){
-//     console.log("Base Start!")
-// }
+// @ts-nocheck
+function BaseStart(base, Game){
+    console.log("Base Start!")
+}
 
-// function BaseUpdate(){
-//     const energy = 50
-//     if (ship.resources.metal > ship.shipCost && ship.resources.energy > energy){
-//         ship.trySpawnShip(energy,false)
-//     }
-// }
+function BaseUpdate(base, Game){
+    const energy = 50
+    if (base.resources.metal > base.shipCost && base.resources.energy > energy){
+        base.spawnShip(energy,false)
+    }
+}
 
-function Start(ship, Game, Render){
+function Start(ship, Game){
 
     ship.target = {}
     ship.state = "IDLE"

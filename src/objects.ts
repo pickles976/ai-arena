@@ -383,11 +383,19 @@ class Ship extends GameObject{
             this.team])
     }
 
+    /**
+     * ShipProxy to inject into code
+     * @returns 
+     */
     createProxy(){
         // create proxy
         const shipProxy = new ShipProxy(this.uuid, this.circle.position,this.resources.energy, this.team)
         shipProxy.resources.metal = this.resources.metal
         shipProxy.resources.water = this.resources.water
+        shipProxy.maxEnergy = this.maxEnergy
+        shipProxy.damage = this.damage
+        shipProxy.energyCost = this.energyCost
+        shipProxy.damageCost = this.damageCost
 
         // load custom memory
         var keys = Object.keys(this)
@@ -402,10 +410,10 @@ class Ship extends GameObject{
 
     /**
      * 1. Create proxy object and inject into code
-     * 2. Add fields to proxy object
-     * 3. Return proxy object + ActionQueue
-     * 4. Find difference between ProxyObject and "real" object fields, 
+     * 2. Return proxy object + ActionQueue
+     * 3. Find difference between ProxyObject and "real" object fields, 
      * add the difference to temporaryMemory
+     * 4. Run all actions in ActionQueue
      */
     start(){
 
@@ -424,7 +432,6 @@ class Ship extends GameObject{
     }
 
     update(){
-        // Update.call(this)
         const updateCode = compileCode('this.Update(ship,Game,Render) \n' + 
                                     ' return ship')
         const shipProxy = updateCode({ship : this.createProxy(), Game : GameObjectManager, Render : GlobalRender})
@@ -555,6 +562,9 @@ class Bullet extends GameObject {
 
 class Base extends GameObject {
 
+    ActionQueue : Array<any>
+    proxyMemory : Object
+
     team : number
     resources : Resources
     maxEnergy : number
@@ -590,6 +600,9 @@ class Base extends GameObject {
         this.healRateCost = 250
         this.interactRadiusCost = 250
         this.energyCost = 250
+
+        this.proxyMemory = {}
+        this.ActionQueue = []
     }
 
     
@@ -651,16 +664,8 @@ class Base extends GameObject {
         GlobalRender.drawText(this.resources.toString(),this.circle.position,12,"#FFFFFF")
     }
 
-    start(){
-        // BaseStart.call(this)
-    }
-
-    update(){
-        // BaseUpdate.call(this)
-    }
-
     destroy(){
-
+        this.type == "DEAD"
     }
 
     healShip(deltaTime : number,ship : Ship){
@@ -744,5 +749,113 @@ class Base extends GameObject {
             this.circle.position.serialize(),
             this.resources.getResources()["energy"],
             this.team])
+    }
+
+    /**
+     * baseProxy to inject into code
+     * @returns 
+     */
+     createProxy(){
+        // create proxy
+        const baseProxy = new BaseProxy(this.uuid, this.circle.position,this.resources.energy, this.team)
+        baseProxy.resources.metal = this.resources.metal
+        baseProxy.resources.water = this.resources.water
+        baseProxy.maxEnergy = this.maxEnergy
+        baseProxy.refiningRate = this.refiningRate
+        baseProxy.baseShipCost = this.baseShipCost
+        baseProxy.shipCost = this.shipCost
+        baseProxy.healRate = this.healRate
+        baseProxy.interactRadius = this.interactRadius
+        baseProxy.healRateCost = this.healRateCost
+        baseProxy.interactRadiusCost = this.interactRadiusCost
+        baseProxy.energyCost = this.energyCost
+
+        // load custom memory
+        var keys = Object.keys(this)
+        for(var key in this.proxyMemory){
+            if(!keys.includes(key)){
+                // @ts-ignore
+                baseProxy[key] = this.proxyMemory[key]
+            }
+        }
+        return baseProxy
+    }
+
+    /**
+     * 1. Create proxy object and inject into code
+     * 2. Return proxy object + ActionQueue
+     * 3. Find difference between ProxyObject and "real" object fields, 
+     * add the difference to temporaryMemory
+     * 4. Run all actions in ActionQueue
+     */
+    start(){
+
+        const startCode = compileCode('this.BaseStart(ship,Game) \n' +
+                                'return base')
+        const tempMem = startCode({base : this.createProxy(), Game : GameObjectManager})
+        
+        // add the user-created fields to our proxy memory
+        var keys = Object.keys(this)
+        for (var key in tempMem){
+            if (!keys.includes(key)){
+                // @ts-ignore
+                this.proxyMemory[key] = tempMem[key]
+            }
+        }
+    }
+
+    update(){
+        const updateCode = compileCode('this.BaseUpdate(base,Game) \n' + 
+                                    ' return base')
+        const baseProxy = updateCode({base : this.createProxy(), Game : GameObjectManager})
+
+        // update proxy with new memory
+        var keys = Object.keys(this)
+        for (var key in baseProxy){
+            if (!keys.includes(key)){
+                // @ts-ignore
+                this.proxyMemory[key] = baseProxy[key]
+            }
+        }
+
+        this.runActionQueue(baseProxy.ActionQueue)
+    }
+
+    runActionQueue(aq : Array<Array<any>>){
+
+        for(var index in aq){
+            const argsList = aq[index]
+            const args = argsList.slice(1)
+            const type = argsList[0]
+
+            switch(type){
+                case "UPGRADE_INTERACT_RADIUS":
+                    this.upgradeInteractRadius()
+                    break;
+                case "UPGRADE_HEAL_RATE":
+                    this.upgradeHealRate()
+                    break
+                case "UPGRADE_HEALTH":
+                    this.upgradeHealth()
+                    break
+                case "SPAWN_SHIP":
+                    //@ts-ignore
+                    this.trySpawnShip(...args,false)
+                    break
+                case "DRAW_TEXT":
+                    //@ts-ignore
+                    GlobalRender.drawText(...args)
+                    break
+                case "DRAW_LINE":
+                    //@ts-ignore
+                    GlobalRender.drawLine(...args)
+                    break
+                case "DRAW_CIRCLE":
+                    //@ts-ignore
+                    GlobalRender.drawCircle(...args)
+                    break
+            }
+        }
+
     }
 }
