@@ -134,4 +134,3 @@ class BaseProxy extends GameObject {
     }
 
 }
-

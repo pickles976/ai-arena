@@ -1,3 +1,7 @@
+/**
+ * https://blog.risingstack.com/writing-a-javascript-framework-sandboxed-code-evaluation/
+ */
+
 const sandboxProxies = new WeakMap()
 
 function compileCode (src) {

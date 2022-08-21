@@ -33,7 +33,9 @@ circle is compared against the X array, and the indices are used to return an ar
 - [x] full game engine
 - [x] Inject user AI code
 - [x] Convert to Typescript
-- [ ] Safely sandbox user AI code
+- [x] Safely sandbox user AI code
+- [ ] Clean up and add single entrypoint
+- [ ] Allow users to write code in browser
 - [ ] Port to Node.js
 - [ ] Sync via websockets
 - [ ] Add client prediction
