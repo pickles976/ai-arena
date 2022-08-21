@@ -184,7 +184,7 @@ class Ship extends GameObject{
     // User-created memory for the proxy object
     proxyMemory : Object
     
-    //
+    // This sits empty, it is just needed to overlap with proxyShip fields
     ActionQueue : Array<Array<any>>
 
     constructor(uuid : number,position : Vector2D,energy : number,team : number){
@@ -299,64 +299,6 @@ class Ship extends GameObject{
         return this.circle.mass + this.resources.water + this.resources.metal
     }
 
-    createProxy(){
-        // create proxy
-        const shipProxy = new ShipProxy(this.uuid, this.circle.position,this.resources.energy, this.team)
-        shipProxy.resources.metal = this.resources.metal
-        shipProxy.resources.water = this.resources.water
-
-        // load custom memory
-        var keys = Object.keys(this)
-        for(var key in this.proxyMemory){
-            if(!keys.includes(key)){
-                // @ts-ignore
-                shipProxy[key] = this.proxyMemory[key]
-            }
-        }
-        return shipProxy
-    }
-
-    /**
-     * 1. Create proxy object and inject into code
-     * 2. Add fields to proxy object
-     * 3. Return proxy object + ActionQueue
-     * 4. Find difference between ProxyObject and "real" object fields, 
-     * add the difference to temporaryMemory
-     */
-    start(){
-
-        const startCode = compileCode('this.Start(ship,Game,Render) \n' +
-                                'return ship')
-        const tempMem = startCode({ship : this.createProxy(), Game : GameObjectManager, Render : GlobalRender})
-        
-        // add the user-created fields to our proxy memory
-        var keys = Object.keys(this)
-        for (var key in tempMem){
-            if (!keys.includes(key)){
-                // @ts-ignore
-                this.proxyMemory[key] = tempMem[key]
-            }
-        }
-    }
-
-    update(){
-        // Update.call(this)
-        const updateCode = compileCode('this.Update(ship,Game,Render) \n' + 
-                                    ' return ship')
-        const shipProxy = updateCode({ship : this.createProxy(), Game : GameObjectManager, Render : GlobalRender})
-
-        // update proxy with new memory
-        var keys = Object.keys(this)
-        for (var key in shipProxy){
-            if (!keys.includes(key)){
-                // @ts-ignore
-                this.proxyMemory[key] = shipProxy[key]
-            }
-        }
-
-        console.log(shipProxy)
-    }
-
     moveTo(position : Vector2D){
         const vec = position.subtract(this.circle.position)
         const power = vec.magnitude / 100
@@ -439,6 +381,111 @@ class Ship extends GameObject{
             this.circle.position.serialize(),
             this.resources.getResources()["energy"],
             this.team])
+    }
+
+    createProxy(){
+        // create proxy
+        const shipProxy = new ShipProxy(this.uuid, this.circle.position,this.resources.energy, this.team)
+        shipProxy.resources.metal = this.resources.metal
+        shipProxy.resources.water = this.resources.water
+
+        // load custom memory
+        var keys = Object.keys(this)
+        for(var key in this.proxyMemory){
+            if(!keys.includes(key)){
+                // @ts-ignore
+                shipProxy[key] = this.proxyMemory[key]
+            }
+        }
+        return shipProxy
+    }
+
+    /**
+     * 1. Create proxy object and inject into code
+     * 2. Add fields to proxy object
+     * 3. Return proxy object + ActionQueue
+     * 4. Find difference between ProxyObject and "real" object fields, 
+     * add the difference to temporaryMemory
+     */
+    start(){
+
+        const startCode = compileCode('this.Start(ship,Game,Render) \n' +
+                                'return ship')
+        const tempMem = startCode({ship : this.createProxy(), Game : GameObjectManager, Render : GlobalRender})
+        
+        // add the user-created fields to our proxy memory
+        var keys = Object.keys(this)
+        for (var key in tempMem){
+            if (!keys.includes(key)){
+                // @ts-ignore
+                this.proxyMemory[key] = tempMem[key]
+            }
+        }
+    }
+
+    update(){
+        // Update.call(this)
+        const updateCode = compileCode('this.Update(ship,Game,Render) \n' + 
+                                    ' return ship')
+        const shipProxy = updateCode({ship : this.createProxy(), Game : GameObjectManager, Render : GlobalRender})
+
+        // update proxy with new memory
+        var keys = Object.keys(this)
+        for (var key in shipProxy){
+            if (!keys.includes(key)){
+                // @ts-ignore
+                this.proxyMemory[key] = shipProxy[key]
+            }
+        }
+
+        this.runActionQueue(shipProxy.ActionQueue)
+    }
+
+    runActionQueue(aq : Array<Array<any>>){
+
+        for(var index in aq){
+            const argsList = aq[index]
+            const args = argsList.slice(1)
+            const type = argsList[0]
+
+            switch(type){
+                case "APPLY_THRUST":
+                    //@ts-ignore
+                    this.applyThrust(...args)
+                    break;
+                case "SHOOT":
+                    //@ts-ignore
+                    this.shoot(...args)
+                    break
+                case "UPGRADE_MAX_ENERGY":
+                    this.upgradeMaxEnergy()
+                    break
+                case "UPGRADE_DAMAGE":
+                    this.upgradeDamage
+                    break
+                case "MOVE_TO_OBJECT":
+                    //@ts-ignore
+                    this.moveToObject(...args)
+                    break;
+                case "SEEK_TARGET":
+                    //@ts-ignore
+                    this.seekTarget(...args)
+                    break
+                case "DRAW_TEXT":
+                    //@ts-ignore
+                    GlobalRender.drawText(...args)
+                    break
+                case "DRAW_LINE":
+                    //@ts-ignore
+                    GlobalRender.drawLine(...args)
+                    break
+                case "DRAW_CIRCLE":
+                    //@ts-ignore
+                    GlobalRender.drawCircle(...args)
+                    break
+            }
+        }
+
     }
 }
 

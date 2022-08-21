@@ -17,12 +17,9 @@ function Start(ship, Game, Render){
 
 }
 
-function Update(ship, Game, Render, ActionQueue){
+function Update(ship, Game){
 
     const base = Game.getBaseByTeam(ship.team)
-
-    ship.maxEnergy = 1000
-    ship.resources.energy = 1000
 
     // STATE MACHINE
     switch(ship.state){
@@ -135,7 +132,7 @@ function Update(ship, Game, Render, ActionQueue){
     }
 
     // DEBUG DRAWING
-    Render.drawText(ship.resources.toString(),ship.circle.position,10,"#FFFFFF")
-    Render.drawText(ship.state,ship.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
-    Render.drawLine(ship.circle.position,ship.target.circle.position,"#00FF00")
+    ship.drawText(ship.resources.toString(),ship.circle.position,10,"#FFFFFF")
+    ship.drawText(ship.state,ship.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
+    ship.drawLine(ship.circle.position,ship.target.circle.position,"#00FF00")
 }
