@@ -44,38 +44,6 @@ class Resources {
     }
 }
 
-class GameObject {
-    uuid : number
-    type : string
-    circle : Circle
-
-    constructor(uuid : number,type : string,circle : Circle){
-        this.uuid = uuid
-        this.type = type
-        this.circle = circle
-    }
-
-    destroy(){
-        this.type = "DEAD"
-    }
-
-    simulate(deltaTime : number){
-        this.circle.simulate(deltaTime)
-    }
-
-    render(){
-
-    }
-
-    collide(otherObject : GameObject){
-
-    }
-
-    serialize(){
-        
-    }
-}
-
 class Asteroid extends GameObject {
 
     resources : Resources
@@ -213,9 +181,15 @@ class Ship extends GameObject{
     energyCost : number
     damageCost : number
 
+    // User-created memory for the proxy object
+    proxyMemory : Object
+    
+    //
+    ActionQueue : Array<Array<any>>
+
     constructor(uuid : number,position : Vector2D,energy : number,team : number){
 
-        super(uuid,"SHIP",new Circle(50.0,position,Vector2D.zero))
+        super(uuid,"SHIP",new Circle(SHIP_MASS,position,Vector2D.zero))
         this.team = team
         this.resources = new Resources(0,0,energy)
 
@@ -226,6 +200,9 @@ class Ship extends GameObject{
         // upgrade costs
         this.energyCost = 100
         this.damageCost = 100
+
+        this.proxyMemory = {}
+        this.ActionQueue = []
         this.start()
     }
 
@@ -255,7 +232,7 @@ class Ship extends GameObject{
         // draw the resources in the asteroid as colored rings
         GlobalRender.drawCircle(position,this.circle.radius,teamColors[this.team])
 
-        // draw thrust effect
+        // draw applyThrust effect
         if (acceleration.y != 0){
             if (acceleration.y > 0){
                 GlobalRender.drawExhaust(position,180,magnitude)
@@ -322,32 +299,82 @@ class Ship extends GameObject{
         return this.circle.mass + this.resources.water + this.resources.metal
     }
 
+    createProxy(){
+        // create proxy
+        const shipProxy = new ShipProxy(this.uuid, this.circle.position,this.resources.energy, this.team)
+        shipProxy.resources.metal = this.resources.metal
+        shipProxy.resources.water = this.resources.water
+
+        // load custom memory
+        var keys = Object.keys(this)
+        for(var key in this.proxyMemory){
+            if(!keys.includes(key)){
+                // @ts-ignore
+                shipProxy[key] = this.proxyMemory[key]
+            }
+        }
+        return shipProxy
+    }
+
+    /**
+     * 1. Create proxy object and inject into code
+     * 2. Add fields to proxy object
+     * 3. Return proxy object + ActionQueue
+     * 4. Find difference between ProxyObject and "real" object fields, 
+     * add the difference to temporaryMemory
+     */
     start(){
-        Start.call(this)
+
+        const startCode = compileCode('this.Start(ship,Game,Render) \n' +
+                                'return ship')
+        const tempMem = startCode({ship : this.createProxy(), Game : GameObjectManager, Render : GlobalRender})
+        
+        // add the user-created fields to our proxy memory
+        var keys = Object.keys(this)
+        for (var key in tempMem){
+            if (!keys.includes(key)){
+                // @ts-ignore
+                this.proxyMemory[key] = tempMem[key]
+            }
+        }
     }
 
     update(){
-        Update.call(this)
+        // Update.call(this)
+        const updateCode = compileCode('this.Update(ship,Game,Render) \n' + 
+                                    ' return ship')
+        const shipProxy = updateCode({ship : this.createProxy(), Game : GameObjectManager, Render : GlobalRender})
+
+        // update proxy with new memory
+        var keys = Object.keys(this)
+        for (var key in shipProxy){
+            if (!keys.includes(key)){
+                // @ts-ignore
+                this.proxyMemory[key] = shipProxy[key]
+            }
+        }
+
+        console.log(shipProxy)
     }
 
     moveTo(position : Vector2D){
         const vec = position.subtract(this.circle.position)
         const power = vec.magnitude / 100
-        this.thrust(vec,power)
+        this.applyThrust(vec,power)
     }
 
     moveToObject(obj : GameObject){
         const vec = obj.circle.position.subtract(this.circle.position)
         const power = vec.magnitude / 100
-        this.thrust(vec,power)
+        this.applyThrust(vec,power)
     }
 
     /**
-     * Apply vectored thrust
+     * Apply vectored applyThrust
      * @param {Vector2D} vector 
      * @param {number} percentage clamped between 0 and 1
      */
-    thrust(vector : Vector2D,percentage : number){
+    applyThrust(vector : Vector2D,percentage : number){
         const pct = clamp(percentage,0,1)
         this.circle.acceleration = vector.normal().multiply(pct)    
     }
@@ -394,7 +421,7 @@ class Ship extends GameObject{
         const desiredSpeed = 2.5 / FRAMERATE
         const desiredVelocity = target.circle.position.subtract(this.circle.position).normal().multiply(desiredSpeed).add(target.circle.velocity)
         const steering = desiredVelocity.subtract(this.circle.velocity)
-        this.thrust(steering,1.0)
+        this.applyThrust(steering,1.0)
     }
 
     toString(){
@@ -413,7 +440,6 @@ class Ship extends GameObject{
             this.resources.getResources()["energy"],
             this.team])
     }
-
 }
 
 class Bullet extends GameObject {
@@ -579,11 +605,11 @@ class Base extends GameObject {
     }
 
     start(){
-        BaseStart.call(this)
+        // BaseStart.call(this)
     }
 
     update(){
-        BaseUpdate.call(this)
+        // BaseUpdate.call(this)
     }
 
     destroy(){

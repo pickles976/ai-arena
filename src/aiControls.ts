@@ -1,114 +1,119 @@
 //@ts-nocheck
-function BaseStart(){
-    console.log("Base Start!")
+// function BaseStart(){
+//     console.log("Base Start!")
+// }
+
+// function BaseUpdate(){
+//     const energy = 50
+//     if (ship.resources.metal > ship.shipCost && ship.resources.energy > energy){
+//         ship.trySpawnShip(energy,false)
+//     }
+// }
+
+function Start(ship, Game, Render){
+
+    ship.target = {}
+    ship.state = "IDLE"
+
 }
 
-function BaseUpdate(){
-    const energy = 50
-    if (this.resources.metal > this.shipCost && this.resources.energy > energy){
-        this.trySpawnShip(energy,false)
-    }
-}
+function Update(ship, Game, Render, ActionQueue){
 
-function Start(){
-    this.target = {}
-    this.state = "IDLE"
-}
+    const base = Game.getBaseByTeam(ship.team)
 
-function Update(){
-
-    const base = GameObjectManager.getBaseByTeam(this.team)
+    ship.maxEnergy = 1000
+    ship.resources.energy = 1000
 
     // STATE MACHINE
-    switch(this.state){
+    switch(ship.state){
 
         case "IDLE":
         
-            const asteroids = GameObjectManager.getAsteroids()
+            const asteroids = Game.getAsteroids()
 
             let closest = [{},100000]
 
             for (const index in asteroids){
                 const asteroid = asteroids[index]
-                const d = dist(asteroid,this)
+                const d = dist(asteroid,ship)
                 if (d < closest[1]){
                     closest = [asteroid,d]
                 }
             }
 
-            this.target = closest[0]
-            this.state = "MOVE_TO_ASTEROID"
+            ship.target = closest[0]
+            ship.state = "MOVE_TO_ASTEROID"
 
 
             break;
 
         case "MOVE_TO_ASTEROID":
 
-            if (this.target.type === "ASTEROID"){
-                this.seekTarget(this.target)
+            if (ship.target.type === "ASTEROID"){
+                ship.seekTarget(ship.target)
             }else{
-                this.target = base
-                this.state = "MOVE_TO_BASE"
+                ship.target = base
+                ship.state = "MOVE_TO_BASE"
             }
 
             break;
 
         case "MOVE_TO_BASE":
 
-            if (this.resources.metal > 0 || this.resources.water > 0){
-                this.moveToObject(this.target)
+            if (ship.resources.metal > 0 || ship.resources.water > 0){
+                ship.moveToObject(ship.target)
             }else{
-                this.state = "IDLE"
+                ship.state = "IDLE"
             }
 
             break;
 
         case "MOVE_TO_ENERGY":
-            if (this.target.type === "ENERGY_CELL"){
-                this.seekTarget(this.target)
-            }else if (this.target.type === "BASE") {
-                if (this.resources.energy > 90 || base.resources.energy < 1 || dist(this,base) > base.interactRadius){
-                    this.state = "IDLE"
+            if (ship.target.type === "ENERGY_CELL"){
+                ship.seekTarget(ship.target)
+            }else if (ship.target.type === "BASE") {
+                if (ship.resources.energy > 90 || base.resources.energy < 1 || dist(ship,base) > base.interactRadius){
+                    ship.state = "IDLE"
                 }else{
-                    this.seekTarget(this.target)
+                    ship.moveToObject(ship.target)
                 }
             }
             else{
-                this.state = "IDLE"
+                ship.state = "IDLE"
             }
             break;
             
     }
 
     // seekTarget ENERGY
-    if (this.resources.energy < (this.maxEnergy / 4)){
-        const energyCells = GameObjectManager.getEnergyCells()
+    if (ship.resources.energy < (ship.maxEnergy / 4)){
+        const energyCells = Game.getEnergyCells()
 
-        let closest = [base,dist(base,this)]
+        let closest = [base,dist(base,ship)]
 
         for (const index in energyCells){
             const energyCell = energyCells[index]
-            const d = dist(energyCell,this)
+            const d = dist(energyCell,ship)
             if (d < closest[1]){
                 closest = [energyCell,d]
             }
         }
 
-        this.target = closest[0]
-        this.state = "MOVE_TO_ENERGY"
+        ship.target = closest[0]
+        ship.state = "MOVE_TO_ENERGY"
     }
 
     // COMBAT
-    if(this.resources.energy > (this.damage)){
+    if(ship.resources.energy > (ship.damage)){
         const shootRadius = 200
-        const ships = GameObjectManager.getShips()
+        const ships = Game.getShips()
 
         let closest = [{},100000]
 
         for (const index in ships){
             const ship = ships[index]
-            if (ship.team != this.team){
-                const d = dist(ship,this)
+            if (ship.team != ship.team){
+                const d = dist(ship,ship)
                 if (d < closest[1]){
                     closest = [ship,d]
                 }
@@ -116,21 +121,21 @@ function Update(){
         }
 
         if (closest[1] < shootRadius){
-            this.shoot(closest[0].circle.position.subtract(this.circle.position).add(closest[0].circle.velocity.multiply(60)))
+            ship.shoot(closest[0].circle.position.subtract(ship.circle.position).add(closest[0].circle.velocity.multiply(60)))
         }
     }
 
     // UPGRADES
-    if (base.resources.metal > this.energyCost && GameObjectManager.getShipsByTeam(this.team).length > 2){
-        this.upgradeMaxEnergy()
+    if (base.resources.metal > ship.energyCost && Game.getShipsByTeam(ship.team).length > 2){
+        ship.upgradeMaxEnergy()
     }
 
-    if (base.resources.metal > this.damageCost && GameObjectManager.getShipsByTeam(this.team).length > 2){
-        this.upgradeDamage()
+    if (base.resources.metal > ship.damageCost && Game.getShipsByTeam(ship.team).length > 2){
+        ship.upgradeDamage()
     }
 
     // DEBUG DRAWING
-    GlobalRender.drawText(this.resources.toString(),this.circle.position,10,"#FFFFFF")
-    GlobalRender.drawText(this.state,this.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
-    GlobalRender.drawLine(this.circle.position,this.target.circle.position,"#00FF00")
+    Render.drawText(ship.resources.toString(),ship.circle.position,10,"#FFFFFF")
+    Render.drawText(ship.state,ship.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
+    Render.drawLine(ship.circle.position,ship.target.circle.position,"#00FF00")
 }

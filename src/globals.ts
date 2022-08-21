@@ -19,3 +19,5 @@ let xArray : Array<number> = []
 
 // multiplier for energy consumption
 const energyScale : number = 25
+
+const SHIP_MASS = 50
