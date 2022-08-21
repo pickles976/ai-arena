@@ -62,6 +62,17 @@ class ShipProxy extends GameObject {
         this.ActionQueue.push(["SEEK_TARGET",target])
     }
 
+    drawText(text : string,position : Vector2D,size : number, color : string){
+        this.ActionQueue.push(["DRAW_TEXT",text,position,size,color])
+    }
+
+    drawLine(start : Vector2D,end : Vector2D,color : string){
+        this.ActionQueue.push(["DRAW_LINE",start,end,color])
+    }
+
+    drawCircle(position : Vector2D,radius : number,color : string){
+        this.ActionQueue.push(["DRAW_CIRCLE",position,radius,color])
+    }
 
 }
 

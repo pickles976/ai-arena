@@ -45,11 +45,11 @@ class ObjectManager{
             this.spawnObject("ENERGY_CELL")
         }
 
-        this.indexObjects()
+        this.indexObjects(GameObjectList)
 
     }
 
-    indexObjects(){
+    indexObjects(gameObjectList : Array<GameObject>){
         this.asteroids = []
         this.obstacles = []
         this.energyCells = []
@@ -57,8 +57,8 @@ class ObjectManager{
         this.bullets = []
         this.bases = []
 
-        for(let i = 0; i < GameObjectList.length; i++){
-            const gameObj = GameObjectList[i]
+        for(let i = 0; i < gameObjectList.length; i++){
+            const gameObj = gameObjectList[i]
 
             switch (gameObj.type){
                 case "ASTEROID":
@@ -103,7 +103,7 @@ class ObjectManager{
             }
         }
 
-        this.indexObjects()
+        this.indexObjects(GameObjectList)
 
         // check spawnQueue and existing objects, see if new ones need to be spawned
         if (ObjectManager.spawnQueue["ASTEROID"].length + this.asteroids.length < ObjectManager.numAsteroids){
