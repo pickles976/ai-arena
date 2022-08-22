@@ -131,6 +131,7 @@ function Update(ship, Game){
         ship.upgradeDamage()
     }
 
+    console.log(ship.target)
     ship.targetID = ship.target.uuid
 
     // DEBUG DRAWING

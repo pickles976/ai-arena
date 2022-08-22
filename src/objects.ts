@@ -299,75 +299,10 @@ class Ship extends GameObject{
         return this.circle.mass + this.resources.water + this.resources.metal
     }
 
-    moveTo(position : Vector2D){
-        const vec = position.subtract(this.circle.position)
-        const power = vec.magnitude / 100
-        this.applyThrust(vec,power)
-    }
-
-    moveToObject(obj : GameObject){
-        const vec = obj.circle.position.subtract(this.circle.position)
-        const power = vec.magnitude / 100
-        this.applyThrust(vec,power)
-    }
-
-    /**
-     * Apply vectored applyThrust
-     * @param {Vector2D} vector 
-     * @param {number} percentage clamped between 0 and 1
-     */
-    applyThrust(vector : Vector2D,percentage : number){
-        const pct = clamp(percentage,0,1)
-        this.circle.acceleration = vector.normal().multiply(pct)    
-    }
-
-    /**
-     * Instantiate a bullet traveling in a certain direction
-     * @param {Vector2D} direction 
-     */
-    shoot(direction : Vector2D){
-        // instantiate object
-        this.resources.energy -= this.damage
-        const bullet = new Bullet(create_UUID(),this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), this.damage, this.uuid)
-        GameObjectList.push(bullet)
-    }
-
     destroy(){
         GameStateManager.addDeath(this.team)
         GameObjectManager.getBaseByTeam(this.team)?.queueShip()
         super.destroy()
-    }
-
-    upgradeMaxEnergy(){
-        const base = GameObjectManager.getBaseByTeam(this.team)
-        if (base !== undefined){
-            if (base.resources.metal > this.energyCost){
-                base.resources.metal -= this.energyCost
-                this.energyCost *= 2
-                this.maxEnergy *= 2
-            }
-        }
-    }
-
-    upgradeDamage(){
-        const base = GameObjectManager.getBaseByTeam(this.team)
-        if (base !== undefined){
-            if (base.resources.metal > this.damageCost){
-                base.resources.metal -= this.damageCost
-                this.damageCost *= 2
-                this.damage *= 2
-            }
-        }
-    }
-
-    // subtracting target's velocity gives us our intercept vector in the inertial reference frame of the target
-    // multiplying by our desired speed gives us the top speed
-    // subtracting our current velocity gives us dV
-    seekTarget(target: GameObject){
-        const desiredSpeed = 2.5 / FRAMERATE
-        const desiredVelocity = target.circle.position.subtract(this.circle.position).normal().multiply(desiredSpeed).add(target.circle.velocity)
-        const steering = desiredVelocity.subtract(this.circle.velocity)
-        this.applyThrust(steering,1.0)
     }
 
     toString(){
@@ -387,10 +322,6 @@ class Ship extends GameObject{
             this.team])
     }
 
-    /**
-     * ShipProxy to inject into code
-     * @returns 
-     */
     createProxy(){
         // create proxy
         const shipProxy = new ShipProxy(this.uuid, this.circle.position,this.resources.energy, this.team)
@@ -412,44 +343,16 @@ class Ship extends GameObject{
         return shipProxy
     }
 
-    /**
-     * 1. Create proxy object and inject into code
-     * 2. Return proxy object + ActionQueue
-     * 3. Find difference between ProxyObject and "real" object fields, 
-     * add the difference to temporaryMemory
-     * 4. Run all actions in ActionQueue
-     */
     start(){
-
         const startCode = compileCode('this.Start(ship) \n' +
                                 'return ship')
-        const tempMem = startCode({ship : this.createProxy()})
-        
-        // add the user-created fields to our proxy memory
-        var keys = Object.keys(this)
-        for (var key in tempMem){
-            if (!keys.includes(key)){
-                // @ts-ignore
-                this.proxyMemory[key] = tempMem[key]
-            }
-        }
+        startCode({ship : createShipProxy(this)})
     }
 
     update(){
         const updateCode = compileCode('this.Update(ship,Game,Render) \n' + 
                                     ' return ship')
-        const shipProxy = updateCode({ship : this.createProxy(), Game : GameObjectManagerProxy})
-
-        // update proxy with new memory
-        var keys = Object.keys(this)
-        for (var key in shipProxy){
-            if (!keys.includes(key)){
-                // @ts-ignore
-                this.proxyMemory[key] = shipProxy[key]
-            }
-        }
-
-        this.runActionQueue(shipProxy.ActionQueue)
+        updateCode({ship : createShipProxy(this), Game : GameObjectManagerProxy})
     }
 
     runActionQueue(aq : Array<Array<any>>){
@@ -497,6 +400,64 @@ class Ship extends GameObject{
             }
         }
 
+    }
+
+    // USER-CALLABLE FUNCTIONS 
+
+    applyThrust(vector : Vector2D,percentage : number){
+        const pct = clamp(percentage,0,1)
+        this.circle.acceleration = vector.normal().multiply(pct)    
+    }
+
+    shoot(direction : Vector2D){
+        // instantiate object
+        this.resources.energy -= this.damage
+        const bullet = new Bullet(create_UUID(),this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), this.damage, this.uuid)
+        GameObjectList.push(bullet)
+    }
+
+    upgradeMaxEnergy(){
+        const base = GameObjectManager.getBaseByTeam(this.team)
+        if (base !== undefined){
+            if (base.resources.metal > this.energyCost){
+                base.resources.metal -= this.energyCost
+                this.energyCost *= 2
+                this.maxEnergy *= 2
+            }
+        }
+    }
+
+    upgradeDamage(){
+        const base = GameObjectManager.getBaseByTeam(this.team)
+        if (base !== undefined){
+            if (base.resources.metal > this.damageCost){
+                base.resources.metal -= this.damageCost
+                this.damageCost *= 2
+                this.damage *= 2
+            }
+        }
+    }
+
+    // subtracting target's velocity gives us our intercept vector in the inertial reference frame of the target
+    // multiplying by our desired speed gives us the top speed
+    // subtracting our current velocity gives us dV
+    seekTarget(target: GameObject){
+        const desiredSpeed = 2.5 / FRAMERATE
+        const desiredVelocity = target.circle.position.subtract(this.circle.position).normal().multiply(desiredSpeed).add(target.circle.velocity)
+        const steering = desiredVelocity.subtract(this.circle.velocity)
+        this.applyThrust(steering,1.0)
+    }
+
+    moveTo(position : Vector2D){
+        const vec = position.subtract(this.circle.position)
+        const power = vec.magnitude / 100
+        this.applyThrust(vec,power)
+    }
+
+    moveToObject(obj : GameObject){
+        const vec = obj.circle.position.subtract(this.circle.position)
+        const power = vec.magnitude / 100
+        this.applyThrust(vec,power)
     }
 }
 

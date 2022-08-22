@@ -80,17 +80,71 @@ function createGameObjectProxy(){
 
 }
 
-/**
- * Create a Proxy object that we pass to user code.
- * We only allow for getting the specific fields that we want users to have access to.
- * Setting, defining, and deleting is not allowed
- * @param gameManager 
- * @returns 
- */
- function createBaseProxy(base : Base){
+ function createShipProxy(ship : Ship){
 
     // readable fields
-    const whiteList = ["team" , "maxEnergy", "refiningRate", "baseShipCost", 
+    const whiteList = ["uuid", "team" , "maxEnergy", "damage", "energyCost", 
+            "damageCost", "upgradeMaxEnergy", "upgradeDamage", "seekTarget", 
+            "moveTo", "moveToObject", "applyThrust", "shoot"]
+
+    // readable after deep copy
+    const grayList = ["resources","circle"]
+
+    // not readable under any circumstances
+    const blackList = ["simulate","render","getResources",
+    "collide", "totalMass","destroy","toString", "serialize", 
+    "createProxy", "start", "update"]
+
+    const shipHandler : ProxyHandler<Ship> = {
+
+        get : (target : Ship, prop : string) => {
+
+            if (grayList.includes(prop)){
+                //@ts-ignore
+                return Serializer.deserialize(target[prop].serialize())
+            }
+            else if (!blackList.includes(prop))
+            {
+                //@ts-ignore
+                const field = target[prop]
+                if (typeof field === "function"){
+                    return function(...args : any[]){
+                        //@ts-ignore
+                        return target[prop].apply(target,args)
+                    }
+                }else{
+                    return field
+                }
+            }
+                
+            return null
+
+        },
+        set : (target, prop : string, value, receiver) => {
+            if (!blackList.includes(prop) && !grayList.includes(prop) && !whiteList.includes(prop))
+                Reflect.set(target,prop,value,receiver)
+                return true
+            return false
+        },
+        deleteProperty : (target, prop : string) => {
+            return false
+        },
+        defineProperty : (target,prop : string, attributes) => {
+            if (!blackList.includes(prop) && !grayList.includes(prop) && !whiteList.includes(prop))
+                Reflect.defineProperty(target,prop,attributes)    
+                return true
+            return false
+        }
+    }
+
+    return new Proxy(ship,shipHandler)
+
+}
+
+function createBaseProxy(base : Base){
+
+    // readable fields
+    const whiteList = ["uuid", "team" , "maxEnergy", "refiningRate", "baseShipCost", 
             "shipCost", "healRate", "interactRadius", "healRateCost", "interactRadiusCost",
             "energyCost","upgradeHealth", "upgradeHealRate", "upgradeInteractRadius", 
             "spawnShip"]
@@ -108,13 +162,12 @@ function createGameObjectProxy(){
         get : (target : Base, prop : string) => {
 
             if (grayList.includes(prop)){
-                //@ts-ignore
-                return Serializer.deserialize(target[prop].serialize())
+                return Serializer.deserialize(Reflect.get(target,prop).serialize())
             }
             else if (!blackList.includes(prop))
             {
                 //@ts-ignore
-                const field = typeof target[prop]
+                const field = target[prop]
                 if (typeof field === "function"){
                     return function(...args : any[]){
                         //@ts-ignore
@@ -129,17 +182,17 @@ function createGameObjectProxy(){
 
         },
         set : (target, prop : string, value, receiver) => {
-            if (!blackList.includes(prop) && !whiteList.includes(prop))
+            if (!blackList.includes(prop) && !grayList.includes(prop) && !whiteList.includes(prop))
+                Reflect.set(target,prop,value,receiver)
                 return true
             return false
         },
         deleteProperty : (target, prop : string) => {
-            if (!blackList.includes(prop) && !whiteList.includes(prop))
-                return true
             return false
         },
         defineProperty : (target,prop : string, attributes) => {
-            if (!blackList.includes(prop) && !whiteList.includes(prop))
+            if (!blackList.includes(prop) && !grayList.includes(prop) && !whiteList.includes(prop))
+                Reflect.defineProperty(target,prop,attributes)    
                 return true
             return false
         }
@@ -153,18 +206,17 @@ function createGameObjectProxy(){
  * Create a Proxy object that we pass to user code.
  * We only allow for getting the specific fields that we want users to have access to.
  * Setting, defining, and deleting is not allowed
- * @param gameManager 
- * @returns 
  */
 function createObjectManagerProxy(gameManager : ObjectManager){
 
+    const whiteList = ["getAsteroids" , "getClosestAsteroid" , "getObstacle", "getClosestObstacle", 
+    "getEnergyCells", "getClosestEnergyCell", "getShips", "getShipsByTeam", 
+    "getBullets","getBases","getBaseByTeam"]
+
+    // whitelist specified functions, disallow all setting, deleting, and defining
     const gameManagerHandler : ProxyHandler<ObjectManager> = {
 
         get : (target : ObjectManager, prop : string) => {
-
-            const whiteList = ["getAsteroids" , "getClosestAsteroid" , "getObstacle", "getClosestObstacle", 
-            "getEnergyCells", "getClosestEnergyCell", "getShips", "getShipsByTeam", 
-            "getBullets","getBases","getBaseByTeam"]
 
             if (whiteList.includes(prop)){
                 return function(...args : any[]){
