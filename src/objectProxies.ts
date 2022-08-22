@@ -134,3 +134,30 @@ class BaseProxy extends GameObject {
     }
 
 }
+
+
+function createObjectManagerProxy(gameManager : ObjectManager){
+
+    const gameManagerHandler : ProxyHandler<ObjectManager> = {
+
+        get : function(target : ObjectManager, prop : string){
+
+            const whiteList = ["getAsteroids" , "getClosestAsteroid" , "getObstacle", "getClosestObstacle", 
+            "getEnergyCells", "getClosestEnergyCell", "getShips", "getShipsByTeam", 
+            "getBullets","getBases","getBaseByTeam"]
+
+            if (whiteList.includes(prop)){
+                return function(...args : any[]){
+                    //@ts-ignore
+                    return target[prop].apply(target,args)
+                }
+            }
+                
+            return null
+
+        }
+    }
+
+    return new Proxy(gameManager,gameManagerHandler)
+
+}

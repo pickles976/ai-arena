@@ -21,10 +21,6 @@ function Update(ship, Game){
 
     const base = Game.getBaseByTeam(ship.team)
 
-    if(ship.target != null && ship.target != undefined){
-        ship.target = Game.refreshObject(ship.target) ?? {}
-    }
-
     // STATE MACHINE
     switch(ship.state){
 

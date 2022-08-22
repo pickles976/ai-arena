@@ -1,9 +1,9 @@
 // Serializer.test()
 
 GameStateManager = new StateManager()
-
 // CREATE OUR SHIT
 GameObjectManager = new ObjectManager()
+GameObjectManagerProxy = createObjectManagerProxy(GameObjectManager)
 
 GameObjectList.push(new Ship(create_UUID(),new Vector2D(W/4,H/4),100,0))
 GameObjectList.push(new Base(create_UUID(),new Vector2D(W/4,H/2),250,0))
@@ -84,9 +84,6 @@ function updateField(){
 
     // manage the game objects
     GameObjectManager.update()
-
-    // CREATE GAMEOBJECTMANAGER PROXY
-    GameObjectManagerProxy = createGameManagerProxy(GameObjectList)
 
     // RUN AI LOGIC
     for(let i = GameObjectList.length - 1; i >= 0; i--){
