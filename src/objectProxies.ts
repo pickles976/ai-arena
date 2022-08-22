@@ -140,7 +140,7 @@ function createObjectManagerProxy(gameManager : ObjectManager){
 
     const gameManagerHandler : ProxyHandler<ObjectManager> = {
 
-        get : function(target : ObjectManager, prop : string){
+        get : (target : ObjectManager, prop : string) => {
 
             const whiteList = ["getAsteroids" , "getClosestAsteroid" , "getObstacle", "getClosestObstacle", 
             "getEnergyCells", "getClosestEnergyCell", "getShips", "getShipsByTeam", 
@@ -154,6 +154,11 @@ function createObjectManagerProxy(gameManager : ObjectManager){
             }
                 
             return null
+
+        },
+        set : (target, prop, value, receiver) => {
+ 
+            return false
 
         }
     }
