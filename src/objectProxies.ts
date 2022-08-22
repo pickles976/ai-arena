@@ -4,81 +4,44 @@
  * Setting, defining, and deleting is not allowed
  */
 
-class ShipProxy extends GameObject {
+function createRendererProxy(renderer : Renderer){
 
-    ActionQueue : Array<any>
+    const whiteList = ["H","W","drawText","drawLine","drawCircle",
+    "drawCircleTransparent"]
 
-    team : number
-    maxEnergy : number
-    damage : number
-    energyCost : number
-    damageCost : number
+    const rendererHandler : ProxyHandler<Renderer> = {
 
-    uuid : number
-    position : Vector2D
-    velocity : Vector2D
-    resources : Resources
+        get : (target : Renderer, prop : string) => {
 
-    radius : number
-    
+            const field = Reflect.get(target,prop)
 
-    // all the same values
-    constructor(uuid: number, position: Vector2D, energy: number,team: number){
+            if (whiteList.includes(prop))
+            {
+                if (typeof field === "function"){
+                    return function(...args : any[]){
+                        return field.apply(target,args)
+                    }
+                }else{
+                    return field
+                }
+            }
 
-        super(uuid,"SHIP",new Circle(SHIP_MASS,position,Vector2D.zero))
-        this.uuid = uuid
+            return null
 
-        this.resources = new Resources(0,0,energy)
-        this.team = team
+        },
+        set : (target, prop : string, value, receiver) => {
+            return false
+        },
+        deleteProperty : (target, prop : string) => {
+            return false
+        },
+        defineProperty : (target,prop : string, attributes) => {
+            return false
+        }
 
-        // upgradeable
-        this.maxEnergy = 100
-        this.damage = 25
-
-        // upgrade costs
-        this.energyCost = 100
-        this.damageCost = 100
-
-        this.ActionQueue = []
     }
 
-    // calling the functions results in strings being added to the proxy queue
-
-    applyThrust(vector : Vector2D, percentage : number){
-        this.ActionQueue.push(["APPLY_THRUST",vector,percentage])
-    }
-
-    shoot(vector : Vector2D){
-        this.ActionQueue.push(["SHOOT",vector])
-    }
-
-    upgradeMaxEnergy(){
-        this.ActionQueue.push(["UPGRADE_MAX_ENERGY"])
-    }
-
-    upgradeDamage(){
-        this.ActionQueue.push(["UPGRADE_DAMAGE"])
-    }
-
-    moveToObject(target : GameObject){
-        this.ActionQueue.push(["MOVE_TO_OBJECT",target])
-    }
-
-    seekTarget(target : GameObject){
-        this.ActionQueue.push(["SEEK_TARGET",target])
-    }
-
-    drawText(text : string,position : Vector2D,size : number, color : string){
-        this.ActionQueue.push(["DRAW_TEXT",text,position,size,color])
-    }
-
-    drawLine(start : Vector2D,end : Vector2D,color : string){
-        this.ActionQueue.push(["DRAW_LINE",start,end,color])
-    }
-
-    drawCircle(position : Vector2D,radius : number,color : string){
-        this.ActionQueue.push(["DRAW_CIRCLE",position,radius,color])
-    }
+    return new Proxy(renderer,rendererHandler)
 
 }
 

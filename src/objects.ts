@@ -322,27 +322,6 @@ class Ship extends GameObject{
             this.team])
     }
 
-    createProxy(){
-        // create proxy
-        const shipProxy = new ShipProxy(this.uuid, this.circle.position,this.resources.energy, this.team)
-        shipProxy.resources.metal = this.resources.metal
-        shipProxy.resources.water = this.resources.water
-        shipProxy.maxEnergy = this.maxEnergy
-        shipProxy.damage = this.damage
-        shipProxy.energyCost = this.energyCost
-        shipProxy.damageCost = this.damageCost
-
-        // load custom memory
-        var keys = Object.keys(this)
-        for(var key in this.proxyMemory){
-            if(!keys.includes(key)){
-                // @ts-ignore
-                shipProxy[key] = this.proxyMemory[key]
-            }
-        }
-        return shipProxy
-    }
-
     start(){
         const startCode = compileCode('this.Start(ship) \n' +
                                 'return ship')
@@ -350,9 +329,9 @@ class Ship extends GameObject{
     }
 
     update(){
-        const updateCode = compileCode('this.Update(ship,Game,Render) \n' + 
+        const updateCode = compileCode('this.Update(ship,Game,Graphics) \n' + 
                                     ' return ship')
-        updateCode({ship : createShipProxy(this), Game : GameObjectManagerProxy})
+        updateCode({ship : createShipProxy(this) , Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy})
     }
 
     runActionQueue(aq : Array<Array<any>>){
@@ -700,9 +679,9 @@ class Base extends GameObject {
     }
 
     update(){
-        const updateCode = compileCode('this.BaseUpdate(base,Game) \n' + 
+        const updateCode = compileCode('this.BaseUpdate(base,Game,Graphics) \n' + 
                                     ' return base')
-        updateCode({base : createBaseProxy(this), Game : GameObjectManagerProxy})
+        updateCode({base : createBaseProxy(this), Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy})
     }
 
     // USER CALLABLE FUNCTIONS

@@ -66,6 +66,12 @@
         this.queueAction(drawLineCoroutine,5,[this,start,end,color])
     }
 
+    drawCircleTransparent(pos : Vector2D, radius : number, color : string, opacity : number){
+        this.ctx.globalAlpha = opacity
+        this.drawCircle(pos,radius,color)
+        this.ctx.globalAlpha = 1.0
+    }
+
     drawCircle(pos : Vector2D,radius : number,color : string)
     {
         function* drawCircleCoroutine(self : Renderer,pos : Vector2D,radius : number,color : string){

@@ -1,23 +1,23 @@
 // @ts-nocheck
-function BaseStart(base){
+function BaseStart(base, Graphics){
     console.log("Base Start!")
 }
 
-function BaseUpdate(base, Game){
+function BaseUpdate(base, Game, Graphics){
     const energy = 50
     if (base.resources.metal > base.shipCost && base.resources.energy > energy){
         base.spawnShip(energy,false)
     }
 }
 
-function Start(ship){
+function Start(ship, Graphics){
 
     ship.target = {}
     ship.state = "IDLE"
 
 }
 
-function Update(ship, Game){
+function Update(ship, Game, Graphics){
 
     const base = Game.getBaseByTeam(ship.team)
 
@@ -131,12 +131,11 @@ function Update(ship, Game){
         ship.upgradeDamage()
     }
 
-    console.log(ship.target)
     ship.targetID = ship.target.uuid
 
     // DEBUG DRAWING
-    ship.drawText(ship.resources.toString(),ship.circle.position,10,"#FFFFFF")
-    ship.drawText(ship.state,ship.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
+    Graphics.drawText(ship.resources.toString(),ship.circle.position,10,"#FFFFFF")
+    Graphics.drawText(ship.state,ship.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
     if (ship.target != undefined && ship.target.circle != undefined)
-        ship.drawLine(ship.circle.position,ship.target.circle.position,"#00FF00")
+        Graphics.drawLine(ship.circle.position,ship.target.circle.position,"#00FF00")
 }

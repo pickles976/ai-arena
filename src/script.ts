@@ -23,6 +23,7 @@ gameCanvas.width = W;
 gameCanvas.height = H;
 
 GlobalRender = new Renderer(gameCanvas)
+GlobalRenderProxy = createRendererProxy(GlobalRender)
 
 let frameStart = performance.now();
 
