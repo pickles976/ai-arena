@@ -2,6 +2,10 @@
  * Create a Proxy objects that we pass to user code.
  * We only allow for getting the specific fields that we want users to have access to.
  * Setting, defining, and deleting is not allowed
+ * 
+ * TODO: 
+ * The whitelist, blacklist, and graylist all have overlapping fields.
+ * It may be nice to remove some of the overlapping and explicitness 
  */
 
 function createRendererProxy(renderer : Renderer){

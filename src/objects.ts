@@ -323,15 +323,22 @@ class Ship extends GameObject{
     }
 
     start(){
-        const startCode = compileCode('this.Start(ship) \n' +
+        const startCode = compileCode('this.Start(ship,base) \n' +
                                 'return ship')
-        startCode({ship : createShipProxy(this)})
+
+        startCode({ship : createShipProxy(this), 
+            //@ts-ignore
+            base : createBaseProxy(GameObjectManager.getBaseByTeam(this.team))})
     }
 
     update(){
-        const updateCode = compileCode('this.Update(ship,Game,Graphics) \n' + 
+        const updateCode = compileCode('this.Update(ship,base,Game,Graphics) \n' + 
                                     ' return ship')
-        updateCode({ship : createShipProxy(this) , Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy})
+        updateCode({ship : createShipProxy(this) , 
+            //@ts-ignore
+            base: createBaseProxy(GameObjectManager.getBaseByTeam(this.team)), 
+            Game : GameObjectManagerProxy, 
+            Graphics : GlobalRenderProxy })
     }
 
     runActionQueue(aq : Array<Array<any>>){

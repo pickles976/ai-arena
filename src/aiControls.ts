@@ -10,16 +10,14 @@ function BaseUpdate(base, Game, Graphics){
     }
 }
 
-function Start(ship, Graphics){
+function Start(ship, base, Graphics){
 
     ship.target = {}
     ship.state = "IDLE"
 
 }
 
-function Update(ship, Game, Graphics){
-
-    const base = Game.getBaseByTeam(ship.team)
+function Update(ship, base, Game, Graphics){
 
     // STATE MACHINE
     switch(ship.state){
