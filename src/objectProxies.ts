@@ -76,66 +76,86 @@ class ShipProxy extends GameObject {
 
 }
 
-class BaseProxy extends GameObject {
-
-    ActionQueue : Array<any>
-
-    team : number
-    resources : Resources
-    maxEnergy : number
-    shipQueue : Array<Generator>
-    refiningRate : number
-    baseShipCost : number
-    shipCost : number
-    healRate : number
-    interactRadius : number
-    healRateCost : number
-    interactRadiusCost : number
-    energyCost : number
-    
-
-    // all the same values
-    constructor(uuid : number,position : Vector2D,energy : number,team : number){
-
-        super(uuid,"BASE",new Circle(BASE_MASS,position,Vector2D.zero))
-
-        this.team = team
-        this.resources = new Resources(0,0,energy)
-
-        this.ActionQueue = []
-    }
-
-    upgradeInteractRadius(){
-        this.ActionQueue.push(["UPGRADE_INTERACT_RADIUS"])
-    }
-
-    upgradeHealRate(){
-        this.ActionQueue.push(["UPGRADE_HEAL_RATE"])
-    }
-
-    upgradeHealth(){
-        this.ActionQueue.push(["UPGRADE_HEALTH"])
-    }
-
-    spawnShip(energy : number){
-        this.ActionQueue.push(["SPAWN_SHIP",energy])
-    }
-
-    drawText(text : string,position : Vector2D,size : number, color : string){
-        this.ActionQueue.push(["DRAW_TEXT",text,position,size,color])
-    }
-
-    drawLine(start : Vector2D,end : Vector2D,color : string){
-        this.ActionQueue.push(["DRAW_LINE",start,end,color])
-    }
-
-    drawCircle(position : Vector2D,radius : number,color : string){
-        this.ActionQueue.push(["DRAW_CIRCLE",position,radius,color])
-    }
+function createGameObjectProxy(){
 
 }
 
+/**
+ * Create a Proxy object that we pass to user code.
+ * We only allow for getting the specific fields that we want users to have access to.
+ * Setting, defining, and deleting is not allowed
+ * @param gameManager 
+ * @returns 
+ */
+ function createBaseProxy(base : Base){
 
+    // readable fields
+    const whiteList = ["team" , "maxEnergy", "refiningRate", "baseShipCost", 
+            "shipCost", "healRate", "interactRadius", "healRateCost", "interactRadiusCost",
+            "energyCost","upgradeHealth", "upgradeHealRate", "upgradeInteractRadius", 
+            "spawnShip"]
+
+    // readable after deep copy
+    const grayList = ["resources","circle"]
+
+    // not readable under any circumstances
+    const blackList = ["shipQueue","simulate",
+    "collide","render","destroy","healShip","takeResources",
+    "trySpawnShip", "queueShip", "serialize", "createProxy", "start", "update"]
+
+    const baseHandler : ProxyHandler<Base> = {
+
+        get : (target : Base, prop : string) => {
+
+            if (grayList.includes(prop)){
+                //@ts-ignore
+                return Serializer.deserialize(target[prop].serialize())
+            }
+            else if (!blackList.includes(prop))
+            {
+                //@ts-ignore
+                const field = typeof target[prop]
+                if (typeof field === "function"){
+                    return function(...args : any[]){
+                        //@ts-ignore
+                        return target[prop].apply(target,args)
+                    }
+                }else{
+                    return field
+                }
+            }
+                
+            return null
+
+        },
+        set : (target, prop : string, value, receiver) => {
+            if (!blackList.includes(prop) && !whiteList.includes(prop))
+                return true
+            return false
+        },
+        deleteProperty : (target, prop : string) => {
+            if (!blackList.includes(prop) && !whiteList.includes(prop))
+                return true
+            return false
+        },
+        defineProperty : (target,prop : string, attributes) => {
+            if (!blackList.includes(prop) && !whiteList.includes(prop))
+                return true
+            return false
+        }
+    }
+
+    return new Proxy(base,baseHandler)
+
+}
+
+/**
+ * Create a Proxy object that we pass to user code.
+ * We only allow for getting the specific fields that we want users to have access to.
+ * Setting, defining, and deleting is not allowed
+ * @param gameManager 
+ * @returns 
+ */
 function createObjectManagerProxy(gameManager : ObjectManager){
 
     const gameManagerHandler : ProxyHandler<ObjectManager> = {
@@ -160,6 +180,12 @@ function createObjectManagerProxy(gameManager : ObjectManager){
  
             return false
 
+        },
+        deleteProperty : (target, p) => {
+            return false
+        },
+        defineProperty : (target,propery,attributes) => {
+            return false
         }
     }
 

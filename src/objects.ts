@@ -566,13 +566,12 @@ class Bullet extends GameObject {
 
 class Base extends GameObject {
 
-    ActionQueue : Array<any>
-    proxyMemory : Object
-
-    team : number
     resources : Resources
-    maxEnergy : number
     shipQueue : Array<Generator>
+
+    // user gettables
+    team : number
+    maxEnergy : number
     refiningRate : number
     baseShipCost : number
     shipCost : number
@@ -604,9 +603,6 @@ class Base extends GameObject {
         this.healRateCost = 250
         this.interactRadiusCost = 250
         this.energyCost = 250
-
-        this.proxyMemory = {}
-        this.ActionQueue = []
     }
 
     
@@ -716,6 +712,40 @@ class Base extends GameObject {
         return false
     }
 
+    queueShip(){
+        function* spawnShipCoroutine(self : Base,numFrames : number){
+            for (let i = 0; i < numFrames; i++){
+                yield;
+            }
+            console.log("Ship respawning")
+            return self.trySpawnShip(self.resources.energy,true)
+        }
+
+        this.shipQueue.push(spawnShipCoroutine(this,900))
+    }
+
+    serialize(){   
+        return JSON.stringify([this.type,
+            this.uuid,
+            this.circle.position.serialize(),
+            this.resources.getResources()["energy"],
+            this.team])
+    }
+
+    start(){
+        const startCode = compileCode('this.BaseStart(ship) \n' +
+                                'return base')
+        startCode({base : createBaseProxy(this)})
+    }
+
+    update(){
+        const updateCode = compileCode('this.BaseUpdate(base,Game) \n' + 
+                                    ' return base')
+        updateCode({base : createBaseProxy(this), Game : GameObjectManagerProxy})
+    }
+
+    // USER CALLABLE FUNCTIONS
+    
     upgradeHealth(){
         if (this.resources.metal > this.energyCost){
             this.maxEnergy += 500
@@ -740,131 +770,7 @@ class Base extends GameObject {
         }
     }
 
-    queueShip(){
-        function* spawnShipCoroutine(self : Base,numFrames : number){
-            for (let i = 0; i < numFrames; i++){
-                yield;
-            }
-            console.log("Ship respawning")
-            return self.trySpawnShip(self.resources.energy,true)
-        }
-
-        this.shipQueue.push(spawnShipCoroutine(this,900))
-    }
-
-    serialize(){   
-        return JSON.stringify([this.type,
-            this.uuid,
-            this.circle.position.serialize(),
-            this.resources.getResources()["energy"],
-            this.team])
-    }
-
-    /**
-     * baseProxy to inject into code
-     * @returns 
-     */
-     createProxy(){
-        // create proxy
-        const baseProxy = new BaseProxy(this.uuid, this.circle.position,this.resources.energy, this.team)
-        baseProxy.resources.metal = this.resources.metal
-        baseProxy.resources.water = this.resources.water
-        baseProxy.maxEnergy = this.maxEnergy
-        baseProxy.refiningRate = this.refiningRate
-        baseProxy.baseShipCost = this.baseShipCost
-        baseProxy.shipCost = this.shipCost
-        baseProxy.healRate = this.healRate
-        baseProxy.interactRadius = this.interactRadius
-        baseProxy.healRateCost = this.healRateCost
-        baseProxy.interactRadiusCost = this.interactRadiusCost
-        baseProxy.energyCost = this.energyCost
-
-        // load custom memory
-        var keys = Object.keys(this)
-        for(var key in this.proxyMemory){
-            if(!keys.includes(key)){
-                // @ts-ignore
-                baseProxy[key] = this.proxyMemory[key]
-            }
-        }
-        return baseProxy
-    }
-
-    /**
-     * 1. Create proxy object and inject into code
-     * 2. Return proxy object + ActionQueue
-     * 3. Find difference between ProxyObject and "real" object fields, 
-     * add the difference to temporaryMemory
-     * 4. Run all actions in ActionQueue
-     */
-    start(){
-
-        const startCode = compileCode('this.BaseStart(ship) \n' +
-                                'return base')
-        const tempMem = startCode({base : this.createProxy()})
-        
-        // add the user-created fields to our proxy memory
-        var keys = Object.keys(this)
-        for (var key in tempMem){
-            if (!keys.includes(key)){
-                // @ts-ignore
-                this.proxyMemory[key] = tempMem[key]
-            }
-        }
-    }
-
-    update(){
-        const updateCode = compileCode('this.BaseUpdate(base,Game) \n' + 
-                                    ' return base')
-        const baseProxy = updateCode({base : this.createProxy(), Game : GameObjectManagerProxy})
-
-        // update proxy with new memory
-        var keys = Object.keys(this)
-        for (var key in baseProxy){
-            if (!keys.includes(key)){
-                // @ts-ignore
-                this.proxyMemory[key] = baseProxy[key]
-            }
-        }
-
-        this.runActionQueue(baseProxy.ActionQueue)
-    }
-
-    runActionQueue(aq : Array<Array<any>>){
-
-        for(var index in aq){
-            const argsList = aq[index]
-            const args = argsList.slice(1)
-            const type = argsList[0]
-
-            switch(type){
-                case "UPGRADE_INTERACT_RADIUS":
-                    this.upgradeInteractRadius()
-                    break;
-                case "UPGRADE_HEAL_RATE":
-                    this.upgradeHealRate()
-                    break
-                case "UPGRADE_HEALTH":
-                    this.upgradeHealth()
-                    break
-                case "SPAWN_SHIP":
-                    //@ts-ignore
-                    this.trySpawnShip(...args,false)
-                    break
-                case "DRAW_TEXT":
-                    //@ts-ignore
-                    GlobalRender.drawText(...args)
-                    break
-                case "DRAW_LINE":
-                    //@ts-ignore
-                    GlobalRender.drawLine(...args)
-                    break
-                case "DRAW_CIRCLE":
-                    //@ts-ignore
-                    GlobalRender.drawCircle(...args)
-                    break
-            }
-        }
-
+    spawnShip(energy : number){
+        this.trySpawnShip(energy,false)
     }
 }
