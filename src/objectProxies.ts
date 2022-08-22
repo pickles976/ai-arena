@@ -1,3 +1,9 @@
+/**
+ * Create a Proxy objects that we pass to user code.
+ * We only allow for getting the specific fields that we want users to have access to.
+ * Setting, defining, and deleting is not allowed
+ */
+
 class ShipProxy extends GameObject {
 
     ActionQueue : Array<any>
@@ -76,7 +82,42 @@ class ShipProxy extends GameObject {
 
 }
 
-function createGameObjectProxy(){
+function createGameObjectProxy(gameObject : GameObject){
+
+    const whiteList = ["uuid","type"]
+
+    const grayList = ["circle","resources"]
+
+    const gameObjectHandler : ProxyHandler<GameObject> = {
+
+        get : (target : GameObject, prop : string) => {
+
+            const field = Reflect.get(target,prop)
+
+            if (grayList.includes(prop)){
+                return Serializer.deserialize(field.serialize())
+            }
+            else if (whiteList.includes(prop))
+            {
+                return field
+            }
+                
+            return null
+
+        },
+        set : (target, prop : string, value, receiver) => {
+            return false
+        },
+        deleteProperty : (target, prop : string) => {
+            return false
+        },
+        defineProperty : (target,prop : string, attributes) => {
+            return false
+        }
+
+    }
+
+    return new Proxy(gameObject,gameObjectHandler)
 
 }
 
@@ -99,18 +140,16 @@ function createGameObjectProxy(){
 
         get : (target : Ship, prop : string) => {
 
+            const field = Reflect.get(target,prop)
+
             if (grayList.includes(prop)){
-                //@ts-ignore
-                return Serializer.deserialize(target[prop].serialize())
+                return Serializer.deserialize(field.serialize())
             }
             else if (!blackList.includes(prop))
             {
-                //@ts-ignore
-                const field = target[prop]
                 if (typeof field === "function"){
                     return function(...args : any[]){
-                        //@ts-ignore
-                        return target[prop].apply(target,args)
+                        return field.apply(target,args)
                     }
                 }else{
                     return field
@@ -122,8 +161,10 @@ function createGameObjectProxy(){
         },
         set : (target, prop : string, value, receiver) => {
             if (!blackList.includes(prop) && !grayList.includes(prop) && !whiteList.includes(prop))
+            {
                 Reflect.set(target,prop,value,receiver)
                 return true
+            }
             return false
         },
         deleteProperty : (target, prop : string) => {
@@ -131,8 +172,10 @@ function createGameObjectProxy(){
         },
         defineProperty : (target,prop : string, attributes) => {
             if (!blackList.includes(prop) && !grayList.includes(prop) && !whiteList.includes(prop))
+            {
                 Reflect.defineProperty(target,prop,attributes)    
                 return true
+            }
             return false
         }
     }
@@ -183,8 +226,10 @@ function createBaseProxy(base : Base){
         },
         set : (target, prop : string, value, receiver) => {
             if (!blackList.includes(prop) && !grayList.includes(prop) && !whiteList.includes(prop))
+            {    
                 Reflect.set(target,prop,value,receiver)
                 return true
+            }
             return false
         },
         deleteProperty : (target, prop : string) => {
@@ -192,8 +237,10 @@ function createBaseProxy(base : Base){
         },
         defineProperty : (target,prop : string, attributes) => {
             if (!blackList.includes(prop) && !grayList.includes(prop) && !whiteList.includes(prop))
+            {
                 Reflect.defineProperty(target,prop,attributes)    
                 return true
+            }
             return false
         }
     }
@@ -202,11 +249,6 @@ function createBaseProxy(base : Base){
 
 }
 
-/**
- * Create a Proxy object that we pass to user code.
- * We only allow for getting the specific fields that we want users to have access to.
- * Setting, defining, and deleting is not allowed
- */
 function createObjectManagerProxy(gameManager : ObjectManager){
 
     const whiteList = ["getAsteroids" , "getClosestAsteroid" , "getObstacle", "getClosestObstacle", 
@@ -220,8 +262,18 @@ function createObjectManagerProxy(gameManager : ObjectManager){
 
             if (whiteList.includes(prop)){
                 return function(...args : any[]){
-                    //@ts-ignore
-                    return target[prop].apply(target,args)
+
+                    // get the objects from whatever call
+                    let items = Reflect.get(target,prop).apply(target,args)
+
+                    // create proxies for both lists and individual objects
+                    if(Object.prototype.toString.call(items) === '[object Array]'){
+                        items = items.map((item : GameObject) => createGameObjectProxy(item))
+                    }else{
+                        items = createGameObjectProxy(items)
+                    }
+
+                    return items
                 }
             }
                 
@@ -229,9 +281,7 @@ function createObjectManagerProxy(gameManager : ObjectManager){
 
         },
         set : (target, prop, value, receiver) => {
- 
             return false
-
         },
         deleteProperty : (target, p) => {
             return false
