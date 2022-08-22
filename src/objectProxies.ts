@@ -51,7 +51,7 @@ function createRendererProxy(renderer : Renderer){
 
 function createGameObjectProxy(gameObject : GameObject){
 
-    const whiteList = ["uuid","type"]
+    const whiteList = ["uuid","type","team","damage", "maxEnergy"]
 
     const grayList = ["circle","resources"]
 

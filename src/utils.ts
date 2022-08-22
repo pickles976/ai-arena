@@ -234,10 +234,3 @@ function create_UUID(){
 function dist(obj1 : GameObject,obj2 : GameObject){
     return Vector2D.dist(obj1.circle.position,obj2.circle.position)
 }
-
-function createGameManagerProxy(goList : Array<GameObject>){
-    const gameManager = new ObjectManager()
-    const goListCopy = Serializer.deserializeGameObjectList(Serializer.serializeGameObjectList(goList))
-    gameManager.indexObjects(goListCopy)
-    return gameManager
-}

@@ -102,7 +102,7 @@ function Update(ship, base, Game, Graphics){
     if(ship.resources.energy > (ship.damage)){
         const shootRadius = 200
         const ships = Game.getShips()
-
+        
         let closest = [{},100000]
 
         for (const index in ships){

@@ -181,12 +181,6 @@ class Ship extends GameObject{
     energyCost : number
     damageCost : number
 
-    // User-created memory for the proxy object
-    proxyMemory : Object
-    
-    // This sits empty, it is just needed to overlap with proxyShip fields
-    ActionQueue : Array<Array<any>>
-
     constructor(uuid : number,position : Vector2D,energy : number,team : number){
 
         super(uuid,"SHIP",new Circle(SHIP_MASS,position,Vector2D.zero))
@@ -194,15 +188,13 @@ class Ship extends GameObject{
         this.resources = new Resources(0,0,energy)
 
         // upgradeable
-        this.maxEnergy = 100
-        this.damage = 25
+        this.maxEnergy = SHIP_BASE_MAX_ENERGY
+        this.damage = 5
 
         // upgrade costs
         this.energyCost = 100
-        this.damageCost = 100
+        this.damageCost = 50
 
-        this.proxyMemory = {}
-        this.ActionQueue = []
         this.start()
     }
 
@@ -341,53 +333,6 @@ class Ship extends GameObject{
             Graphics : GlobalRenderProxy })
     }
 
-    runActionQueue(aq : Array<Array<any>>){
-
-        for(var index in aq){
-            const argsList = aq[index]
-            const args = argsList.slice(1)
-            const type = argsList[0]
-
-            switch(type){
-                case "APPLY_THRUST":
-                    //@ts-ignore
-                    this.applyThrust(...args)
-                    break;
-                case "SHOOT":
-                    //@ts-ignore
-                    this.shoot(...args)
-                    break
-                case "UPGRADE_MAX_ENERGY":
-                    this.upgradeMaxEnergy()
-                    break
-                case "UPGRADE_DAMAGE":
-                    this.upgradeDamage
-                    break
-                case "MOVE_TO_OBJECT":
-                    //@ts-ignore
-                    this.moveToObject(...args)
-                    break;
-                case "SEEK_TARGET":
-                    //@ts-ignore
-                    this.seekTarget(...args)
-                    break
-                case "DRAW_TEXT":
-                    //@ts-ignore
-                    GlobalRender.drawText(...args)
-                    break
-                case "DRAW_LINE":
-                    //@ts-ignore
-                    GlobalRender.drawLine(...args)
-                    break
-                case "DRAW_CIRCLE":
-                    //@ts-ignore
-                    GlobalRender.drawCircle(...args)
-                    break
-            }
-        }
-
-    }
-
     // USER-CALLABLE FUNCTIONS 
 
     applyThrust(vector : Vector2D,percentage : number){
@@ -475,7 +420,7 @@ class Bullet extends GameObject {
         switch (otherObject.type){
             case "SHIP":
                 if (otherObject instanceof Ship){
-                    otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
+                    otherObject.resources.energy -= this.damage // velocity + explosive
                     if (otherObject.resources.energy < 0){
                         GameStateManager.recordKill(this.parent)
                     }
@@ -488,7 +433,7 @@ class Bullet extends GameObject {
                 break;
             case "BASE":
                 if (otherObject instanceof Base){
-                    otherObject.resources.energy -= energyDiff(this,otherObject) + this.damage // velocity + explosive
+                    otherObject.resources.energy -= this.damage // velocity + explosive
                 }
                 break;
             default:
@@ -597,6 +542,10 @@ class Base extends GameObject {
                     this.queueShip()
             }
         }
+
+        if (this.resources.energy < 0){
+            this.destroy()
+        }
     }
 
     collide(otherObject : GameObject){
@@ -611,7 +560,7 @@ class Base extends GameObject {
     }
 
     destroy(){
-        this.type == "DEAD"
+        this.type = "DEAD"
     }
 
     healShip(deltaTime : number,ship : Ship){
@@ -632,30 +581,38 @@ class Base extends GameObject {
 
     trySpawnShip(energy : number,respawn : boolean){
 
-        // THIS IS WHAT'S CAUSING THE BUG
-        if (this.resources.metal > this.shipCost && this.resources.energy > energy){
+        let canSpawnShip = false
+        const newEnergy = Math.min(energy,SHIP_BASE_MAX_ENERGY)
 
-            // check around the base
-            const angle = 360 / 32
-            for(let i = 0; i < 32; i++){
-                let pos = new Vector2D(0,1).multiply(this.circle.radius * 1.5).rotate(angle*i).add(this.circle.position)
-                const obj = new Ship(create_UUID(),pos,energy,this.team)
-                if (overlapCircle(pos,obj.circle.radius*1.2).length < 1){
-
-                    GameObjectList.push(obj)
-
-                    // TODO : FIGURE OUT HOW THIS IS GONNA WORK
-                    if (!respawn){
-                        this.resources.metal -= this.shipCost
-                    }
-
-                    // const newEnergy = Math.min(energy,obj.maxEnergy)
-                    // this.resources.energy -= newEnergy
-
-                    return true
-                }
+        // check if we have the required resources
+        if(!respawn){
+            if (this.resources.metal > this.shipCost && this.resources.energy > newEnergy){
+                canSpawnShip = true
+            }     
+        }else{
+            if (this.resources.energy > newEnergy){
+                canSpawnShip = true
             }
         }
+
+        // check around the base
+        const angle = 360 / 32
+        for(let i = 0; i < 32; i++){
+            let pos = new Vector2D(0,1).multiply(this.circle.radius * 1.5).rotate(angle*i).add(this.circle.position)
+            const obj = new Ship(create_UUID(),pos,energy,this.team)
+            if (overlapCircle(pos,obj.circle.radius*1.2).length < 1){
+
+                // SPAWNING
+                if (!respawn)
+                    this.resources.metal -= this.shipCost
+            
+                this.resources.energy -= newEnergy
+
+                GameObjectList.push(obj)
+                return true
+            }
+        }
+
         return false
     }
 
@@ -665,7 +622,7 @@ class Base extends GameObject {
                 yield;
             }
             console.log("Ship respawning")
-            return self.trySpawnShip(self.resources.energy,true)
+            return self.trySpawnShip(10,true)
         }
 
         this.shipQueue.push(spawnShipCoroutine(this,900))
