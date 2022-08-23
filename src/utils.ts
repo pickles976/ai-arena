@@ -237,3 +237,16 @@ function create_UUID(){
 function dist(obj1 : GameObject,obj2 : GameObject){
     return Vector2D.dist(obj1.transform.position,obj2.transform.position)
 }
+
+function checkMemory(obj : Ship | Base){
+
+    const size = new TextEncoder().encode(JSON.stringify(obj)).length
+    const kiloBytes = size / 1024;
+
+    // console.log(obj.uuid + " memory is " + kiloBytes.toFixed(2) + "kB")
+
+    if (kiloBytes > 8){
+        GameObjectManager.getBaseByTeam(obj.team)?.destroy()
+        alert("You used up too much memory!")
+    }
+}

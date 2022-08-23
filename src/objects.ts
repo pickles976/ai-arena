@@ -227,21 +227,21 @@ class Ship extends GameObject{
         // draw applyThrust effect
         if (acceleration.y != 0){
             if (acceleration.y > 0){
-                GlobalRender.drawExhaust(position,180,magnitude)
+                GlobalRender.drawExhaust(position,180,acceleration.y)
             } 
             else if (acceleration.y < 0)
             {
-                GlobalRender.drawExhaust(position,0,magnitude)
+                GlobalRender.drawExhaust(position,0,-acceleration.y)
             }
         }
 
         if (acceleration.x != 0){
             if (acceleration.x > 0){
-                GlobalRender.drawExhaust(position,90,magnitude)
+                GlobalRender.drawExhaust(position,90,acceleration.x)
             } 
             else if (acceleration.x < 0)
             {
-                GlobalRender.drawExhaust(position,270,magnitude)
+                GlobalRender.drawExhaust(position,270,-acceleration.x)
             }
         }
 
@@ -315,6 +315,9 @@ class Ship extends GameObject{
     }
 
     start(){
+
+        checkMemory(this)
+
         const startCode = compileCode('this.Start(ship,base) \n' +
                                 'return ship')
 
@@ -324,6 +327,9 @@ class Ship extends GameObject{
     }
 
     update(){
+
+        checkMemory(this)
+
         const updateCode = compileCode('this.Update(ship,base,Game,Graphics) \n' + 
                                     ' return ship')
         updateCode({ship : createShipProxy(this) , 
@@ -643,12 +649,18 @@ class Base extends GameObject {
     }
 
     start(){
+
+        checkMemory(this)
+
         const startCode = compileCode('this.BaseStart(ship) \n' +
                                 'return base')
         startCode({base : createBaseProxy(this)})
     }
 
     update(){
+
+        checkMemory(this)
+
         const updateCode = compileCode('this.BaseUpdate(base,Game,Graphics) \n' + 
                                     ' return base')
         updateCode({base : createBaseProxy(this), Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy})

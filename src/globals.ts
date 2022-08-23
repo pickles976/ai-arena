@@ -1,9 +1,8 @@
 /**
  * GLOBAL VARIABLES
  */
-
-const W : number = 640
-const H : number = 480
+const W : number = 1080
+const H : number = 720
 const FRAMERATE : number = 60.0
 const MS : number = 1000.0 / FRAMERATE
 let PAUSED : boolean = false

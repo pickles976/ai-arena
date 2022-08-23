@@ -1,31 +1,3 @@
-## Game
-
-The Game object is used to query the game state. From here you can get information about all the active gameobjects on the field. You can use this to find nearest resources, enemies, and find out about the amount of resources contained in an asteroid, or the enemy's health.
-
-The available default functions for Game are:
-
-- ["getAsteroids" , "getClosestAsteroid" , "getObstacle", "getClosestObstacle", 
-    "getEnergyCells", "getClosestEnergyCell", "getShips", "getShipsByTeam", 
-    "getBullets","getBases","getBaseByTeam"]
-
-Example usage of Game object:
-
-    let asteroids = Game.getAsteroids()
-    let myBase = Game.getBaseByTeam(1)
-
-## Graphics
-
-The available default fields for Graphics are:
-- ["H", "W"]
-
-The available default functions for Graphics are:
-- ["drawText", "drawLine", "drawCircle", "drawCircleTransparent"]
-
-Example usage of Graphics object:
-
-    let H = Graphics.H
-    Graphics.drawCircle(new Vector2D(0,H),100,"#FFFF00")
-
 # User code injection
 
 https://blog.risingstack.com/writing-a-javascript-framework-sandboxed-code-evaluation/

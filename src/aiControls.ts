@@ -14,6 +14,7 @@ function Start(ship, base, Graphics){
 
     ship.target = {}
     ship.state = "IDLE"
+    ship.arr = []
 
 }
 
