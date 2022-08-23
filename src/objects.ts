@@ -512,7 +512,7 @@ class Base extends GameObject {
         if (this.resources.water > 0 && this.resources.energy < this.maxEnergy){
             const newEnergy = this.refiningRate * deltaTime
             this.resources.water -= newEnergy
-            this.resources.energy += newEnergy / 2
+            this.resources.energy += newEnergy
             GameStateManager.addEnergy(this.team,newEnergy)
         }
 
