@@ -4,6 +4,13 @@
  * The RenderQueue is structured like:
  * { 0 : [newFrameCoroutine], 1 : [drawCircleCoroutine,...], ...}
  * This is done so that render calls can be deferred until later, and can be executed in layers with some sort of Z ordering
+ * 
+ * { 0 : background 
+ *   1 : NA
+ *   2 : effects behind
+ *   3 : circles 
+ *   4 : effects in front
+ *   5 : debug drawing }
  */
  class Renderer{
 
@@ -57,6 +64,7 @@
         function* drawLineCoroutine(self : Renderer,start : Vector2D,end : Vector2D,color : string){
             const ctx = self.ctx
             ctx.strokeStyle = color
+            ctx.lineWidth = 1
             ctx.beginPath()
             ctx.moveTo(start.x,start.y)
             ctx.lineTo(end.x,end.y)
@@ -116,6 +124,53 @@
         }
 
         this.queueAction(drawCircleCoroutine,3,[this,pos,radius,color])
+    }
+
+    drawArc(pos : Vector2D, radius : number, start: number, end: number, color : string)
+    {
+        function* drawArcCoroutine(self : Renderer,pos : Vector2D,radius : number,start: number, end: number, color : string){
+
+            const ctx = self.ctx
+            ctx.fillStyle = color;
+    
+            ctx.beginPath();
+            ctx.arc(pos.x,pos.y,radius,start,end);
+            ctx.lineWidth = 4
+            ctx.stroke();
+    
+            // WRAPAROUND RENDERING
+            let newX = pos.x;
+            let newY = pos.y;
+            let wraparound = false;
+
+            // check x bounds
+            if (pos.x + radius > W){
+                newX = pos.x - W
+                wraparound = true
+            }
+            else if (pos.x - radius < 0){
+                newX = pos.x + W
+                wraparound = true
+            }
+
+            // check y bounds
+            if (pos.y + radius > H){
+                newY = pos.y - H
+                wraparound = true
+            }
+            else if (pos.y - radius < 0){
+                newY = pos.y + H
+                wraparound = true
+            }
+
+            if (wraparound){
+                ctx.beginPath();
+                ctx.arc(newX,newY,radius,0,2* Math.PI);
+                ctx.fill();
+            }
+        }
+
+        this.queueAction(drawArcCoroutine,2,[this,pos,radius,start,end,color])
     }
 
     drawExhaust(position : Vector2D,rotation : number,scale : number){

@@ -473,12 +473,17 @@ class Base extends GameObject {
     interactRadiusCost : number
     energyCost : number
 
+    health : number
+    healthCost : number
+    healSelfRate : number
+    healSelfRateCost : number
+
     constructor(uuid : number,position : Vector2D,energy : number,team : number){
 
         super(uuid,"BASE",new Circle(300.0,position,new Vector2D(0,0)))
 
         this.team = team
-        this.resources = new Resources(501,100,energy)
+        this.resources = new Resources(0,0,energy)
         this.maxEnergy = 500
 
         this.shipQueue = []
@@ -556,6 +561,7 @@ class Base extends GameObject {
 
     render(){
         GlobalRender.drawCircle(this.circle.position,this.circle.radius,teamColors[this.team])
+        GlobalRender.drawArc(this.circle.position,this.circle.radius,0,(this.resources.energy / this.maxEnergy) * 2 * Math.PI,"#FFFF00")
         GlobalRender.drawText(this.resources.toString(),this.circle.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
     }
 
