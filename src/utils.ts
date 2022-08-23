@@ -36,7 +36,7 @@ function clamp(value : number,min : number,max : number){
  * @returns number
  */
 function energyDiff(thisObject : GameObject,otherObject : GameObject){
-    return energyScale * otherObject.circle.mass * (thisObject.circle.velocity.subtract(otherObject.circle.velocity).magnitude ** 2) / 2
+    return energyScale * otherObject.transform.mass * (thisObject.transform.velocity.subtract(otherObject.transform.velocity).magnitude ** 2) / 2
 }
 
 
@@ -104,7 +104,8 @@ function overlapCircle(position : Vector2D,radius : number){
             index += GameObjectList.length
         }
 
-        let c2 = GameObjectList[index].circle
+        let c2 = GameObjectList[index].transform
+        let r2 = GameObjectList[index].collider.radius
         let dist = 100000;
 
         // normal collision
@@ -115,7 +116,7 @@ function overlapCircle(position : Vector2D,radius : number){
         }
 
         // POSSIBLE COLLISION
-        if (Math.abs(dist) < (radius + c2.radius)){
+        if (Math.abs(dist) < (radius + r2)){
             // the checking object will always be first in the pair
             possible.push(GameObjectList[index])
             collision = true
@@ -138,7 +139,8 @@ function overlapCircle(position : Vector2D,radius : number){
             index -= GameObjectList.length
         }
 
-        let c2 = GameObjectList[index].circle
+        let c2 = GameObjectList[index].transform
+        let r2 = GameObjectList[index].collider.radius
         let dist = 100000;
 
         // normal collision
@@ -149,7 +151,7 @@ function overlapCircle(position : Vector2D,radius : number){
         }
 
         // POSSIBLE COLLISION
-        if (Math.abs(dist) < (radius + c2.radius)){
+        if (Math.abs(dist) < (radius + r2)){
             // the checking object will always be first in the pair
             possible.push(GameObjectList[index])
             collision = true
@@ -163,7 +165,8 @@ function overlapCircle(position : Vector2D,radius : number){
     while(k < possible.length){
 
         const obj = possible[k]
-        const c2 = obj.circle
+        const c2 = obj.transform
+        let r2 = obj.collider.radius
         let c2Pos = c2.position
 
         // check if it's a wraparound collision in the X direction
@@ -175,7 +178,7 @@ function overlapCircle(position : Vector2D,radius : number){
         let dist = position.subtract(c2Pos).magnitude
 
         // check for wraparound collision in the Y direction
-        if (dist > (radius + c2.radius)){
+        if (dist > (radius + r2)){
 
             let tempC2 = c2Pos.copy()
 
@@ -188,14 +191,14 @@ function overlapCircle(position : Vector2D,radius : number){
 
             // check if there is collision after the shift
             let tempDist = position.subtract(tempC2).magnitude
-            if (tempDist < (radius + c2.radius)){
+            if (tempDist < (radius + r2)){
                 dist = tempDist // update with shift
                 c2Pos = tempC2
             }
         }
 
         //check for collision
-        if (dist < (radius + c2.radius)){
+        if (dist < (radius + r2)){
             collisions.push(obj)
         }
 
@@ -207,10 +210,10 @@ function overlapCircle(position : Vector2D,radius : number){
         const color = "rgba(255, 255, 0, 0.5)"
         GlobalRender.drawCircle(position,radius,color)
         possible.map((c) => {
-            GlobalRender.drawLine(position,c.circle.position,"rgba(255, 255, 255, 0.5)")
+            GlobalRender.drawLine(position,c.transform.position,"rgba(255, 255, 255, 0.5)")
         })
         collisions.map((c) => {
-            GlobalRender.drawLine(position,c.circle.position,color)
+            GlobalRender.drawLine(position,c.transform.position,color)
         })
     }
 
@@ -232,5 +235,5 @@ function create_UUID(){
 }
 
 function dist(obj1 : GameObject,obj2 : GameObject){
-    return Vector2D.dist(obj1.circle.position,obj2.circle.position)
+    return Vector2D.dist(obj1.transform.position,obj2.transform.position)
 }

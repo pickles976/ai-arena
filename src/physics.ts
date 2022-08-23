@@ -4,10 +4,6 @@
 
  class Vector2D {
 
-    static zero = new Vector2D(0,0)
-    static up = new Vector2D(0,1)
-    static right = new Vector2D(1,0)
-
     type: string
     x : number
     y : number
@@ -81,18 +77,13 @@
     }
 }
 
-/**
- * This entire physics sim uses circles for colliders, since they are extremely easy to
- * program for and I am stupid/lazy. Think of the Circle as the base class that every game object inherits from.
- */
-class Circle {
+class Transform {
 
     type : string
     mass : number
     position : Vector2D
     velocity : Vector2D
     acceleration : Vector2D
-    radius : number
 
     /**
      * Circle is basically a point mass with a radius for collision checking
@@ -101,19 +92,18 @@ class Circle {
      * @param {Vector2D} velocity (m/s)
      */
     constructor(mass : number,position : Vector2D, velocity : Vector2D){
-        this.type = "CIRCLE"
+        this.type = "TRANSFORM"
         this.mass = mass;
-        this.radius = Math.sqrt(mass)
         this.position = position;
         this.velocity = velocity;
-        this.acceleration = Vector2D.zero
+        this.acceleration = new Vector2D(0,0)
     }
 
     simulate(deltaTime : number){
 
         this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime).divide(50000));
 
-        this.acceleration = Vector2D.zero
+        this.acceleration = new Vector2D(0,0)
 
         this.position = this.position.add(this.velocity.multiply(deltaTime));
 
@@ -135,5 +125,19 @@ class Circle {
             this.mass,
             this.position.serialize(),
             this.velocity.serialize()])
+    }
+}
+
+class Collider {
+    type : string
+    radius : number
+    constructor(radius : number){
+        this.type = "COLLIDER"
+        this.radius = radius
+    }
+
+    serialize(){
+        return JSON.stringify([this.type,
+            this.radius])
     }
 }

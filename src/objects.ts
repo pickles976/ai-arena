@@ -49,12 +49,12 @@ class Asteroid extends GameObject {
     resources : Resources
 
     constructor(uuid : number,position : Vector2D,velocity : Vector2D,metal : number,water : number){
-        super(uuid,"ASTEROID",new Circle(metal+water,position,velocity))
+        super(uuid,"ASTEROID",new Transform(metal+water,position,velocity), new Collider(Math.sqrt(metal+water)))
         this.resources = new Resources(metal,water,0)
     }
 
     simulate(deltaTime : number){
-        // this.circle.simulate(deltaTime)
+        // this.transform.simulate(deltaTime)
         super.simulate(deltaTime)
     }
 
@@ -65,7 +65,7 @@ class Asteroid extends GameObject {
 
         // draw the resources in the asteroid as colored rings
         for(let i = 0; i < 2; i++){
-            GlobalRender.drawCircle(this.circle.position,total*this.circle.radius,Resources.colors[i])
+            GlobalRender.drawCircle(this.transform.position,total*this.collider.radius,Resources.colors[i])
             total -= ratio[i]
         }
     }
@@ -82,8 +82,8 @@ class Asteroid extends GameObject {
         const temp = this.resources.getResources()
         return JSON.stringify([this.type,
             this.uuid,
-            this.circle.position.serialize(),
-            this.circle.velocity.serialize(),
+            this.transform.position.serialize(),
+            this.transform.velocity.serialize(),
             temp["metal"],
             temp["water"]])
     }
@@ -93,7 +93,7 @@ class Asteroid extends GameObject {
 class Obstacle extends GameObject {
 
     constructor(uuid : number,position : Vector2D,velocity : Vector2D,mass : number){
-        super(uuid,"OBSTACLE",new Circle(mass,position,velocity))
+        super(uuid,"OBSTACLE",new Transform(mass,position,velocity),new Collider(Math.sqrt(mass)))
     }
 
     simulate(deltaTime : number){
@@ -102,20 +102,20 @@ class Obstacle extends GameObject {
 
     render(){
         // draw the obstacle
-        GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#A52A2A")
+        GlobalRender.drawCircle(this.transform.position,this.collider.radius,"#A52A2A")
     }
 
     breakUp(){
 
-        if (this.circle.mass > 60.0){
+        if (this.transform.mass > 60.0){
             // break into multiple pieces
             const numPieces = Math.floor(2 + Math.random() * 3)
             
             for(let i = 0; i < numPieces; i++){
                 const massRatio = 0.1 + (Math.random() * 0.15)
                 const rotationOffset = (i * 360 / numPieces) + (Math.random() - 0.5) * 45
-                const offset = Vector2D.up.multiply(this.circle.radius / 1.5).rotate(rotationOffset)
-                const newChunk = new Obstacle(create_UUID(),this.circle.position.add(offset),this.circle.velocity.rotate(-rotationOffset).add(this.circle.velocity),this.circle.mass * massRatio)
+                const offset = new Vector2D(0,1).multiply(this.collider.radius / 1.5).rotate(rotationOffset)
+                const newChunk = new Obstacle(create_UUID(),this.transform.position.add(offset),this.transform.velocity.rotate(-rotationOffset).add(this.transform.velocity),this.transform.mass * massRatio)
                 GameObjectList.push(newChunk)
             }
 
@@ -130,9 +130,9 @@ class Obstacle extends GameObject {
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
-            this.circle.position.serialize(),
-            this.circle.velocity.serialize(),
-            parseFloat(this.circle.mass.toFixed(2))])
+            this.transform.position.serialize(),
+            this.transform.velocity.serialize(),
+            parseFloat(this.transform.mass.toFixed(2))])
     }
 
 }
@@ -142,7 +142,7 @@ class EnergyCell extends GameObject{
     resources : Resources
 
     constructor(uuid : number,position : Vector2D,velocity : Vector2D,energy : number){
-        super(uuid,"ENERGY_CELL",new Circle(energy,position,velocity))
+        super(uuid,"ENERGY_CELL",new Transform(energy,position,velocity),new Collider(Math.sqrt(energy)))
         this.resources = new Resources(0,0,energy)
     }
 
@@ -152,7 +152,7 @@ class EnergyCell extends GameObject{
 
     render(){
         // draw the resources in the asteroid as colored rings
-        GlobalRender.drawCircle(this.circle.position,this.circle.radius,Resources.colors[2])
+        GlobalRender.drawCircle(this.transform.position,this.collider.radius,Resources.colors[2])
     }
 
     getResources(){
@@ -166,8 +166,8 @@ class EnergyCell extends GameObject{
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
-            this.circle.position.serialize(),
-            this.circle.velocity.serialize(),
+            this.transform.position.serialize(),
+            this.transform.velocity.serialize(),
             this.resources.getResources()["energy"]])
     }
 }
@@ -183,7 +183,7 @@ class Ship extends GameObject{
 
     constructor(uuid : number,position : Vector2D,energy : number,team : number){
 
-        super(uuid,"SHIP",new Circle(SHIP_MASS,position,Vector2D.zero))
+        super(uuid,"SHIP",new Transform(SHIP_MASS,position,new Vector2D(0,0)),new Collider(Math.sqrt(SHIP_MASS)))
         this.team = team
         this.resources = new Resources(0,0,energy)
 
@@ -199,9 +199,9 @@ class Ship extends GameObject{
     }
 
     simulate(deltaTime : number){
-        const oldVel = this.circle.velocity.magnitude ** 2
+        const oldVel = this.transform.velocity.magnitude ** 2
         super.simulate(deltaTime)
-        const dV = Math.abs(oldVel - (this.circle.velocity.magnitude ** 2))
+        const dV = Math.abs(oldVel - (this.transform.velocity.magnitude ** 2))
         this.resources.energy -= dV * (this.totalMass()) * 0.5 * energyScale
 
         if (this.resources.energy < 0){
@@ -215,14 +215,14 @@ class Ship extends GameObject{
 
     render(){
 
-        const acceleration = this.circle.acceleration
-        const position = this.circle.position
+        const acceleration = this.transform.acceleration
+        const position = this.transform.position
 
         // add a flickering animation
         const magnitude = acceleration.magnitude * clamp(Math.random() + 0.6,0.5,1.0)
 
         // draw the resources in the asteroid as colored rings
-        GlobalRender.drawCircle(position,this.circle.radius,teamColors[this.team])
+        GlobalRender.drawCircle(position,this.collider.radius,teamColors[this.team])
 
         // draw applyThrust effect
         if (acceleration.y != 0){
@@ -288,7 +288,7 @@ class Ship extends GameObject{
     }
 
     totalMass(){
-        return this.circle.mass + this.resources.water + this.resources.metal
+        return this.transform.mass + this.resources.water + this.resources.metal
     }
 
     destroy(){
@@ -309,7 +309,7 @@ class Ship extends GameObject{
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
-            this.circle.position.serialize(),
+            this.transform.position.serialize(),
             this.resources.getResources()["energy"],
             this.team])
     }
@@ -337,13 +337,13 @@ class Ship extends GameObject{
 
     applyThrust(vector : Vector2D,percentage : number){
         const pct = clamp(percentage,0,1)
-        this.circle.acceleration = vector.normal().multiply(pct)    
+        this.transform.acceleration = vector.normal().multiply(pct)    
     }
 
     shoot(direction : Vector2D){
         // instantiate object
         this.resources.energy -= this.damage
-        const bullet = new Bullet(create_UUID(),this.circle.position.add(direction.normal().multiply(Bullet.offset + this.circle.radius)), direction.normal().multiply(Bullet.speed), this.damage, this.uuid)
+        const bullet = new Bullet(create_UUID(),this.transform.position.add(direction.normal().multiply(Bullet.offset + this.collider.radius)), direction.normal().multiply(Bullet.speed), this.damage, this.uuid)
         GameObjectList.push(bullet)
     }
 
@@ -374,19 +374,19 @@ class Ship extends GameObject{
     // subtracting our current velocity gives us dV
     seekTarget(target: GameObject){
         const desiredSpeed = 2.5 / FRAMERATE
-        const desiredVelocity = target.circle.position.subtract(this.circle.position).normal().multiply(desiredSpeed).add(target.circle.velocity)
-        const steering = desiredVelocity.subtract(this.circle.velocity)
+        const desiredVelocity = target.transform.position.subtract(this.transform.position).normal().multiply(desiredSpeed).add(target.transform.velocity)
+        const steering = desiredVelocity.subtract(this.transform.velocity)
         this.applyThrust(steering,1.0)
     }
 
     moveTo(position : Vector2D){
-        const vec = position.subtract(this.circle.position)
+        const vec = position.subtract(this.transform.position)
         const power = vec.magnitude / 100
         this.applyThrust(vec,power)
     }
 
     moveToObject(obj : GameObject){
-        const vec = obj.circle.position.subtract(this.circle.position)
+        const vec = obj.transform.position.subtract(this.transform.position)
         const power = vec.magnitude / 100
         this.applyThrust(vec,power)
     }
@@ -400,7 +400,7 @@ class Bullet extends GameObject {
     parent : number
 
     constructor(uuid : number,position : Vector2D,velocity : Vector2D,damage : number,parent : number){
-        super(uuid,"BULLET",new Circle(15,position,velocity))
+        super(uuid,"BULLET",new Transform(BULLET_MASS,position,velocity),new Collider(Math.sqrt(BULLET_MASS)))
 
         this.damage = damage
         this.parent = parent
@@ -412,7 +412,7 @@ class Bullet extends GameObject {
 
     render(){
         // draw the resources in the asteroid as colored rings
-        GlobalRender.drawCircle(this.circle.position,this.circle.radius,"#FFFF00")
+        GlobalRender.drawCircle(this.transform.position,this.collider.radius,"#FFFF00")
     }
 
     collide(otherObject : GameObject){
@@ -449,8 +449,8 @@ class Bullet extends GameObject {
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
-            this.circle.position.serialize(),
-            this.circle.velocity.serialize(),
+            this.transform.position.serialize(),
+            this.transform.velocity.serialize(),
             this.damage,
             this.parent])
     }
@@ -480,7 +480,7 @@ class Base extends GameObject {
 
     constructor(uuid : number,position : Vector2D,energy : number,team : number){
 
-        super(uuid,"BASE",new Circle(300.0,position,new Vector2D(0,0)))
+        super(uuid,"BASE",new Transform(BASE_MASS,position,new Vector2D(0,0)), new Collider(Math.sqrt(BASE_MASS)))
 
         this.team = team
         this.resources = new Resources(0,0,energy)
@@ -506,7 +506,7 @@ class Base extends GameObject {
     simulate(deltaTime : number){
 
         // stay static
-        this.circle.velocity = new Vector2D(0,0)
+        this.transform.velocity = new Vector2D(0,0)
 
         // refine water
         if (this.resources.water > 0 && this.resources.energy < this.maxEnergy){
@@ -555,14 +555,14 @@ class Base extends GameObject {
 
     collide(otherObject : GameObject){
         const oomf = 15.0
-        const vec = otherObject.circle.position.subtract(this.circle.position).normal()
-        otherObject.circle.velocity = otherObject.circle.velocity.add(vec.multiply(oomf))
+        const vec = otherObject.transform.position.subtract(this.transform.position).normal()
+        otherObject.transform.velocity = otherObject.transform.velocity.add(vec.multiply(oomf))
     }
 
     render(){
-        GlobalRender.drawCircle(this.circle.position,this.circle.radius,teamColors[this.team])
-        GlobalRender.drawArc(this.circle.position,this.circle.radius,0,(this.resources.energy / this.maxEnergy) * 2 * Math.PI,"#FFFF00")
-        GlobalRender.drawText(this.resources.toString(),this.circle.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
+        GlobalRender.drawCircle(this.transform.position,this.collider.radius,teamColors[this.team])
+        GlobalRender.drawArc(this.transform.position,this.collider.radius,0,(this.resources.energy / this.maxEnergy) * 2 * Math.PI,"#FFFF00")
+        GlobalRender.drawText(this.resources.toString(),this.transform.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
     }
 
     destroy(){
@@ -604,9 +604,9 @@ class Base extends GameObject {
         // check around the base
         const angle = 360 / 32
         for(let i = 0; i < 32; i++){
-            let pos = new Vector2D(0,1).multiply(this.circle.radius * 1.5).rotate(angle*i).add(this.circle.position)
+            let pos = new Vector2D(0,1).multiply(this.collider.radius * 1.5).rotate(angle*i).add(this.transform.position)
             const obj = new Ship(create_UUID(),pos,energy,this.team)
-            if (overlapCircle(pos,obj.circle.radius*1.2).length < 1){
+            if (overlapCircle(pos,obj.collider.radius*1.2).length < 1){
 
                 // SPAWNING
                 if (!respawn)
@@ -637,7 +637,7 @@ class Base extends GameObject {
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
-            this.circle.position.serialize(),
+            this.transform.position.serialize(),
             this.resources.getResources()["energy"],
             this.team])
     }

@@ -51,9 +51,9 @@ function createRendererProxy(renderer : Renderer){
 
 function createGameObjectProxy(gameObject : GameObject){
 
-    const whiteList = ["uuid","type","team","damage", "maxEnergy"]
+    const whiteList = ["uuid","type","team","damage","maxEnergy"]
 
-    const grayList = ["circle","resources"]
+    const grayList = ["transform","collider","resources"]
 
     const gameObjectHandler : ProxyHandler<GameObject> = {
 
@@ -96,7 +96,7 @@ function createGameObjectProxy(gameObject : GameObject){
             "moveTo", "moveToObject", "applyThrust", "shoot"]
 
     // readable after deep copy
-    const grayList = ["resources","circle"]
+    const grayList = ["transform","collider","resources"]
 
     // not readable under any circumstances
     const blackList = ["simulate","render","getResources",
@@ -160,7 +160,7 @@ function createBaseProxy(base : Base){
             "upgradeInteractRadius", "spawnShip"]
 
     // readable after deep copy
-    const grayList = ["resources","circle"]
+    const grayList = ["transform","collider","resources"]
 
     // not readable under any circumstances
     const blackList = ["shipQueue","simulate",

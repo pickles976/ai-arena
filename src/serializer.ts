@@ -30,9 +30,12 @@ class Serializer{
                 case "VECTOR2D":
                     /* @ts-ignore */
                     return new Vector2D(...args)
-                case "CIRCLE":
+                case "TRANSFORM":
                     /* @ts-ignore */
-                    return new Circle(...args)
+                    return new Transform(...args)
+                case "COLLIDER":
+                    /* @ts-ignore */
+                    return new Collider(...args)
                 case "RESOURCES":
                     /* @ts-ignore */
                     return new Resources(...args)
@@ -69,8 +72,11 @@ class Serializer{
         console.log("Test Vector2D serialization")
         console.log(Serializer.deserialize(vec.serialize()))
 
-        console.log("Test Circle serialization")
-        console.log(Serializer.deserialize(new Circle(100,vec, vec).serialize()))
+        console.log("Test Transform serialization")
+        console.log(Serializer.deserialize(new Transform(100,vec, vec).serialize()))
+
+        console.log("Test Collider serialization")
+        console.log(Serializer.deserialize(new Collider(100).serialize()))
 
         console.log("Test Resource serialization")
         console.log(Serializer.deserialize(new Resources(100.021,20.12,0.0).serialize()))

@@ -23,6 +23,7 @@ let xArray : Array<number> = []
 const energyScale : number = 25
 
 const SHIP_MASS = 50
+const BULLET_MASS = 15
 const BASE_MASS = 300
 
 const SHIP_BASE_MAX_ENERGY = 100

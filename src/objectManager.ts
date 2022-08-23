@@ -141,15 +141,15 @@ class ObjectManager{
             case "ASTEROID":
                 const metal = randomInRange(...ObjectManager.asteroidMetalRange)
                 const water = randomInRange(...ObjectManager.asteroidWaterRange)
-                obj = new Asteroid(create_UUID(),Vector2D.zero,vel,metal,water)
+                obj = new Asteroid(create_UUID(),new Vector2D(0,0),vel,metal,water)
                 break;
             case "OBSTACLE":
                 const mass = randomInRange(...ObjectManager.obstacleMassRange)
-                obj = new Obstacle(create_UUID(),Vector2D.zero,vel,mass)
+                obj = new Obstacle(create_UUID(),new Vector2D(0,0),vel,mass)
                 break;
             case "ENERGY_CELL":
                 const energy = randomInRange(...ObjectManager.energyCellRange)
-                obj = new EnergyCell(create_UUID(),Vector2D.zero,vel,energy)
+                obj = new EnergyCell(create_UUID(),new Vector2D(0,0),vel,energy)
                 break;
         }
 
@@ -157,8 +157,8 @@ class ObjectManager{
             // check 32 times for a spot to place it
             for(let i = 0; i < 32; i++){
                 const randomPos = new Vector2D(Math.random()*W,Math.random()*H)
-                if (overlapCircle(randomPos,obj.circle.radius*1.5).length < 1){
-                    obj.circle.position = randomPos
+                if (overlapCircle(randomPos,obj.collider.radius*1.5).length < 1){
+                    obj.transform.position = randomPos
                     GameObjectList.push(obj)
                     return true
                 }
@@ -199,7 +199,7 @@ class ObjectManager{
             let closest = [{},100000]
             for (const i in asteroids){
                 const asteroid = asteroids[i]
-                const d = asteroid.circle.position.subtract(position).magnitude
+                const d = asteroid.transform.position.subtract(position).magnitude
                 if (d < closest[1]){
                     closest = [asteroid,d]
                 }
@@ -217,7 +217,7 @@ class ObjectManager{
             let closest = [{},100000]
             for (const i in obstacles){
                 const obstacle = obstacles[i]
-                const d = obstacle.circle.position.subtract(position).magnitude
+                const d = obstacle.transform.position.subtract(position).magnitude
                 if (d < closest[1]){
                     closest = [obstacle,d]
                 }
@@ -235,7 +235,7 @@ class ObjectManager{
             let closest = [{},100000]
             for (const i in energyCells){
                 const energyCell = energyCells[i]
-                const d = energyCell.circle.position.subtract(position).magnitude
+                const d = energyCell.transform.position.subtract(position).magnitude
                 if (d < closest[1]){
                     closest = [energyCell,d]
                 }

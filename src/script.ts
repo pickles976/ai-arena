@@ -135,7 +135,8 @@ function checkForCollisions(gameObjArray : Array<GameObject>){
 
     while (i < gameObjArray.length) {
 
-        let c1 = gameObjArray[i].circle;
+        let c1 = gameObjArray[i].transform;
+        let r1 = gameObjArray[i].collider.radius
         let j = 1;
 
         //ITERATE BACKWARDS IN CIRCLEARRAY
@@ -150,7 +151,8 @@ function checkForCollisions(gameObjArray : Array<GameObject>){
                 index += gameObjArray.length
             }
 
-            let c2 = gameObjArray[index].circle
+            let c2 = gameObjArray[index].transform
+            let r2 = gameObjArray[index].collider.radius
             let dist = 100000;
 
             // normal collision
@@ -161,7 +163,7 @@ function checkForCollisions(gameObjArray : Array<GameObject>){
             }
 
             // POSSIBLE COLLISION
-            if (Math.abs(dist) < (c1.radius + c2.radius)){
+            if (Math.abs(dist) < (r1 + r2)){
                 // the checking object will always be first in the pair
                 pairs.push([gameObjArray[i],gameObjArray[index]])
                 collision = true
@@ -179,8 +181,10 @@ function checkForCollisions(gameObjArray : Array<GameObject>){
 
         const obj1 = pairs[i][0]
         const obj2 = pairs[i][1]
-        const c1 = obj1.circle
-        const c2 = obj2.circle
+        const c1 = obj1.transform
+        const r1 = obj1.collider.radius
+        const c2 = obj2.transform
+        const r2 = obj2.collider.radius
         let c1Pos = c1.position
         let c2Pos = c2.position
         
@@ -193,7 +197,7 @@ function checkForCollisions(gameObjArray : Array<GameObject>){
         let dist = c1Pos.subtract(c2Pos).magnitude
 
         // check for wraparound collision in the Y direction
-        if (dist > (c1.radius + c2.radius)){
+        if (dist > (r1 + r2)){
 
             let tempC2 = c2Pos.copy()
 
@@ -206,14 +210,14 @@ function checkForCollisions(gameObjArray : Array<GameObject>){
 
             // check if there is collision after the shift
             let tempDist = c1Pos.subtract(tempC2).magnitude
-            if (tempDist < (c1.radius + c2.radius)){
+            if (tempDist < (r1 + r2)){
                 dist = tempDist // update with shift
                 c2Pos = tempC2
             }
         }
 
         //check for collision
-        if (dist < (c1.radius + c2.radius)){
+        if (dist < (r1 + r2)){
 
             let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity,c1.mass,c2.mass) 
             obj1.collide(obj2)
@@ -253,11 +257,11 @@ function checkForCollisions(gameObjArray : Array<GameObject>){
  */
 function sortGameObjectList(){
     GameObjectList.sort(function(a,b){
-        const circleA = a.circle
-        const circleB = b.circle
+        const circleA = a.transform
+        const circleB = b.transform
         return circleA.position.x - circleB.position.x
     })
 
     // save a cached array of X values for operations
-    xArray = GameObjectList.map((value) => value.circle.position.x)
+    xArray = GameObjectList.map((value) => value.transform.position.x)
 }

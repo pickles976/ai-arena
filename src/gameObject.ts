@@ -1,12 +1,14 @@
 class GameObject {
     uuid : number
     type : string
-    circle : Circle
+    transform : Transform
+    collider : Collider
 
-    constructor(uuid : number,type : string,circle : Circle){
+    constructor(uuid : number,type : string,transform : Transform, collider : Collider){
         this.uuid = uuid
         this.type = type
-        this.circle = circle
+        this.transform = transform
+        this.collider = collider
     }
 
     destroy(){
@@ -14,7 +16,7 @@ class GameObject {
     }
 
     simulate(deltaTime : number){
-        this.circle.simulate(deltaTime)
+        this.transform.simulate(deltaTime)
     }
 
     render(){

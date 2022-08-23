@@ -116,7 +116,7 @@ function Update(ship, base, Game, Graphics){
         }
 
         if (closest[1] < shootRadius){
-            ship.shoot(closest[0].circle.position.subtract(ship.circle.position).add(closest[0].circle.velocity.multiply(60)))
+            ship.shoot(closest[0].transform.position.subtract(ship.transform.position).add(closest[0].transform.velocity.multiply(60)))
         }
     }
 
@@ -132,8 +132,8 @@ function Update(ship, base, Game, Graphics){
     ship.targetID = ship.target.uuid
 
     // DEBUG DRAWING
-    Graphics.drawText(ship.resources.toString(),ship.circle.position,10,"#FFFFFF")
-    Graphics.drawText(ship.state,ship.circle.position.subtract(Vector2D.up.multiply(-10)),8,"#FFFFFF")
-    if (ship.target != undefined && ship.target.circle != undefined)
-        Graphics.drawLine(ship.circle.position,ship.target.circle.position,"#00FF00")
+    Graphics.drawText(ship.resources.toString(),ship.transform.position,10,"#FFFFFF")
+    Graphics.drawText(ship.state,ship.transform.position.subtract(new Vector2D(0,1).multiply(-10)),8,"#FFFFFF")
+    if (ship.target != undefined && ship.target.transform != undefined)
+        Graphics.drawLine(ship.transform.position,ship.target.transform.position,"#00FF00")
 }
