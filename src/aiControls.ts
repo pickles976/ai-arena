@@ -159,7 +159,7 @@ function Update(ship, base, Game, Graphics){
         }
 
         if (closest[1] < shootRadius){
-            ship.shoot(closest[0].transform.position.add(closest[0].transform.velocity.multiply(720)).subtract(ship.transform.position))
+            ship.shoot(closest[0].transform.position.add(closest[0].transform.velocity.multiply(720)).subtract(ship.transform.position).subtract(ship.transform.velocity.multiply(60)))
             ship.shootTimer = ship.shootCooldown
         }
     }
