@@ -12,7 +12,7 @@ However, if a base's energy drops to zero, then your base dies and you lose!
 
 Example usage of the base object:  
 
-    const energyCost = base.energyCost
+    const upgradeMaxEnergyCost = base.upgradeMaxEnergyCost
     base.spawnShip(new Vector2D(0,1),25)
 
 ### Start
@@ -27,9 +27,9 @@ This is the logic that will run every frame for controlling your base. You could
 
 The available default fields for base are:
 
--  ["uuid", "team" , "maxEnergy", "energyCost", "refiningRate", 
-    "baseShipCost", "shipCost", "healRate", "healRateCost", "interactRadius", 
-    "interactRadiusCost", "transform","collider","resources"]
+-  ["uuid", "team" , "maxEnergy", "upgradeMaxEnergyCost", "refiningRate", 
+    "shipCost", "healRate", "upgradeHealRateCost", "interactRadius", 
+    "upgradeInteractRadiusCost", "transform","collider","resources"]
 
 The available default functions for base are:
 
@@ -58,12 +58,12 @@ This is the game logic that runs every frame. You can access your previously ini
 The available default fields for ship are:
 
 -  ["uuid", "team" , "transform","collider","resources", "maxEnergy", 
-    "damage", "energyCost", "damageCost"]
+    "damage", "upgradeMaxEnergyCost", "damageCost"]
 
 The available default functions for ship are:
 
 -  [ "upgradeMaxEnergy", "upgradeDamage", "seekTarget", 
-            "moveTo", "moveToObject", "applyThrust", "shoot"]
+            "moveTo", "shoot"]
 
 ## Game
 

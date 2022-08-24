@@ -49,11 +49,17 @@ function createRendererProxy(renderer : Renderer){
 
 }
 
+// we use a blacklist for the GameObject proxy so we can access the
+// user-generated memory of other AI
 function createGameObjectProxy(gameObject : GameObject){
 
-    const whiteList = ["uuid","type","team","damage","maxEnergy"]
-
     const grayList = ["transform","collider","resources"]
+
+    const blackList = ["spawnShip", "upgradeInteractRadius", "upgradeHealRate",
+    "upgradeMaxEnergy", "update", "start", "serialize", "queueShip", "trySpawnShip", "takeResources",
+    "healShip", "destroy", "render", "collide", "simulate", "shipQueue", "moveTo",
+    "seekTarget", "upgradeDamage", "shoot", "applyThrust", "breakup", "totalMass",
+    "getResources", "toString", "colors"]
 
     const gameObjectHandler : ProxyHandler<GameObject> = {
 
@@ -64,7 +70,7 @@ function createGameObjectProxy(gameObject : GameObject){
             if (grayList.includes(prop)){
                 return Serializer.deserialize(field.serialize())
             }
-            else if (whiteList.includes(prop))
+            else if (!blackList.includes(prop))
             {
                 return field
             }
@@ -91,9 +97,9 @@ function createGameObjectProxy(gameObject : GameObject){
  function createShipProxy(ship : Ship){
 
     // readable fields
-    const whiteList = ["uuid", "team" , "maxEnergy", "damage", "energyCost", 
+    const whiteList = ["uuid", "team" , "maxEnergy", "damage", "upgradeMaxEnergyCost", 
             "damageCost", "upgradeMaxEnergy", "upgradeDamage", "seekTarget", 
-            "moveTo", "moveToObject", "applyThrust", "shoot"]
+            "moveTo", "shoot"]
 
     // readable after deep copy
     const grayList = ["transform","collider","resources"]
@@ -154,9 +160,9 @@ function createGameObjectProxy(gameObject : GameObject){
 function createBaseProxy(base : Base){
 
     // readable fields
-    const whiteList = ["uuid", "team" , "maxEnergy", "energyCost", "refiningRate", 
-            "baseShipCost", "shipCost", "healRate", "healRateCost", "interactRadius", 
-            "interactRadiusCost", "upgradeHealth", "upgradeHealRate", 
+    const whiteList = ["uuid", "team" , "maxEnergy", "upgradeMaxEnergyCost", "refiningRate", 
+            "shipCost", "healRate", "upgradeHealRateCost", "interactRadius", 
+            "upgradeInteractRadiusCost", "upgradeMaxEnergy", "upgradeHealRate", 
             "upgradeInteractRadius", "spawnShip"]
 
     // readable after deep copy

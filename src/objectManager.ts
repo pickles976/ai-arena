@@ -1,8 +1,8 @@
 class ObjectManager{
 
-    static numAsteroids : number = 10
-    static numObstacles : number = 20
-    static numEnergyCells : number = 5
+    static numAsteroids : number = 15
+    static numObstacles : number = 25
+    static numEnergyCells : number = 8
 
     static obstacleMassRange : [number, number] = [20,200]
     static asteroidMetalRange : [number, number] = [10,100]

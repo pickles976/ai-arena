@@ -181,50 +181,54 @@ function checkForCollisions(gameObjArray : Array<GameObject>){
 
         const obj1 = pairs[i][0]
         const obj2 = pairs[i][1]
-        const c1 = obj1.transform
-        const r1 = obj1.collider.radius
-        const c2 = obj2.transform
-        const r2 = obj2.collider.radius
-        let c1Pos = c1.position
-        let c2Pos = c2.position
-        
-        // check if it's a wraparound collision in the X direction
-        if (c1.position.x < c2.position.x){
-            c2Pos = new Vector2D(c2.position.x - W,c2.position.y)
-        }
 
-        // temporary distance calculation
-        let dist = c1Pos.subtract(c2Pos).magnitude
+        if(obj1.type !== "DEAD" && obj2.type !== "DEAD"){
 
-        // check for wraparound collision in the Y direction
-        if (dist > (r1 + r2)){
-
-            let tempC2 = c2Pos.copy()
-
-            // shift the C2 up or down
-            if (c1.position.y < c2.position.y){
-                tempC2.y -= H
-            }else{
-                tempC2.y += H
+            const c1 = obj1.transform
+            const r1 = obj1.collider.radius
+            const c2 = obj2.transform
+            const r2 = obj2.collider.radius
+            let c1Pos = c1.position
+            let c2Pos = c2.position
+            
+            // check if it's a wraparound collision in the X direction
+            if (c1.position.x < c2.position.x){
+                c2Pos = new Vector2D(c2.position.x - W,c2.position.y)
             }
 
-            // check if there is collision after the shift
-            let tempDist = c1Pos.subtract(tempC2).magnitude
-            if (tempDist < (r1 + r2)){
-                dist = tempDist // update with shift
-                c2Pos = tempC2
+            // temporary distance calculation
+            let dist = c1Pos.subtract(c2Pos).magnitude
+
+            // check for wraparound collision in the Y direction
+            if (dist > (r1 + r2)){
+
+                let tempC2 = c2Pos.copy()
+
+                // shift the C2 up or down
+                if (c1.position.y < c2.position.y){
+                    tempC2.y -= H
+                }else{
+                    tempC2.y += H
+                }
+
+                // check if there is collision after the shift
+                let tempDist = c1Pos.subtract(tempC2).magnitude
+                if (tempDist < (r1 + r2)){
+                    dist = tempDist // update with shift
+                    c2Pos = tempC2
+                }
             }
-        }
 
-        //check for collision
-        if (dist < (r1 + r2)){
+            //check for collision
+            if (dist < (r1 + r2)){
 
-            let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity,c1.mass,c2.mass) 
-            obj1.collide(obj2)
-            obj2.collide(obj1)
+                let newVelocities = collide(c1Pos,c2Pos,c1.velocity,c2.velocity,c1.mass,c2.mass) 
+                obj1.collide(obj2)
+                obj2.collide(obj1)
 
-            c1.velocity = newVelocities[0]
-            c2.velocity = newVelocities[1]
+                c1.velocity = newVelocities[0]
+                c2.velocity = newVelocities[1]
+            }
         }
 
         i++;

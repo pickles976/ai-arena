@@ -4,9 +4,28 @@ function BaseStart(base, Graphics){
 }
 
 function BaseUpdate(base, Game, Graphics){
-    const energy = 50
-    if (base.resources.metal > base.shipCost && base.resources.energy > energy){
-        base.spawnShip(energy,false)
+
+    const energyPerShip = 200
+    const shipEnergy = 50
+
+    if (base.resources.metal > base.shipCost && base.resources.energy > energyPerShip * Game.getShipsByTeam(base.team).length){
+        base.spawnShip(shipEnergy,false)
+    }
+
+    if (base.resources.metal > base.upgradeMaxEnergyCost){
+        base.upgradeMaxEnergy()
+    }
+
+    if (base.resources.metal > base.upgradeInteractRadiusCost){
+        base.upgradeInteractRadius()
+    }
+
+    if (base.resources.metal > base.healthCost){
+        base.upgradeHealth()
+    }
+
+    if (base.resources.metal > base.upgradeHealRateCost){
+        base.upgradeHealRate()
     }
 }
 
@@ -15,38 +34,59 @@ function Start(ship, base, Graphics){
     ship.target = {}
     ship.state = "IDLE"
     ship.arr = []
+    ship.shootCooldown = 10
+    ship.shootTimer = 0
 
 }
 
 function Update(ship, base, Game, Graphics){
+
+    const speed = 2.5
+    ship.shootTimer--
+    
+    function teammateHasTarget(target){
+        const teamShips = Game.getShipsByTeam(ship.team).filter((obj) => obj.uuid != ship.uuid)
+
+        if(teamShips.length > 0){
+            for (const j in teamShips){
+                if (target != null && target != undefined)
+                    if (teamShips[j].target.uuid == target.uuid)
+                        return true
+            }
+        }
+        return false
+    }
 
     // STATE MACHINE
     switch(ship.state){
 
         case "IDLE":
         
-            const asteroids = Game.getAsteroids()
+            if (ship.resources.energy > (ship.maxEnergy * 0.75)){
 
-            let closest = [{},100000]
+                const asteroids = Game.getAsteroids()
+                let closest = [{},100000]
 
-            for (const index in asteroids){
-                const asteroid = asteroids[index]
-                const d = dist(asteroid,ship)
-                if (d < closest[1]){
-                    closest = [asteroid,d]
+                for (const index in asteroids){
+                    const asteroid = asteroids[index]
+                    const d = dist(asteroid,ship)
+                    if (d < closest[1]){
+                        if (!teammateHasTarget(asteroid)){
+                            closest = [asteroid,d]
+                        }
+                    }
                 }
+
+                ship.target = closest[0]
+                ship.state = "MOVE_TO_ASTEROID"
             }
-
-            ship.target = closest[0]
-            ship.state = "MOVE_TO_ASTEROID"
-
 
             break;
 
         case "MOVE_TO_ASTEROID":
 
             if (ship.target.type === "ASTEROID"){
-                ship.seekTarget(ship.target)
+                ship.seekTarget(ship.target,speed)
             }else{
                 ship.target = base
                 ship.state = "MOVE_TO_BASE"
@@ -56,8 +96,8 @@ function Update(ship, base, Game, Graphics){
 
         case "MOVE_TO_BASE":
 
-            if (ship.resources.metal > 0 || ship.resources.water > 0){
-                ship.moveToObject(ship.target)
+            if (ship.resources.metal > 0 || ship.resources.water > 0 && dist(ship,base) > base.interactRadius){
+                ship.seekTarget(ship.target,speed)
             }else{
                 ship.state = "IDLE"
             }
@@ -66,12 +106,12 @@ function Update(ship, base, Game, Graphics){
 
         case "MOVE_TO_ENERGY":
             if (ship.target.type === "ENERGY_CELL"){
-                ship.seekTarget(ship.target)
+                ship.seekTarget(ship.target,speed)
             }else if (ship.target.type === "BASE") {
                 if (ship.resources.energy > 90 || base.resources.energy < 1 || dist(ship,base) > base.interactRadius){
                     ship.state = "IDLE"
                 }else{
-                    ship.seekTarget(ship.target)
+                    ship.seekTarget(ship.target,speed)
                 }
             }
             else{
@@ -82,7 +122,7 @@ function Update(ship, base, Game, Graphics){
     }
 
     // seekTarget ENERGY
-    if (ship.resources.energy < (ship.maxEnergy / 4)){
+    if (ship.resources.energy < (ship.maxEnergy / 3)){
         const energyCells = Game.getEnergyCells()
 
         let closest = [base,dist(base,ship)]
@@ -91,7 +131,9 @@ function Update(ship, base, Game, Graphics){
             const energyCell = energyCells[index]
             const d = dist(energyCell,ship)
             if (d < closest[1]){
-                closest = [energyCell,d]
+                if (!teammateHasTarget(energyCell)){
+                    closest = [energyCell,d]
+                }
             }
         }
 
@@ -100,8 +142,8 @@ function Update(ship, base, Game, Graphics){
     }
 
     // COMBAT
-    if(ship.resources.energy > (ship.damage)){
-        const shootRadius = 200
+    if(ship.resources.energy > (ship.maxEnergy / 2) && ship.shootTimer < 0){
+        const shootRadius = 250
         const ships = Game.getShips()
         
         let closest = [{},100000]
@@ -117,12 +159,13 @@ function Update(ship, base, Game, Graphics){
         }
 
         if (closest[1] < shootRadius){
-            ship.shoot(closest[0].transform.position.subtract(ship.transform.position).add(closest[0].transform.velocity.multiply(60)))
+            ship.shoot(closest[0].transform.position.add(closest[0].transform.velocity.multiply(720)).subtract(ship.transform.position))
+            ship.shootTimer = ship.shootCooldown
         }
     }
 
     // UPGRADES
-    if (base.resources.metal > ship.energyCost && Game.getShipsByTeam(ship.team).length > 2){
+    if (base.resources.metal > ship.upgradeMaxEnergyCost && Game.getShipsByTeam(ship.team).length > 2){
         ship.upgradeMaxEnergy()
     }
 

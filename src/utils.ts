@@ -226,11 +226,7 @@ function randomInRange(min : number,max : number){
 
 function create_UUID(){
     var dt = new Date().getTime();
-    var uuid = '9xxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (dt + Math.random()*10)%10 | 0;
-        dt = Math.floor(dt/16);
-        return (c=='x' ? r :(r&0x3|0x8)).toString(9);
-    });
+    var uuid = (Math.random() * 1000000000).toFixed(0)
     return parseFloat(uuid);
 }
 

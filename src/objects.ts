@@ -6,8 +6,6 @@ class Resources {
     metal : number
     water : number
     energy : number
-    sum : number
-    ratio : Array<number> 
 
     /**
      * The sum of metal, water, and energy will determine the mass of an object
@@ -20,8 +18,6 @@ class Resources {
         this.metal = metal
         this.water = water
         this.energy = energy
-        this.sum = metal + water + energy
-        this.ratio = [metal/this.sum, water/this.sum, energy/this.sum]
     }
 
     getResources(){
@@ -61,7 +57,8 @@ class Asteroid extends GameObject {
     render(){
 
         let total = 1.0
-        const ratio = this.resources.ratio
+        const sum = this.resources.metal + this.resources.water + this.resources.energy
+        const ratio =  [this.resources.metal/sum, this.resources.water/sum, this.resources.energy/sum]
 
         // draw the resources in the asteroid as colored rings
         for(let i = 0; i < 2; i++){
@@ -120,10 +117,10 @@ class Obstacle extends GameObject {
             }
 
         }
-        this.destroy()
     }
 
     destroy(){
+        this.breakUp()
         super.destroy()
     }
 
@@ -178,7 +175,7 @@ class Ship extends GameObject{
     resources : Resources
     maxEnergy : number
     damage : number
-    energyCost : number
+    upgradeMaxEnergyCost : number
     damageCost : number
 
     constructor(uuid : number,position : Vector2D,energy : number,team : number){
@@ -188,11 +185,11 @@ class Ship extends GameObject{
         this.resources = new Resources(0,0,energy)
 
         // upgradeable
-        this.maxEnergy = SHIP_BASE_MAX_ENERGY
+        this.maxEnergy = SHIP_INITIAL_MAX_ENERGY
         this.damage = 5
 
         // upgrade costs
-        this.energyCost = 100
+        this.upgradeMaxEnergyCost = 100
         this.damageCost = 50
 
         this.start()
@@ -274,6 +271,7 @@ class Ship extends GameObject{
                     this.resources.metal += otherObject.resources.metal
                     this.resources.water += otherObject.resources.water
                     otherObject.destroy()
+                    // this.destroy()
                 }
                 break;
             case "BASE":
@@ -291,9 +289,32 @@ class Ship extends GameObject{
         return this.transform.mass + this.resources.water + this.resources.metal
     }
 
+    breakUp(){
+
+        const totalResources = this.resources.metal + this.resources.water
+
+        if (totalResources > 80.0){
+            // break into multiple pieces
+            const numPieces = Math.floor(2 + Math.random() * 3)
+            
+            for(let i = 0; i < numPieces; i++){
+                const massRatio = 0.2 + (Math.random() * 0.15)
+                const rotationOffset = (i * 360 / numPieces) + (Math.random() - 0.5) * 45
+                const offset = new Vector2D(0,1).multiply(this.collider.radius).rotate(rotationOffset)
+                const cargo = new Asteroid(create_UUID(),this.transform.position.add(offset),this.transform.velocity.multiply(0.25).rotate(-rotationOffset).add(this.transform.velocity),this.resources.metal * massRatio,this.resources.water * massRatio)
+                GameObjectList.push(cargo)
+            }
+
+        }
+
+    }
+
     destroy(){
         GameStateManager.addDeath(this.team)
         GameObjectManager.getBaseByTeam(this.team)?.queueShip()
+
+        this.breakUp()
+
         super.destroy()
     }
 
@@ -342,8 +363,10 @@ class Ship extends GameObject{
     // USER-CALLABLE FUNCTIONS 
 
     applyThrust(vector : Vector2D,percentage : number){
-        const pct = clamp(percentage,0,1)
-        this.transform.acceleration = vector.normal().multiply(pct)    
+        if (this.transform.acceleration.magnitude <= 0.01){
+            const pct = clamp(percentage,0,1)
+            this.transform.acceleration = vector.normal().multiply(pct)   
+        } 
     }
 
     shoot(direction : Vector2D){
@@ -356,10 +379,10 @@ class Ship extends GameObject{
     upgradeMaxEnergy(){
         const base = GameObjectManager.getBaseByTeam(this.team)
         if (base !== undefined){
-            if (base.resources.metal > this.energyCost){
-                base.resources.metal -= this.energyCost
-                this.energyCost *= 2
-                this.maxEnergy *= 2
+            if (base.resources.metal > this.upgradeMaxEnergyCost){
+                base.resources.metal -= this.upgradeMaxEnergyCost
+                this.upgradeMaxEnergyCost *= 2
+                this.upgradeMaxEnergyCost *= 2
             }
         }
     }
@@ -378,29 +401,25 @@ class Ship extends GameObject{
     // subtracting target's velocity gives us our intercept vector in the inertial reference frame of the target
     // multiplying by our desired speed gives us the top speed
     // subtracting our current velocity gives us dV
-    seekTarget(target: GameObject){
-        const desiredSpeed = 2.5 / FRAMERATE
+    seekTarget(target: GameObject, speed: number){
+        const desiredSpeed = speed / FRAMERATE
         const desiredVelocity = target.transform.position.subtract(this.transform.position).normal().multiply(desiredSpeed).add(target.transform.velocity)
         const steering = desiredVelocity.subtract(this.transform.velocity)
         this.applyThrust(steering,1.0)
     }
 
-    moveTo(position : Vector2D){
-        const vec = position.subtract(this.transform.position)
-        const power = vec.magnitude / 100
-        this.applyThrust(vec,power)
-    }
-
-    moveToObject(obj : GameObject){
-        const vec = obj.transform.position.subtract(this.transform.position)
-        const power = vec.magnitude / 100
-        this.applyThrust(vec,power)
+    moveTo(position : Vector2D, speed: number){
+        const desiredSpeed = speed / FRAMERATE
+        const diffVector = position.subtract(this.transform.position)
+        const desiredVelocity = diffVector.normal().multiply(desiredSpeed)
+        const steering = desiredVelocity.subtract(this.transform.velocity)
+        this.applyThrust(steering,1.0)
     }
 }
 
 class Bullet extends GameObject {
 
-    static speed = 0.25
+    static speed = 0.125
     static offset = 5
     damage : number
     parent : number
@@ -430,11 +449,6 @@ class Bullet extends GameObject {
                     if (otherObject.resources.energy < 0){
                         GameStateManager.recordKill(this.parent)
                     }
-                }
-                break;
-            case "OBSTACLE":
-                if (otherObject instanceof Obstacle){
-                    otherObject.breakUp()
                 }
                 break;
             case "BASE":
@@ -471,13 +485,12 @@ class Base extends GameObject {
     team : number
     maxEnergy : number
     refiningRate : number
-    baseShipCost : number
     shipCost : number
     healRate : number
     interactRadius : number
-    healRateCost : number
-    interactRadiusCost : number
-    energyCost : number
+    upgradeHealRateCost : number
+    upgradeInteractRadiusCost : number
+    upgradeMaxEnergyCost : number
 
     health : number
     healthCost : number
@@ -490,22 +503,21 @@ class Base extends GameObject {
 
         this.team = team
         this.resources = new Resources(0,0,energy)
-        this.maxEnergy = 500
+        this.maxEnergy = BASE_INITIAL_MAX_ENERGY
 
         this.shipQueue = []
 
-        this.refiningRate = 0.01
-        this.baseShipCost = 300
+        this.refiningRate = BASE_INITIAL_REFINING_RATE
 
-        // upgradeable
-        this.shipCost = 300
-        this.healRate = 0.01
-        this.interactRadius = 50
+        // mutable
+        this.shipCost = BASE_INITIAL_SHIP_COST
+        this.healRate = BASE_INITIAL_HEAL_RATE
+        this.interactRadius = BASE_INITIAL_INTERACT_RADIUS
 
         // upgrade costs
-        this.healRateCost = 250
-        this.interactRadiusCost = 250
-        this.energyCost = 250
+        this.upgradeHealRateCost = BASE_INITIAL_UPGRADE_HEAL_RATE_COST
+        this.upgradeInteractRadiusCost = BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST
+        this.upgradeMaxEnergyCost = BASE_INITIAL_UPGRADE_MAX_ENERGY_COST
     }
 
     
@@ -594,7 +606,7 @@ class Base extends GameObject {
     trySpawnShip(energy : number,respawn : boolean){
 
         let canSpawnShip = false
-        const newEnergy = Math.min(energy,SHIP_BASE_MAX_ENERGY)
+        const newEnergy = Math.min(energy,SHIP_INITIAL_MAX_ENERGY)
 
         // check if we have the required resources
         if(!respawn){
@@ -668,27 +680,27 @@ class Base extends GameObject {
 
     // USER CALLABLE FUNCTIONS
     
-    upgradeHealth(){
-        if (this.resources.metal > this.energyCost){
-            this.maxEnergy += 500
-            this.resources.metal -= this.energyCost
-            this.energyCost *= 2
+    upgradeMaxEnergy(){
+        if (this.resources.metal > this.upgradeMaxEnergyCost){
+            this.maxEnergy += BASE_INITIAL_MAX_ENERGY
+            this.resources.metal -= this.upgradeMaxEnergyCost
+            this.upgradeMaxEnergyCost *= 2
         }
     }
 
     upgradeHealRate(){
-        if (this.resources.metal > this.healRateCost){
-            this.healRate *= 2
-            this.resources.metal -= this.healRateCost
-            this.healRateCost *= 2
+        if (this.resources.metal > this.upgradeHealRateCost){
+            this.healRate += BASE_INITIAL_HEAL_RATE
+            this.resources.metal -= this.upgradeHealRateCost
+            this.upgradeHealRateCost *= 2
         }
     }
 
     upgradeInteractRadius(){
-        if (this.resources.metal > this.interactRadiusCost){
-            this.interactRadius *= 2
-            this.resources.metal -= this.interactRadiusCost
-            this.interactRadiusCost *= 2
+        if (this.resources.metal > this.upgradeInteractRadiusCost){
+            this.interactRadius += BASE_INITIAL_INTERACT_RADIUS
+            this.resources.metal -= this.upgradeInteractRadiusCost
+            this.upgradeInteractRadiusCost *= 2
         }
     }
 
