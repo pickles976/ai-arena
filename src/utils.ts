@@ -36,7 +36,7 @@ function clamp(value : number,min : number,max : number){
  * @returns number
  */
 function energyDiff(thisObject : GameObject,otherObject : GameObject){
-    return energyScale * otherObject.transform.mass * (thisObject.transform.velocity.subtract(otherObject.transform.velocity).magnitude ** 2) / 2
+    return ENERGY_SCALE * otherObject.transform.mass * (thisObject.transform.velocity.subtract(otherObject.transform.velocity).magnitude ** 2) / 2
 }
 
 
@@ -70,167 +70,17 @@ function binarySearch(array : Array<number>,k : number){
 
 }
 
-/**
- * Detects collisions
- * Uses binary search to find position in array, then iterates backwards and forwards
- * in array to detect all possible collisions. Possible collisions are filtered and
- * returned as an array of collided with objects.
- * @param {Vector2D} position 
- * @param {number} radius 
- * @returns 
- */
-function overlapCircle(position : Vector2D,radius : number){
-
-    if (xArray.length <= 0){
-        return []
-    }
-
-    const i = binarySearch(xArray,position.x)
-    
-    const possible = []
-
-    // loop backwards and forwards through array
-    let collision = true
-    let j = 1
-
-    // iterate backwards
-    while (collision){
-
-        collision = false
-        let index = i - j
-
-        // IF WE HAVE LOOPED AROUND
-        if (index < 0){
-            index += GameObjectList.length
-        }
-
-        let c2 = GameObjectList[index].transform
-        let r2 = GameObjectList[index].collider.radius
-        let dist = 100000;
-
-        // normal collision
-        if (index < i){
-            dist = position.x - c2.position.x
-        } else {
-            dist = position.x + W - c2.position.x
-        }
-
-        // POSSIBLE COLLISION
-        if (Math.abs(dist) < (radius + r2)){
-            // the checking object will always be first in the pair
-            possible.push(GameObjectList[index])
-            collision = true
-        }
-
-        j++
-    }
-
-    collision = true
-    j = 0
-
-    // iterate forwards
-    while (collision){
-
-        collision = false
-        let index = i + j
-
-        // IF WE HAVE LOOPED AROUND
-        if (index >= GameObjectList.length){
-            index -= GameObjectList.length
-        }
-
-        let c2 = GameObjectList[index].transform
-        let r2 = GameObjectList[index].collider.radius
-        let dist = 100000;
-
-        // normal collision
-        if (index >= i){
-            dist = position.x - c2.position.x
-        } else {
-            dist = position.x + W - c2.position.x
-        }
-
-        // POSSIBLE COLLISION
-        if (Math.abs(dist) < (radius + r2)){
-            // the checking object will always be first in the pair
-            possible.push(GameObjectList[index])
-            collision = true
-        }
-
-        j++
-    }
-
-    const collisions = []
-    let k = 0
-    while(k < possible.length){
-
-        const obj = possible[k]
-        const c2 = obj.transform
-        let r2 = obj.collider.radius
-        let c2Pos = c2.position
-
-        // check if it's a wraparound collision in the X direction
-        if (position.x < c2.position.x){
-            c2Pos = new Vector2D(c2.position.x - W,c2.position.y)
-        }
-
-        // temporary distance calculation
-        let dist = position.subtract(c2Pos).magnitude
-
-        // check for wraparound collision in the Y direction
-        if (dist > (radius + r2)){
-
-            let tempC2 = c2Pos.copy()
-
-            // shift the C2 up or down
-            if (position.y < c2.position.y){
-                tempC2.y -= H
-            }else{
-                tempC2.y += H
-            }
-
-            // check if there is collision after the shift
-            let tempDist = position.subtract(tempC2).magnitude
-            if (tempDist < (radius + r2)){
-                dist = tempDist // update with shift
-                c2Pos = tempC2
-            }
-        }
-
-        //check for collision
-        if (dist < (radius + r2)){
-            collisions.push(obj)
-        }
-
-        k++;
-    }
-
-    const debug = false
-    if (debug){
-        const color = "rgba(255, 255, 0, 0.5)"
-        GlobalRender.drawCircle(position,radius,color)
-        possible.map((c) => {
-            GlobalRender.drawLine(position,c.transform.position,"rgba(255, 255, 255, 0.5)")
-        })
-        collisions.map((c) => {
-            GlobalRender.drawLine(position,c.transform.position,color)
-        })
-    }
-
-    return collisions
-}
-
 function randomInRange(min : number,max : number){
     return min + Math.random() * (max-min)
 }
 
 function create_UUID(){
-    var dt = new Date().getTime();
     var uuid = (Math.random() * 1000000000).toFixed(0)
     return parseFloat(uuid);
 }
 
 function dist(obj1 : GameObject,obj2 : GameObject){
+    // TODO: add wraparound checking
     return Vector2D.dist(obj1.transform.position,obj2.transform.position)
 }
 
@@ -245,4 +95,22 @@ function checkMemory(obj : Ship | Base){
         GameObjectManager.getBaseByTeam(obj.team)?.destroy()
         alert("You used up too much memory!")
     }
+}
+
+function spawn(obj : GameObject){
+    GameObjectList.push(obj)
+}
+
+/**
+ * This mutates GameObjectList btw
+ */
+ function sortGameObjectList(){
+    GameObjectList.sort(function(a,b){
+        const circleA = a.transform
+        const circleB = b.transform
+        return circleA.position.x - circleB.position.x
+    })
+
+    // save a cached array of X values for operations
+    xArray = GameObjectList.map((value) => value.transform.position.x)
 }

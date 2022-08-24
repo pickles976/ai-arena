@@ -16,6 +16,10 @@ function BaseUpdate(base, Game, Graphics){
         base.upgradeMaxEnergy()
     }
 
+    if (base.resources.metal > base.upgradeRefiningEfficiencyCost){
+        base.upgradeRefiningEfficiency()
+    }
+
     if (base.resources.metal > base.upgradeInteractRadiusCost){
         base.upgradeInteractRadius()
     }
@@ -27,6 +31,8 @@ function BaseUpdate(base, Game, Graphics){
     if (base.resources.metal > base.upgradeHealRateCost){
         base.upgradeHealRate()
     }
+
+    Graphics.drawText(base.resources.toString(),base.transform.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
 }
 
 function Start(ship, base, Graphics){
@@ -159,7 +165,7 @@ function Update(ship, base, Game, Graphics){
         }
 
         if (closest[1] < shootRadius){
-            ship.shoot(closest[0].transform.position.add(closest[0].transform.velocity.multiply(720)).subtract(ship.transform.position).subtract(ship.transform.velocity.multiply(60)))
+            ship.shoot(closest[0].transform.position.add(closest[0].transform.velocity.multiply(720)).subtract(ship.transform.position))
             ship.shootTimer = ship.shootCooldown
         }
     }
@@ -169,7 +175,7 @@ function Update(ship, base, Game, Graphics){
         ship.upgradeMaxEnergy()
     }
 
-    if (base.resources.metal > ship.damageCost && Game.getShipsByTeam(ship.team).length > 2){
+    if (base.resources.metal > ship.upgradeDamageCost && Game.getShipsByTeam(ship.team).length > 2){
         ship.upgradeDamage()
     }
 

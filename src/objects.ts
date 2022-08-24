@@ -54,7 +54,7 @@ class Asteroid extends GameObject {
         super.simulate(deltaTime)
     }
 
-    render(){
+    render(renderer : Renderer){
 
         let total = 1.0
         const sum = this.resources.metal + this.resources.water + this.resources.energy
@@ -62,7 +62,7 @@ class Asteroid extends GameObject {
 
         // draw the resources in the asteroid as colored rings
         for(let i = 0; i < 2; i++){
-            GlobalRender.drawCircle(this.transform.position,total*this.collider.radius,Resources.colors[i])
+            renderer.drawCircle(this.transform.position,total*this.collider.radius,Resources.colors[i])
             total -= ratio[i]
         }
     }
@@ -97,9 +97,9 @@ class Obstacle extends GameObject {
         super.simulate(deltaTime)
     }
 
-    render(){
+    render(renderer : Renderer){
         // draw the obstacle
-        GlobalRender.drawCircle(this.transform.position,this.collider.radius,"#A52A2A")
+        renderer.drawCircle(this.transform.position,this.collider.radius,"#A52A2A")
     }
 
     breakUp(){
@@ -113,7 +113,7 @@ class Obstacle extends GameObject {
                 const rotationOffset = (i * 360 / numPieces) + (Math.random() - 0.5) * 45
                 const offset = new Vector2D(0,1).multiply(this.collider.radius / 1.5).rotate(rotationOffset)
                 const newChunk = new Obstacle(create_UUID(),this.transform.position.add(offset),this.transform.velocity.rotate(-rotationOffset).add(this.transform.velocity),this.transform.mass * massRatio)
-                GameObjectList.push(newChunk)
+                spawn(newChunk)
             }
 
         }
@@ -176,7 +176,7 @@ class Ship extends GameObject{
     maxEnergy : number
     damage : number
     upgradeMaxEnergyCost : number
-    damageCost : number
+    upgradeDamageCost : number
 
     constructor(uuid : number,position : Vector2D,energy : number,team : number){
 
@@ -186,11 +186,11 @@ class Ship extends GameObject{
 
         // upgradeable
         this.maxEnergy = SHIP_INITIAL_MAX_ENERGY
-        this.damage = 5
+        this.damage = SHIP_INITIAL_DAMAGE
 
         // upgrade costs
-        this.upgradeMaxEnergyCost = 100
-        this.damageCost = 50
+        this.upgradeMaxEnergyCost = SHIP_UPGRADE_MAX_ENERGY_COST
+        this.upgradeDamageCost = SHIP_UPGRADE_DAMAGE_COST
 
         this.start()
     }
@@ -199,7 +199,7 @@ class Ship extends GameObject{
         const oldVel = this.transform.velocity.magnitude ** 2
         super.simulate(deltaTime)
         const dV = Math.abs(oldVel - (this.transform.velocity.magnitude ** 2))
-        this.resources.energy -= dV * (this.totalMass()) * 0.5 * energyScale
+        this.resources.energy -= dV * (this.totalMass()) * 0.5 * ENERGY_SCALE
 
         if (this.resources.energy < 0){
             this.destroy()
@@ -210,13 +210,10 @@ class Ship extends GameObject{
         }
     }
 
-    render(){
+    render(renderer : Renderer){
 
         const acceleration = this.transform.acceleration
         const position = this.transform.position
-
-        // add a flickering animation
-        const magnitude = acceleration.magnitude * clamp(Math.random() + 0.6,0.5,1.0)
 
         // draw the resources in the asteroid as colored rings
         GlobalRender.drawCircle(position,this.collider.radius,teamColors[this.team])
@@ -224,21 +221,21 @@ class Ship extends GameObject{
         // draw applyThrust effect
         if (acceleration.y != 0){
             if (acceleration.y > 0){
-                GlobalRender.drawExhaust(position,180,acceleration.y)
+                renderer.drawExhaust(position,180,acceleration.y)
             } 
             else if (acceleration.y < 0)
             {
-                GlobalRender.drawExhaust(position,0,-acceleration.y)
+                renderer.drawExhaust(position,0,-acceleration.y)
             }
         }
 
         if (acceleration.x != 0){
             if (acceleration.x > 0){
-                GlobalRender.drawExhaust(position,90,acceleration.x)
+                renderer.drawExhaust(position,90,acceleration.x)
             } 
             else if (acceleration.x < 0)
             {
-                GlobalRender.drawExhaust(position,270,-acceleration.x)
+                renderer.drawExhaust(position,270,-acceleration.x)
             }
         }
 
@@ -302,7 +299,7 @@ class Ship extends GameObject{
                 const rotationOffset = (i * 360 / numPieces) + (Math.random() - 0.5) * 45
                 const offset = new Vector2D(0,1).multiply(this.collider.radius).rotate(rotationOffset)
                 const cargo = new Asteroid(create_UUID(),this.transform.position.add(offset),this.transform.velocity.multiply(0.25).rotate(-rotationOffset).add(this.transform.velocity),this.resources.metal * massRatio,this.resources.water * massRatio)
-                GameObjectList.push(cargo)
+                spawn(cargo)
             }
 
         }
@@ -373,7 +370,7 @@ class Ship extends GameObject{
         // instantiate object
         this.resources.energy -= this.damage
         const bullet = new Bullet(create_UUID(),this.transform.position.add(direction.normal().multiply(Bullet.offset + this.collider.radius)), direction.normal().multiply(Bullet.speed), this.damage, this.uuid)
-        GameObjectList.push(bullet)
+        spawn(bullet)
     }
 
     upgradeMaxEnergy(){
@@ -381,8 +378,8 @@ class Ship extends GameObject{
         if (base !== undefined){
             if (base.resources.metal > this.upgradeMaxEnergyCost){
                 base.resources.metal -= this.upgradeMaxEnergyCost
-                this.upgradeMaxEnergyCost *= 2
-                this.upgradeMaxEnergyCost *= 2
+                this.maxEnergy += SHIP_INITIAL_MAX_ENERGY
+                this.upgradeMaxEnergyCost *= SHIP_MAX_ENERGY_COST_MULTIPLIER
             }
         }
     }
@@ -390,10 +387,10 @@ class Ship extends GameObject{
     upgradeDamage(){
         const base = GameObjectManager.getBaseByTeam(this.team)
         if (base !== undefined){
-            if (base.resources.metal > this.damageCost){
-                base.resources.metal -= this.damageCost
-                this.damageCost *= 2
-                this.damage *= 2
+            if (base.resources.metal > this.upgradeDamageCost){
+                base.resources.metal -= this.upgradeDamageCost
+                this.damage += SHIP_INITIAL_DAMAGE
+                this.upgradeDamageCost *= SHIP_DAMAGE_COST_MULTIPLIER
             }
         }
     }
@@ -419,7 +416,7 @@ class Ship extends GameObject{
 
 class Bullet extends GameObject {
 
-    static speed = 0.125
+    static speed = BULLET_SPEED
     static offset = 5
     damage : number
     parent : number
@@ -435,9 +432,9 @@ class Bullet extends GameObject {
         super.simulate(deltaTime)
     }
 
-    render(){
+    render(renderer : Renderer){
         // draw the resources in the asteroid as colored rings
-        GlobalRender.drawCircle(this.transform.position,this.collider.radius,"#FFFF00")
+        renderer.drawCircle(this.transform.position,this.collider.radius,"#FFFF00")
     }
 
     collide(otherObject : GameObject){
@@ -485,12 +482,15 @@ class Base extends GameObject {
     team : number
     maxEnergy : number
     refiningRate : number
+    refiningEfficiency : number
     shipCost : number
     healRate : number
     interactRadius : number
     upgradeHealRateCost : number
     upgradeInteractRadiusCost : number
     upgradeMaxEnergyCost : number
+    upgradeRefiningRateCost : number
+    upgradeRefiningEfficiencyCost : number
 
     health : number
     healthCost : number
@@ -508,6 +508,7 @@ class Base extends GameObject {
         this.shipQueue = []
 
         this.refiningRate = BASE_INITIAL_REFINING_RATE
+        this.refiningEfficiency = BASE_INITIAL_REFINING_EFFICIENCY
 
         // mutable
         this.shipCost = BASE_INITIAL_SHIP_COST
@@ -518,14 +519,11 @@ class Base extends GameObject {
         this.upgradeHealRateCost = BASE_INITIAL_UPGRADE_HEAL_RATE_COST
         this.upgradeInteractRadiusCost = BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST
         this.upgradeMaxEnergyCost = BASE_INITIAL_UPGRADE_MAX_ENERGY_COST
+        this.upgradeRefiningRateCost = BASE_INITIAL_UPGRADE_REFINING_RATE_COST
+        this.upgradeRefiningEfficiencyCost = BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST
     }
 
-    
-    simulate(deltaTime : number){
-
-        // stay static
-        this.transform.velocity = new Vector2D(0,0)
-
+    refineWater(deltaTime : number){
         // refine water
         if (this.resources.water > 0 && this.resources.energy < this.maxEnergy){
             const newEnergy = this.refiningRate * deltaTime
@@ -533,6 +531,14 @@ class Base extends GameObject {
             this.resources.energy += newEnergy
             GameStateManager.addEnergy(this.team,newEnergy)
         }
+    }
+    
+    simulate(deltaTime : number){
+
+        // stay static
+        this.transform.velocity = new Vector2D(0,0)
+
+        this.refineWater(deltaTime)
 
         if (this.resources.water < 0){
             this.resources.water = 0
@@ -577,10 +583,9 @@ class Base extends GameObject {
         otherObject.transform.velocity = otherObject.transform.velocity.add(vec.multiply(oomf))
     }
 
-    render(){
-        GlobalRender.drawCircle(this.transform.position,this.collider.radius,teamColors[this.team])
-        GlobalRender.drawArc(this.transform.position,this.collider.radius,0,(this.resources.energy / this.maxEnergy) * 2 * Math.PI,"#FFFF00")
-        GlobalRender.drawText(this.resources.toString(),this.transform.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
+    render(renderer : Renderer){
+        renderer.drawCircle(this.transform.position,this.collider.radius,teamColors[this.team])
+        renderer.drawArc(this.transform.position,this.collider.radius,0,(this.resources.energy / this.maxEnergy) * 2 * Math.PI,"#FFFF00")
     }
 
     destroy(){
@@ -597,8 +602,8 @@ class Base extends GameObject {
 
     takeResources(ship : Ship){
         GameStateManager.addMetal(this.team,ship.resources.metal)
-        this.resources.metal += ship.resources.metal
-        this.resources.water += ship.resources.water
+        this.resources.metal += ship.resources.metal * this.refiningEfficiency
+        this.resources.water += ship.resources.water * this.refiningEfficiency
         ship.resources.metal = 0
         ship.resources.water = 0
     }
@@ -632,7 +637,7 @@ class Base extends GameObject {
             
                 this.resources.energy -= newEnergy
 
-                GameObjectList.push(obj)
+                spawn(obj)
                 return true
             }
         }
@@ -649,7 +654,7 @@ class Base extends GameObject {
             return self.trySpawnShip(10,true)
         }
 
-        this.shipQueue.push(spawnShipCoroutine(this,900))
+        this.shipQueue.push(spawnShipCoroutine(this,SHIP_RESPAWN_TIME))
     }
 
     serialize(){   
@@ -684,7 +689,7 @@ class Base extends GameObject {
         if (this.resources.metal > this.upgradeMaxEnergyCost){
             this.maxEnergy += BASE_INITIAL_MAX_ENERGY
             this.resources.metal -= this.upgradeMaxEnergyCost
-            this.upgradeMaxEnergyCost *= 2
+            this.upgradeMaxEnergyCost *= BASE_MAX_ENERGY_COST_MULTIPLIER
         }
     }
 
@@ -692,7 +697,7 @@ class Base extends GameObject {
         if (this.resources.metal > this.upgradeHealRateCost){
             this.healRate += BASE_INITIAL_HEAL_RATE
             this.resources.metal -= this.upgradeHealRateCost
-            this.upgradeHealRateCost *= 2
+            this.upgradeHealRateCost *= BASE_HEAL_RATE_COST_MULTIPLIER
         }
     }
 
@@ -700,7 +705,23 @@ class Base extends GameObject {
         if (this.resources.metal > this.upgradeInteractRadiusCost){
             this.interactRadius += BASE_INITIAL_INTERACT_RADIUS
             this.resources.metal -= this.upgradeInteractRadiusCost
-            this.upgradeInteractRadiusCost *= 2
+            this.upgradeInteractRadiusCost *= BASE_INTERACT_RADIUS_COST_MULTIPLIER
+        }
+    }
+
+    upgradeRefiningRate(){
+        if (this.resources.metal > this.upgradeRefiningRateCost){
+            this.refiningRate += BASE_INITIAL_REFINING_RATE
+            this.resources.metal -= this.upgradeRefiningRateCost
+            this.upgradeRefiningRateCost *= BASE_REFINING_RATE_COST_MULTIPLIER
+        }
+    }
+
+    upgradeRefiningEfficiency(){
+        if (this.resources.metal > this.upgradeRefiningEfficiencyCost){
+            this.refiningRate += BASE_INITIAL_REFINING_EFFICIENCY
+            this.resources.metal -= this.upgradeRefiningEfficiencyCost
+            this.upgradeRefiningEfficiencyCost *= BASE_REFINING_EFFICIENCY_COST_MULTIPLIER
         }
     }
 

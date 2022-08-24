@@ -54,7 +54,6 @@ class StateManager{
     serialize(){
 
         const obj = { "team 0" : this.getTeamInfo(0), "team 1" : this.getTeamInfo(1)}
-
         return JSON.stringify(obj)
 
     }

@@ -1,7 +1,6 @@
 /**
  * ALL GAME OBJECT CLASSES WILL LIVE HERE FOR NOW
  */
-
  class Vector2D {
 
     type: string
@@ -18,7 +17,7 @@
         this.type = "VECTOR2D"
         this.x = x;
         this.y = y;
-        this.magnitude = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
+        this.magnitude = ((x**2) + (y**2)) ** 0.5;
     }
 
     add(newVector : Vector2D){
@@ -49,10 +48,6 @@
         return new Vector2D(this.x,this.y)
     }
 
-    toString(){
-        return "{ x : " + this.x + ", y : " + this.y + " }"
-    }
-
     rotate(degrees : number){
         const rad = Math.PI * degrees / 180
         const rotX = this.x * Math.cos(rad) - this.y * Math.sin(rad)
@@ -60,10 +55,7 @@
         return new Vector2D(rotX,rotY)
     }
 
-    /**
-     * 
-     * @returns A vector of length 1 in a random direction
-     */
+    // Returns a vector of length 1 in a random direction
     static random(){
         return new Vector2D(Math.random()-0.5,Math.random()-0.5).normal();
     }
@@ -85,12 +77,6 @@ class Transform {
     velocity : Vector2D
     acceleration : Vector2D
 
-    /**
-     * Circle is basically a point mass with a radius for collision checking
-     * @param {float} mass (m)
-     * @param {Vector2D} position (m)
-     * @param {Vector2D} velocity (m/s)
-     */
     constructor(mass : number,position : Vector2D, velocity : Vector2D){
         this.type = "TRANSFORM"
         this.mass = mass;

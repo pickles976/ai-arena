@@ -2,12 +2,7 @@
  * Create a Proxy objects that we pass to user code.
  * We only allow for getting the specific fields that we want users to have access to.
  * Setting, defining, and deleting is not allowed
- * 
- * TODO: 
- * The whitelist, blacklist, and graylist all have overlapping fields.
- * It may be nice to remove some of the overlapping and explicitness 
  */
-
 function createRendererProxy(renderer : Renderer){
 
     const whiteList = ["H","W","drawText","drawLine","drawCircle",
@@ -98,7 +93,7 @@ function createGameObjectProxy(gameObject : GameObject){
 
     // readable fields
     const whiteList = ["uuid", "team" , "maxEnergy", "damage", "upgradeMaxEnergyCost", 
-            "damageCost", "upgradeMaxEnergy", "upgradeDamage", "seekTarget", 
+            "upgradeDamageCost", "upgradeMaxEnergy", "upgradeDamage", "seekTarget", 
             "moveTo", "shoot"]
 
     // readable after deep copy
@@ -163,7 +158,7 @@ function createBaseProxy(base : Base){
     const whiteList = ["uuid", "team" , "maxEnergy", "upgradeMaxEnergyCost", "refiningRate", 
             "shipCost", "healRate", "upgradeHealRateCost", "interactRadius", 
             "upgradeInteractRadiusCost", "upgradeMaxEnergy", "upgradeHealRate", 
-            "upgradeInteractRadius", "spawnShip"]
+            "upgradeInteractRadius", "upgradeRefiningRate", "upgradeRefiningEfficiency","spawnShip"]
 
     // readable after deep copy
     const grayList = ["transform","collider","resources"]

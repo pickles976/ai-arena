@@ -18,6 +18,8 @@ class Serializer{
         return this.listToObj(list)
     }
 
+    // recursively traverse the list of objects
+    // Why? GameObject contains Transform contains Vector2D
     static listToObj(list : Array<any>){
         if (list.slice !== undefined){
             const args = list.slice(1)

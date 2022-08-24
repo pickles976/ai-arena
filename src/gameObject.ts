@@ -19,7 +19,7 @@ class GameObject {
         this.transform.simulate(deltaTime)
     }
 
-    render(){
+    render(renderer : Renderer){
 
     }
 

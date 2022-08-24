@@ -58,7 +58,7 @@ This is the game logic that runs every frame. You can access your previously ini
 The available default fields for ship are:
 
 -  ["uuid", "team" , "transform","collider","resources", "maxEnergy", 
-    "damage", "upgradeMaxEnergyCost", "damageCost"]
+    "damage", "upgradeMaxEnergyCost", "upgradeDamageCost"]
 
 The available default functions for ship are:
 

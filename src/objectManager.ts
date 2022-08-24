@@ -1,14 +1,14 @@
 class ObjectManager{
 
-    static numAsteroids : number = 15
-    static numObstacles : number = 25
-    static numEnergyCells : number = 8
+    static numAsteroids : number = NUM_ASTEROIDS
+    static numObstacles : number = NUM_OBSTACLES
+    static numEnergyCells : number = NUM_ENERGY_CELLS
 
-    static obstacleMassRange : [number, number] = [20,200]
-    static asteroidMetalRange : [number, number] = [10,100]
-    static asteroidWaterRange : [number, number] = [10,100]
-    static energyCellRange : [number, number] = [20,120]
-    static speedRange : [number, number] = [0.01,0.05]
+    static obstacleMassRange : [number, number] = OBSTACLE_MASS_RANGE
+    static asteroidMetalRange : [number, number] = ASTEROID_METAL_RANGE
+    static asteroidWaterRange : [number, number] = ASTEROID_WATER_RANGE
+    static energyCellRange : [number, number] = ENERGY_CELL_RANGE
+    static speedRange : [number, number] = SPEED_RANGE
 
     spawnQueue : {[key: string] : Array<Generator> }
 
@@ -116,15 +116,15 @@ class ObjectManager{
 
         // check spawnQueue and existing objects, see if new ones need to be spawned
         if (this.spawnQueue["ASTEROID"].length + this.asteroids.length < ObjectManager.numAsteroids){
-            this.queueObject("ASTEROID", 450)
+            this.queueObject("ASTEROID", ASTEROID_RESPAWN_TIME)
         }
 
         if (this.spawnQueue["OBSTACLE"].length + this.obstacles.length < ObjectManager.numObstacles){
-            this.queueObject("OBSTACLE", 300)
+            this.queueObject("OBSTACLE", OBSTACLE_RESPAWN_TIME)
         }
 
         if (this.spawnQueue["ENERGY_CELL"].length + this.energyCells.length < ObjectManager.numEnergyCells){
-            this.queueObject("ENERGY_CELL", 600)
+            this.queueObject("ENERGY_CELL", ENERGY_CELL_RESPAWN_TIME)
         }
 
     }
@@ -159,7 +159,7 @@ class ObjectManager{
                 const randomPos = new Vector2D(Math.random()*W,Math.random()*H)
                 if (overlapCircle(randomPos,obj.collider.radius*1.5).length < 1){
                     obj.transform.position = randomPos
-                    GameObjectList.push(obj)
+                    spawn(obj)
                     return true
                 }
             }
