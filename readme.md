@@ -27,14 +27,20 @@ This is the logic that will run every frame for controlling your base. You could
 
 The available default fields for base are:
 
--  ["uuid", "team" , "maxEnergy", "upgradeMaxEnergyCost", "refiningRate", 
-    "shipCost", "healRate", "upgradeHealRateCost", "interactRadius", 
-    "upgradeInteractRadiusCost", "transform","collider","resources"]
+-  ["uuid", "team" , "health", "shipCost",
+    "healRate", "upgradeHealRateCost", 
+    "maxEnergy", "upgradeMaxEnergyCost",
+    "refiningRate","upgradeRefiningRateCost",
+    "interactRadius", "upgradeInteractRadiusCost",
+    "refiningEfficiency","upgradeRefiningEfficiencyCost",
+    "repairRate","upgradeRepairRateCost",
+    "maxHealth","upgradeMaxHealthCost",]
 
 The available default functions for base are:
 
--  [ "upgradeHealth", "upgradeHealRate", 
-            "upgradeInteractRadius", "spawnShip"]
+-  [ "spawnShip", "upgradeHealRate", "upgradeMaxEnergy", 
+    "upgradeRefiningRate", "upgradeInteractRadius", 
+    "upgradeRefiningEfficiency","upgradeRepairRate","upgradeMaxHealth"]
 
 ## Ship
 

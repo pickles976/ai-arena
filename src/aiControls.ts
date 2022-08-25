@@ -5,7 +5,7 @@ function BaseStart(base, Graphics){
 
 function BaseUpdate(base, Game, Graphics){
 
-    const energyPerShip = 200
+    const energyPerShip = 100
     const shipEnergy = 50
 
     if (base.resources.metal > base.shipCost && base.resources.energy > energyPerShip * Game.getShipsByTeam(base.team).length){
@@ -24,8 +24,8 @@ function BaseUpdate(base, Game, Graphics){
         base.upgradeInteractRadius()
     }
 
-    if (base.resources.metal > base.healthCost){
-        base.upgradeHealth()
+    if (base.resources.metal > base.upgradeMaxHealthCost){
+        base.upgradeMaxHealth()
     }
 
     if (base.resources.metal > base.upgradeHealRateCost){
@@ -67,7 +67,7 @@ function Update(ship, base, Game, Graphics){
     switch(ship.state){
 
         case "IDLE":
-            
+
             const asteroids = Game.getAsteroids()
             let closest = [{},100000]
 

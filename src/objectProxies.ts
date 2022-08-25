@@ -155,12 +155,15 @@ function createGameObjectProxy(gameObject : GameObject){
 function createBaseProxy(base : Base){
 
     // readable fields
-    const whiteList = ["uuid", "team" , "maxEnergy", "upgradeMaxEnergyCost", "refiningRate", 
-            "shipCost", "healRate", "upgradeHealRateCost", "interactRadius", 
-            "upgradeInteractRadiusCost", "upgradeMaxEnergy", "upgradeHealRate", 
-            "upgradeInteractRadius", "upgradeRefiningRate", "upgradeRefiningEfficiency","spawnShip",
-        "repairRate","maxHealth","health","upgradeMaxHealthCost","upgradeRepairRateCost",
-    "upgradeMaxHealth", "upgradeRepairRate"]
+    const whiteList = ["uuid", "team" , "health",
+            "shipCost", "spawnShip",
+            "healRate", "upgradeHealRateCost", "upgradeHealRate", 
+            "maxEnergy", "upgradeMaxEnergyCost", "upgradeMaxEnergy",
+            "refiningRate","upgradeRefiningRateCost", "upgradeRefiningRate",
+            "interactRadius", "upgradeInteractRadiusCost", "upgradeInteractRadius", 
+            "refiningEfficiency","upgradeRefiningEfficiencyCost","upgradeRefiningEfficiency",
+            "repairRate","upgradeRepairRateCost","upgradeRepairRate",
+            "maxHealth","upgradeMaxHealthCost","upgradeMaxHealth"]
 
     // readable after deep copy
     const grayList = ["transform","collider","resources"]
