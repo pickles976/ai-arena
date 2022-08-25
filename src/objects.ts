@@ -336,8 +336,7 @@ class Ship extends GameObject{
 
         checkMemory(this)
 
-        const startCode = compileCode('this.Start(ship,base) \n' +
-                                'return ship')
+        const startCode = compileCode('this.Start(ship,base)')
 
         startCode({ship : createShipProxy(this), 
             //@ts-ignore
@@ -348,8 +347,7 @@ class Ship extends GameObject{
 
         checkMemory(this)
 
-        const updateCode = compileCode('this.Update(ship,base,Game,Graphics) \n' + 
-                                    ' return ship')
+        const updateCode = compileCode('this.Update(ship,base,Game,Graphics)')
         updateCode({ship : createShipProxy(this) , 
             //@ts-ignore
             base: createBaseProxy(GameObjectManager.getBaseByTeam(this.team)), 
@@ -534,6 +532,8 @@ class Base extends GameObject {
         this.upgradeRefiningEfficiencyCost = BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST
         this.upgradeRepairRateCost = BASE_INITIAL_UPGRADE_REPAIR_RATE_COST
         this.upgradeMaxHealthCost = BASE_INITIAL_UPGRADE_MAX_HEALTH_COST
+
+        this.start()
     }
 
     refineWater(deltaTime : number){
@@ -707,8 +707,7 @@ class Base extends GameObject {
 
         checkMemory(this)
 
-        const startCode = compileCode('this.BaseStart(ship) \n' +
-                                'return base')
+        const startCode = compileCode('this.BaseStart(base)')
         startCode({base : createBaseProxy(this)})
     }
 
@@ -716,8 +715,7 @@ class Base extends GameObject {
 
         checkMemory(this)
 
-        const updateCode = compileCode('this.BaseUpdate(base,Game,Graphics) \n' + 
-                                    ' return base')
+        const updateCode = compileCode('this.BaseUpdate(base,Game,Graphics)')
         updateCode({base : createBaseProxy(this), Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy})
     }
 

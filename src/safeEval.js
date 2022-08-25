@@ -4,7 +4,7 @@
 
 const sandboxProxies = new WeakMap()
 
-function compileCode (src) {
+const compileCode = function(src) {
   src = 'with (sandbox) {' + src + '}'
   const code = new Function('sandbox', src)
 
@@ -17,11 +17,11 @@ function compileCode (src) {
   }
 }
 
-function has (target, key) {
+const has = function(target, key) {
   return true
 }
 
-function get (target, key) {
+const get = function(target, key) {
   if (key === Symbol.unscopables) return undefined
   return target[key]
 }

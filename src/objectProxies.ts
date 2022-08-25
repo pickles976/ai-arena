@@ -3,7 +3,7 @@
  * We only allow for getting the specific fields that we want users to have access to.
  * Setting, defining, and deleting is not allowed
  */
-function createRendererProxy(renderer : Renderer){
+const createRendererProxy = function(renderer : Renderer){
 
     const whiteList = ["H","W","drawText","drawLine","drawCircle",
     "drawCircleTransparent"]
@@ -46,7 +46,7 @@ function createRendererProxy(renderer : Renderer){
 
 // we use a blacklist for the GameObject proxy so we can access the
 // user-generated memory of other AI
-function createGameObjectProxy(gameObject : GameObject){
+const createGameObjectProxy = function(gameObject : GameObject){
 
     const grayList = ["transform","collider","resources"]
 
@@ -89,7 +89,7 @@ function createGameObjectProxy(gameObject : GameObject){
 
 }
 
- function createShipProxy(ship : Ship){
+const createShipProxy = function(ship : Ship){
 
     // readable fields
     const whiteList = ["uuid", "team" , "maxEnergy", "damage", "upgradeMaxEnergyCost", 
@@ -152,7 +152,7 @@ function createGameObjectProxy(gameObject : GameObject){
 
 }
 
-function createBaseProxy(base : Base){
+const createBaseProxy = function(base : Base){
 
     // readable fields
     const whiteList = ["uuid", "team" , "health",
@@ -222,7 +222,7 @@ function createBaseProxy(base : Base){
 
 }
 
-function createObjectManagerProxy(gameManager : ObjectManager){
+const createObjectManagerProxy = function(gameManager : ObjectManager){
 
     const whiteList = ["getAsteroids" , "getClosestAsteroid" , "getObstacle", "getClosestObstacle", 
     "getEnergyCells", "getClosestEnergyCell", "getShips", "getShipsByTeam", 

@@ -1,7 +1,7 @@
 /**
  * ALL GAME OBJECT CLASSES WILL LIVE HERE FOR NOW
  */
- class Vector2D {
+class Vector2D {
 
     type: string
     x : number

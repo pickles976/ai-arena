@@ -3,7 +3,7 @@
  * TODO: REMOVE gameObjArray argument, just use GameObjectList
  * @param {list<Circle>} circleArray 
  */
- function checkForCollisions(gameObjArray : Array<GameObject>){
+const checkForCollisions = function(gameObjArray : Array<GameObject>){
 
     let i = 0;
     let pairs = []
@@ -115,7 +115,7 @@
  * https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/5collisionresponse/Physics%20-%20Collision%20Response.pdf
  * @returns [v1,v2]
  */
- function collide(p1 : Vector2D,p2 : Vector2D,v1 : Vector2D,v2 : Vector2D,m1 : number,m2 : number){
+const collide = function(p1 : Vector2D,p2 : Vector2D,v1 : Vector2D,v2 : Vector2D,m1 : number,m2 : number){
 
     let e = 0.15;
     let oomf = 0.001;
@@ -140,7 +140,7 @@
  * @param {number} radius 
  * @returns 
  */
- function overlapCircle(position : Vector2D,radius : number){
+const overlapCircle = function(position : Vector2D,radius : number){
 
     if (xArray.length <= 0){
         return []

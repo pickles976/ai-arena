@@ -1,5 +1,5 @@
 
-function initializeGameState(){
+const initializeGameState = function(){
 
     // INITALIZE GAME STATE MANAGER
     GameStateManager = new StateManager()
@@ -36,7 +36,7 @@ function initializeGameState(){
 /**
  * CONTROLS THE LOGIC FOR EACH FRAME
  */
-function step(){
+const step = function(){
 
     if(!PAUSED){
 
@@ -47,7 +47,7 @@ function step(){
     drawInfoPanels()
 
     let elapsed = performance.now() - frameStart
-    console.log(elapsed)
+    // console.log(elapsed)
     sleep(MS - elapsed)
     window.requestAnimationFrame(step);
 
@@ -65,7 +65,7 @@ function step(){
  * AI Logic
  * 
  */
-function updateField(){
+const updateField = function(){
 
     // SORT BY X POSITION (ALLOWS US TO DO COLLISION CHECKS)
     sortGameObjectList()
@@ -102,7 +102,7 @@ function updateField(){
 /**
  * Renders a frame
  */
-function render(){
+const render = function(){
 
     // call the rendering functions for each object. This doesn't actually render,
     // it queues up rendering calls in the queue

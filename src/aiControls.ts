@@ -1,6 +1,7 @@
 // @ts-nocheck
-function BaseStart(base, Graphics){
+function BaseStart(base){
     console.log("Base Start!")
+    console.log(this)
 }
 
 function BaseUpdate(base, Game, Graphics){
@@ -35,7 +36,7 @@ function BaseUpdate(base, Game, Graphics){
     Graphics.drawText(base.resources.toString() + ' Health: ' + base.health.toFixed(2),base.transform.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
 }
 
-function Start(ship, base, Graphics){
+function Start(ship, base){
 
     ship.target = {}
     ship.state = "IDLE"

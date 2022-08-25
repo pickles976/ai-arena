@@ -5,11 +5,11 @@
 /**
  * Sleeps for given amount of time. Synchronous.
  */
-function sleep(ms : number) {
+const sleep = function(ms : number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function togglePause(){
+const togglePause = function(){
 
     console.log(Serializer.deserializeGameObjectList(Serializer.serializeGameObjectList(GameObjectList)))
 
@@ -24,7 +24,7 @@ function togglePause(){
     
 }
 
-function clamp(value : number,min : number,max : number){
+const clamp = function(value : number,min : number,max : number){
     return Math.min(Math.max(min,value),max)
 }
 
@@ -35,7 +35,7 @@ function clamp(value : number,min : number,max : number){
  * @param {Object} otherObject 
  * @returns number
  */
-function energyDiff(thisObject : GameObject,otherObject : GameObject){
+const energyDiff = function(thisObject : GameObject,otherObject : GameObject){
     return ENERGY_SCALE * otherObject.transform.mass * (thisObject.transform.velocity.subtract(otherObject.transform.velocity).magnitude ** 2) / 2
 }
 
@@ -45,7 +45,7 @@ function energyDiff(thisObject : GameObject,otherObject : GameObject){
  * @param {list} array 
  * @param {number} k 
  */
-function binarySearch(array : Array<number>,k : number){
+const binarySearch = function(array : Array<number>,k : number){
 
     // Lower and upper bounds
     let start = 0;
@@ -70,21 +70,21 @@ function binarySearch(array : Array<number>,k : number){
 
 }
 
-function randomInRange(min : number,max : number){
+const randomInRange = function(min : number,max : number){
     return min + Math.random() * (max-min)
 }
 
-function create_UUID(){
+const create_UUID = function(){
     var uuid = (Math.random() * 1000000000).toFixed(0)
     return parseFloat(uuid);
 }
 
-function dist(obj1 : GameObject,obj2 : GameObject){
+const dist = function(obj1 : GameObject,obj2 : GameObject){
     // TODO: add wraparound checking
     return Vector2D.dist(obj1.transform.position,obj2.transform.position)
 }
 
-function checkMemory(obj : Ship | Base){
+const checkMemory = function(obj : Ship | Base){
 
     const size = new TextEncoder().encode(JSON.stringify(obj)).length
     const kiloBytes = size / 1024;
@@ -97,14 +97,14 @@ function checkMemory(obj : Ship | Base){
     }
 }
 
-function spawn(obj : GameObject){
+const spawn = function(obj : GameObject){
     GameObjectList.push(obj)
 }
 
 /**
  * This mutates GameObjectList btw
  */
- function sortGameObjectList(){
+const sortGameObjectList = function(){
     GameObjectList.sort(function(a,b){
         const circleA = a.transform
         const circleB = b.transform
