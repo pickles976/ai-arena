@@ -9,21 +9,6 @@ const sleep = function(ms : number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const togglePause = function(){
-
-    console.log(Serializer.deserializeGameObjectList(Serializer.serializeGameObjectList(GameObjectList)))
-
-    if(PAUSED){
-        PAUSED = false
-        console.log("Unpaused!")
-        window.requestAnimationFrame(step);
-    }else{
-        PAUSED = true
-        console.log("Paused!")
-    }
-    
-}
-
 const clamp = function(value : number,min : number,max : number){
     return Math.min(Math.max(min,value),max)
 }

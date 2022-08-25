@@ -7,10 +7,10 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
+
         <script src="built/safeEval.js" async defer></script>
         <script src="built/globals.js" async defer></script>
         <script src="built/stateManager.js" async defer></script>
-        <script src="built/panelDrawer.js" async defer></script>
         <script src="built/utils.js" async defer></script>
         <script src="built/collisions.js" async defer></script>
         <script src="built/renderer.js" async defer></script>
@@ -21,11 +21,14 @@
         <script src="built/objects.js" async defer></script>
         <script src="built/objectManager.js" async defer></script>
         <script src="built/serializer.js" async defer></script>
+        <script src="built/elementControl.js" async defer></script>
+        <script src="built/runner.js" async defer></script>
         <script src="built/script.js" async defer></script>
     </head>
     <body>
         <canvas id="game-canvas" width="640" height="480"></canvas>
         <button onclick="togglePause()">Pause</button>
+        <button onclick="stepFrame()">Step</button>
         <text id="team-info">Teams</text>
         <text id="team0-ships">Teams</text>
         <text id="team1-ships">Teams</text>

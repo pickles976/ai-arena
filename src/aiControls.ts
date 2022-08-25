@@ -1,7 +1,6 @@
 // @ts-nocheck
 function BaseStart(base){
     console.log("Base Start!")
-    console.log(this)
 }
 
 function BaseUpdate(base, Game, Graphics){

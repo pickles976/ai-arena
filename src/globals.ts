@@ -78,6 +78,7 @@ const BASE_REFINING_EFFICIENCY_COST_MULTIPLIER = 1.5
 /**
  * MUTABLE
  */
+let GAME_STARTED = false
 let PAUSED : boolean = false
 let GlobalRender : Renderer
 let GlobalRenderProxy : Renderer
@@ -85,7 +86,7 @@ let RenderQueue : { [key:number] : Array<Generator> } = {}
 let GameObjectManager : ObjectManager
 let GameObjectManagerProxy : ObjectManager
 let GameStateManager : StateManager
-const GameObjectList : Array<GameObject> = []
+let GameObjectList : Array<GameObject> = []
 const teamColors : Array<string> = ["#FF0000","#0000FF"]
 // Ordered x positions of GameObjectList, cached for circleOverlap
 let xArray : Array<number> = []
