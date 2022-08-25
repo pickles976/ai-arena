@@ -158,7 +158,9 @@ function createBaseProxy(base : Base){
     const whiteList = ["uuid", "team" , "maxEnergy", "upgradeMaxEnergyCost", "refiningRate", 
             "shipCost", "healRate", "upgradeHealRateCost", "interactRadius", 
             "upgradeInteractRadiusCost", "upgradeMaxEnergy", "upgradeHealRate", 
-            "upgradeInteractRadius", "upgradeRefiningRate", "upgradeRefiningEfficiency","spawnShip"]
+            "upgradeInteractRadius", "upgradeRefiningRate", "upgradeRefiningEfficiency","spawnShip",
+        "repairRate","maxHealth","health","upgradeMaxHealthCost","upgradeRepairRateCost",
+    "upgradeMaxHealth", "upgradeRepairRate"]
 
     // readable after deep copy
     const grayList = ["transform","collider","resources"]

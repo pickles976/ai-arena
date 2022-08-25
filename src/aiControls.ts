@@ -32,7 +32,7 @@ function BaseUpdate(base, Game, Graphics){
         base.upgradeHealRate()
     }
 
-    Graphics.drawText(base.resources.toString(),base.transform.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
+    Graphics.drawText(base.resources.toString() + ' Health: ' + base.health.toFixed(2),base.transform.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
 }
 
 function Start(ship, base, Graphics){
@@ -67,25 +67,22 @@ function Update(ship, base, Game, Graphics){
     switch(ship.state){
 
         case "IDLE":
-        
-            if (ship.resources.energy > (ship.maxEnergy * 0.75)){
+            
+            const asteroids = Game.getAsteroids()
+            let closest = [{},100000]
 
-                const asteroids = Game.getAsteroids()
-                let closest = [{},100000]
-
-                for (const index in asteroids){
-                    const asteroid = asteroids[index]
-                    const d = dist(asteroid,ship)
-                    if (d < closest[1]){
-                        if (!teammateHasTarget(asteroid)){
-                            closest = [asteroid,d]
-                        }
+            for (const index in asteroids){
+                const asteroid = asteroids[index]
+                const d = dist(asteroid,ship)
+                if (d < closest[1]){
+                    if (!teammateHasTarget(asteroid)){
+                        closest = [asteroid,d]
                     }
                 }
-
-                ship.target = closest[0]
-                ship.state = "MOVE_TO_ASTEROID"
             }
+
+            ship.target = closest[0]
+            ship.state = "MOVE_TO_ASTEROID"
 
             break;
 

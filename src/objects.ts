@@ -450,7 +450,8 @@ class Bullet extends GameObject {
                 break;
             case "BASE":
                 if (otherObject instanceof Base){
-                    otherObject.resources.energy -= this.damage // velocity + explosive
+
+                    otherObject.damage(this.damage) // velocity + explosive
                 }
                 break;
             default:
@@ -480,22 +481,30 @@ class Base extends GameObject {
 
     // user gettables
     team : number
-    maxEnergy : number
-    refiningRate : number
-    refiningEfficiency : number
+
     shipCost : number
+
     healRate : number
-    interactRadius : number
     upgradeHealRateCost : number
+
+    interactRadius : number
     upgradeInteractRadiusCost : number
+
+    maxEnergy : number
     upgradeMaxEnergyCost : number
+
+    refiningRate : number
     upgradeRefiningRateCost : number
+
+    refiningEfficiency : number
     upgradeRefiningEfficiencyCost : number
 
     health : number
-    healthCost : number
-    healSelfRate : number
-    healSelfRateCost : number
+    maxHealth : number
+    upgradeMaxHealthCost : number
+
+    repairRate : number
+    upgradeRepairRateCost : number
 
     constructor(uuid : number,position : Vector2D,energy : number,team : number){
 
@@ -503,17 +512,19 @@ class Base extends GameObject {
 
         this.team = team
         this.resources = new Resources(0,0,energy)
-        this.maxEnergy = BASE_INITIAL_MAX_ENERGY
 
         this.shipQueue = []
 
+        // mutable
+        this.maxEnergy = BASE_INITIAL_MAX_ENERGY
         this.refiningRate = BASE_INITIAL_REFINING_RATE
         this.refiningEfficiency = BASE_INITIAL_REFINING_EFFICIENCY
-
-        // mutable
         this.shipCost = BASE_INITIAL_SHIP_COST
         this.healRate = BASE_INITIAL_HEAL_RATE
         this.interactRadius = BASE_INITIAL_INTERACT_RADIUS
+        this.health = BASE_INITIAL_MAX_HEALTH
+        this.maxHealth = BASE_INITIAL_MAX_HEALTH
+        this.repairRate = BASE_INITIAL_REPAIR_RATE
 
         // upgrade costs
         this.upgradeHealRateCost = BASE_INITIAL_UPGRADE_HEAL_RATE_COST
@@ -521,6 +532,8 @@ class Base extends GameObject {
         this.upgradeMaxEnergyCost = BASE_INITIAL_UPGRADE_MAX_ENERGY_COST
         this.upgradeRefiningRateCost = BASE_INITIAL_UPGRADE_REFINING_RATE_COST
         this.upgradeRefiningEfficiencyCost = BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST
+        this.upgradeRepairRateCost = BASE_INITIAL_UPGRADE_REPAIR_RATE_COST
+        this.upgradeMaxHealthCost = BASE_INITIAL_UPGRADE_MAX_HEALTH_COST
     }
 
     refineWater(deltaTime : number){
@@ -532,6 +545,15 @@ class Base extends GameObject {
             GameStateManager.addEnergy(this.team,newEnergy)
         }
     }
+
+    repairSelf(deltaTime : number){
+        // refine water
+        if (this.resources.metal > 0 && this.health < this.maxHealth){
+            const newHealth = this.repairRate * deltaTime
+            this.resources.metal -= newHealth
+            this.health += newHealth
+        }
+    }
     
     simulate(deltaTime : number){
 
@@ -539,6 +561,7 @@ class Base extends GameObject {
         this.transform.velocity = new Vector2D(0,0)
 
         this.refineWater(deltaTime)
+        this.repairSelf(deltaTime)
 
         if (this.resources.water < 0){
             this.resources.water = 0
@@ -546,6 +569,12 @@ class Base extends GameObject {
 
         if (this.resources.energy > this.maxEnergy){
             this.resources.energy = this.maxEnergy
+        }else if (this.resources.energy < 0){
+            this.resources.energy = 0
+        }
+
+        if (this.resources.metal < 0){
+            this.resources.metal = 0
         }
 
         // heal ships
@@ -572,8 +601,17 @@ class Base extends GameObject {
             }
         }
 
-        if (this.resources.energy < 0){
+        // kill self
+        if (this.health < 0){
             this.destroy()
+        }
+    }
+    
+    damage(amount : number){
+        if(this.resources.energy > 0){
+            this.resources.energy -= amount
+        }else{
+            this.health -= amount
         }
     }
 
@@ -585,7 +623,7 @@ class Base extends GameObject {
 
     render(renderer : Renderer){
         renderer.drawCircle(this.transform.position,this.collider.radius,teamColors[this.team])
-        renderer.drawArc(this.transform.position,this.collider.radius,0,(this.resources.energy / this.maxEnergy) * 2 * Math.PI,"#FFFF00")
+        renderer.drawArc(this.transform.position,this.collider.radius,-0.001,(this.resources.energy / this.maxEnergy) * 2 * Math.PI,"#FFFF00")
     }
 
     destroy(){
@@ -693,6 +731,14 @@ class Base extends GameObject {
         }
     }
 
+    upgradeMaxHealth(){
+        if (this.resources.metal > this.upgradeMaxHealthCost){
+            this.maxHealth += BASE_INITIAL_MAX_HEALTH
+            this.resources.metal -= this.upgradeMaxHealthCost
+            this.upgradeMaxHealthCost *= BASE_MAX_HEALTH_COST_MULTIPLIER
+        }
+    }
+
     upgradeHealRate(){
         if (this.resources.metal > this.upgradeHealRateCost){
             this.healRate += BASE_INITIAL_HEAL_RATE
@@ -714,6 +760,14 @@ class Base extends GameObject {
             this.refiningRate += BASE_INITIAL_REFINING_RATE
             this.resources.metal -= this.upgradeRefiningRateCost
             this.upgradeRefiningRateCost *= BASE_REFINING_RATE_COST_MULTIPLIER
+        }
+    }
+
+    upgradeRepairRate(){
+        if (this.resources.metal > this.upgradeRepairRateCost){
+            this.repairRate += BASE_INITIAL_REPAIR_RATE
+            this.resources.metal -= this.upgradeRepairRateCost
+            this.upgradeRepairRateCost *= BASE_REPAIR_RATE_COST_MULTIPLIER
         }
     }
 
