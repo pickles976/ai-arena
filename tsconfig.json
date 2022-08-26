@@ -1,12 +1,19 @@
 {
     "compilerOptions": {
-        "outDir": "./dist",
-        "allowJs": true,
-        "noEmitOnError": true,
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "noImplicitThis": true,
-        "target": "ES2021"
+      "module": "commonjs",
+      "target": "ES6",
+      "allowJs": true,
+      "noEmitOnError": true,
+      "noImplicitAny": true,
+      "strictNullChecks": true,
+      "noImplicitThis": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "sourceMap": true,
+      "declaration": true,
+      "moduleResolution": "node",
+      "outDir": "./dist",
+      "rootDir": "."
     },
-    "include": ["./src/**/*"]
-}
+    "include": ["src"]
+  }

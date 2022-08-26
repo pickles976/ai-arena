@@ -1,0 +1,25 @@
+{
+  "name": "ai-arena",
+  "version": "1.0.0",
+  "description": "The user has total control over the memory that they create. Users can create their own functions and fields inside of gameobjects. However any default fields/functions are read-only access. A player can read their team or uuid, but they cannot modify it.",
+  "main": "webpack.config.js",
+  "devDependencies": {
+    "webpack-dev-server": "^4.10.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "serve": "webpack server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pickles976/ai-arena.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pickles976/ai-arena/issues"
+  },
+  "homepage": "https://github.com/pickles976/ai-arena#readme"
+}

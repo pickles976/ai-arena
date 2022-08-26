@@ -78,6 +78,7 @@ const BASE_REFINING_EFFICIENCY_COST_MULTIPLIER = 1.5
 /**
  * MUTABLE
  */
+let GRAPHICS_ENABLED = true
 let GAME_STARTED = false
 let PAUSED : boolean = false
 let GlobalRender : Renderer

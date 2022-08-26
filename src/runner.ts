@@ -45,7 +45,12 @@ const step = function(){
     const frameStart = performance.now()
 
     updateField()
-    render()
+
+    if (GRAPHICS_ENABLED){
+        render()
+    }
+
+    clearRenderQueue()
 
     let elapsed = performance.now() - frameStart
     // console.log(elapsed)
@@ -121,7 +126,9 @@ const render = function(){
             renderFunc.next()
         }
     }
+}
 
+const clearRenderQueue = function (){
     RenderQueue = {}
 }
 
