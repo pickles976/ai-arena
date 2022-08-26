@@ -88,6 +88,7 @@ let GameObjectManagerProxy : ObjectManager
 let GameStateManager : StateManager
 let GameObjectList : Array<GameObject> = []
 const teamColors : Array<string> = ["#FF0000","#0000FF"]
+
 // Ordered x positions of GameObjectList, cached for circleOverlap
 let xArray : Array<number> = []
 

@@ -28,19 +28,19 @@ const stepFrame = function(){
     }))
 }
 
-const setBaseStartCode = function(code){
+const setBaseStartCode = function(code : string){
     BaseStartCode = code
 }
 
-const setBaseUpdateCode = function(code){
+const setBaseUpdateCode = function(code : string){
     BaseUpdateCode = code
 }
 
-const setShipStartCode = function(code){
+const setShipStartCode = function(code : string){
     ShipStartCode = code
 }
 
-const setShipUpdateCode = function(code){
+const setShipUpdateCode = function(code : string){
     ShipUpdateCode = code
 }
 
@@ -56,21 +56,10 @@ const getGameState = function(){
     return Serializer.deserializeGameObjectList(Serializer.serializeGameObjectList(GameObjectList))
 }
 
-const setCanvas = function(element){
+const setCanvas = function(element : HTMLCanvasElement){
     setCanvasElement(element)
 }
 
-module.exports = { 
-    togglePause,
-    stepFrame,
-    getGameInfo,
-    getShipsInfo,
-    getGameState,
-    setBaseStartCode,
-    setBaseUpdateCode,
-    setShipStartCode,
-    setShipUpdateCode,
-    run,
-    restart,
-    setCanvas,
+const testPackage = function(){
+    return "success!"
 }
