@@ -56,6 +56,10 @@ const getGameState = function(){
     return Serializer.deserializeGameObjectList(Serializer.serializeGameObjectList(GameObjectList))
 }
 
+const setCanvas = function(element){
+    setCanvasElement(element)
+}
+
 module.exports = { 
     togglePause,
     stepFrame,
@@ -68,4 +72,5 @@ module.exports = {
     setShipUpdateCode,
     run,
     restart,
+    setCanvas,
 }

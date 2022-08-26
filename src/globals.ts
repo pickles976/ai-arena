@@ -91,6 +91,8 @@ const teamColors : Array<string> = ["#FF0000","#0000FF"]
 // Ordered x positions of GameObjectList, cached for circleOverlap
 let xArray : Array<number> = []
 
+let GlobalCanvas : HTMLCanvasElement
+
 let BaseStartCode : string = ""
 let BaseUpdateCode : string = ""
 let ShipStartCode : string = ""

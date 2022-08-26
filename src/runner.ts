@@ -21,13 +21,7 @@ const initializeGameState = function(){
     // populate the game field
     GameObjectManager.start()
 
-    // get the canvas
-    // @ts-ignore
-    const gameCanvas : HTMLCanvasElement = document.getElementById("game-canvas")
-    gameCanvas.width = W;
-    gameCanvas.height = H;
-
-    GlobalRender = new Renderer(gameCanvas)
+    GlobalRender = new Renderer(GlobalCanvas)
     GlobalRenderProxy = createRendererProxy(GlobalRender)
 
 }
@@ -147,4 +141,10 @@ const checkWinCondition = function(){
         alert("Team 0 has won!")
         resetGameState()
     }
+}
+
+const setCanvasElement = function(canvasElement : HTMLCanvasElement){
+    GlobalCanvas = canvasElement
+    GlobalCanvas.width = W;
+    GlobalCanvas.height = H;
 }
