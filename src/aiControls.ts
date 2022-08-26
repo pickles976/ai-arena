@@ -1,9 +1,9 @@
 // @ts-nocheck
-function BaseStart(base){
+const BaseStart = function(base){
     console.log("Base Start!")
 }
 
-function BaseUpdate(base, Game, Graphics){
+const BaseUpdate = function(base, Game, Graphics){
 
     const energyPerShip = 100
     const shipEnergy = 50
@@ -35,7 +35,7 @@ function BaseUpdate(base, Game, Graphics){
     Graphics.drawText(base.resources.toString() + ' Health: ' + base.health.toFixed(2),base.transform.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
 }
 
-function Start(ship, base){
+const Start = function(ship, base){
 
     ship.target = {}
     ship.state = "IDLE"
@@ -45,7 +45,7 @@ function Start(ship, base){
 
 }
 
-function Update(ship, base, Game, Graphics){
+const Update = function(ship, base, Game, Graphics){
 
     const speed = 2.5
     ship.shootTimer--

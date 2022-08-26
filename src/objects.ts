@@ -336,7 +336,7 @@ class Ship extends GameObject{
 
         checkMemory(this)
 
-        const startCode = compileCode('this.Start(ship,base)')
+        const startCode = compileCode(ShipStartCode)
 
         startCode({ship : createShipProxy(this), 
             //@ts-ignore
@@ -347,7 +347,7 @@ class Ship extends GameObject{
 
         checkMemory(this)
 
-        const updateCode = compileCode('this.Update(ship,base,Game,Graphics)')
+        const updateCode = compileCode(ShipUpdateCode)
         updateCode({ship : createShipProxy(this) , 
             //@ts-ignore
             base: createBaseProxy(GameObjectManager.getBaseByTeam(this.team)), 
@@ -707,7 +707,7 @@ class Base extends GameObject {
 
         checkMemory(this)
 
-        const startCode = compileCode('this.BaseStart(base)')
+        const startCode = compileCode(BaseStartCode)
         startCode({base : createBaseProxy(this)})
     }
 
@@ -715,7 +715,7 @@ class Base extends GameObject {
 
         checkMemory(this)
 
-        const updateCode = compileCode('this.BaseUpdate(base,Game,Graphics)')
+        const updateCode = compileCode(BaseUpdateCode)
         updateCode({base : createBaseProxy(this), Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy})
     }
 
