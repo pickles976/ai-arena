@@ -1,4 +1,7 @@
-class GameObject {
+import { Collider, Transform } from "./physics.js"
+import { Renderer } from "./renderer.js"
+
+export class GameObject {
     uuid : number
     type : string
     transform : Transform

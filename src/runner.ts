@@ -1,14 +1,22 @@
+import { checkForCollisions } from './collisions.js'
+import { clearRenderQueue, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, RenderQueue, resetGameState, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, sortGameObjectList, spawn, W } from './globals.js'
+import { ObjectManager } from './objectManager.js'
+import { Base, Ship } from './objects.js'
+import { Vector2D } from './physics.js'
+import { Renderer } from './renderer.js'
+import { StateManager } from './stateManager.js'
+import { create_UUID, sleep } from './utils.js'
 
-const initializeGameState = function(){
 
-    GAME_STARTED = true
+export const initializeGameState = function(){
+
+    setGameStarted(true)
 
     // INITALIZE GAME STATE MANAGER
-    GameStateManager = new StateManager()
+    setGameStateManager(new StateManager())
 
     // CREATE OUR SHIT
-    GameObjectManager = new ObjectManager()
-    GameObjectManagerProxy = createObjectManagerProxy(GameObjectManager)
+    setGameObjectManager(new ObjectManager())
 
     spawn(new Base(create_UUID(),new Vector2D(W/4,H/2),500,0))
     spawn(new Base(create_UUID(),new Vector2D(3*W/4,H/2),500,1))
@@ -21,24 +29,16 @@ const initializeGameState = function(){
     // populate the game field
     GameObjectManager.start()
 
-    GlobalRender = new Renderer(GlobalCanvas)
-    GlobalRenderProxy = createRendererProxy(GlobalRender)
+    setRenderer(new Renderer(GlobalCanvas))
 
 }
-
-const resetGameState = function(){
-    GAME_STARTED = false
-    GameObjectList = []
-    RenderQueue = {}
-}
-
 
 // 60 FPS
 // 16.66ms/frame
 /**
  * CONTROLS THE LOGIC FOR EACH FRAME
  */
-const step = function(){
+export const step = function(){
 
     if(!PAUSED){
 
@@ -128,11 +128,7 @@ const render = function(){
     }
 }
 
-const clearRenderQueue = function (){
-    RenderQueue = {}
-}
-
-const runGame = function(){
+export const run = function(){
     if (GAME_STARTED === false){
         initializeGameState()
         window.requestAnimationFrame(step);
@@ -148,10 +144,4 @@ const checkWinCondition = function(){
         alert("Team 0 has won!")
         resetGameState()
     }
-}
-
-const setCanvasElement = function(canvasElement : HTMLCanvasElement){
-    GlobalCanvas = canvasElement
-    GlobalCanvas.width = W;
-    GlobalCanvas.height = H;
 }

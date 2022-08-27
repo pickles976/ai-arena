@@ -2,14 +2,19 @@
  * MISC UTILITIES WITH GLOBAL SCOPE
  */
 
+import { GameObject } from "./gameObject.js";
+import { ENERGY_SCALE,GameObjectManager} from "./globals.js";
+import { Base, Ship } from "./objects.js";
+import { Vector2D } from "./physics.js";
+
 /**
  * Sleeps for given amount of time. Synchronous.
  */
-const sleep = function(ms : number) {
+export const sleep = function(ms : number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const clamp = function(value : number,min : number,max : number){
+export const clamp = function(value : number,min : number,max : number){
     return Math.min(Math.max(min,value),max)
 }
 
@@ -20,56 +25,25 @@ const clamp = function(value : number,min : number,max : number){
  * @param {Object} otherObject 
  * @returns number
  */
-const energyDiff = function(thisObject : GameObject,otherObject : GameObject){
+export const energyDiff = function(thisObject : GameObject,otherObject : GameObject){
     return ENERGY_SCALE * otherObject.transform.mass * (thisObject.transform.velocity.subtract(otherObject.transform.velocity).magnitude ** 2) / 2
 }
 
-
-/**
- * Find insertion point for k
- * @param {list} array 
- * @param {number} k 
- */
-const binarySearch = function(array : Array<number>,k : number){
-
-    // Lower and upper bounds
-    let start = 0;
-    let end = array.length - 1;
- 
-    // Traverse the search space
-    while (start <= end) {
-        let mid = Math.floor((start + end) / 2);
- 
-        // If K is found
-        if (array[mid] == k)
-            return mid;
- 
-        else if (array[mid] < k)
-            start = mid + 1;
- 
-        else
-            end = mid - 1;
-    }
-
-    return end + 1;
-
-}
-
-const randomInRange = function(min : number,max : number){
+export const randomInRange = function(min : number,max : number){
     return min + Math.random() * (max-min)
 }
 
-const create_UUID = function(){
+export const create_UUID = function(){
     var uuid = (Math.random() * 1000000000).toFixed(0)
     return parseFloat(uuid);
 }
 
-const dist = function(obj1 : GameObject,obj2 : GameObject){
+export const dist = function(obj1 : GameObject,obj2 : GameObject){
     // TODO: add wraparound checking
     return Vector2D.dist(obj1.transform.position,obj2.transform.position)
 }
 
-const checkMemory = function(obj : Ship | Base){
+export const checkMemory = function(obj : Ship | Base){
 
     const size = new TextEncoder().encode(JSON.stringify(obj)).length
     const kiloBytes = size / 1024;
@@ -80,22 +54,4 @@ const checkMemory = function(obj : Ship | Base){
         GameObjectManager.getBaseByTeam(obj.team)?.destroy()
         alert("You used up too much memory!")
     }
-}
-
-const spawn = function(obj : GameObject){
-    GameObjectList.push(obj)
-}
-
-/**
- * This mutates GameObjectList btw
- */
-const sortGameObjectList = function(){
-    GameObjectList.sort(function(a,b){
-        const circleA = a.transform
-        const circleB = b.transform
-        return circleA.position.x - circleB.position.x
-    })
-
-    // save a cached array of X values for operations
-    xArray = GameObjectList.map((value) => value.transform.position.x)
 }

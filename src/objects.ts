@@ -1,4 +1,13 @@
-class Resources {
+import { overlapCircle } from "./collisions.js"
+import { GameObject } from "./gameObject.js"
+import { spawn, BaseStartCode, BaseUpdateCode, BASE_HEAL_RATE_COST_MULTIPLIER, BASE_INITIAL_HEAL_RATE, BASE_INITIAL_INTERACT_RADIUS, BASE_INITIAL_MAX_ENERGY, BASE_INITIAL_MAX_HEALTH, BASE_INITIAL_REFINING_EFFICIENCY, BASE_INITIAL_REFINING_RATE, BASE_INITIAL_REPAIR_RATE, BASE_INITIAL_SHIP_COST, BASE_INITIAL_UPGRADE_HEAL_RATE_COST, BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST, BASE_INITIAL_UPGRADE_MAX_ENERGY_COST, BASE_INITIAL_UPGRADE_MAX_HEALTH_COST, BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST, BASE_INITIAL_UPGRADE_REFINING_RATE_COST, BASE_INITIAL_UPGRADE_REPAIR_RATE_COST, BASE_INTERACT_RADIUS_COST_MULTIPLIER, BASE_MASS, BASE_MAX_ENERGY_COST_MULTIPLIER, BASE_MAX_HEALTH_COST_MULTIPLIER, BASE_REFINING_EFFICIENCY_COST_MULTIPLIER, BASE_REFINING_RATE_COST_MULTIPLIER, BASE_REPAIR_RATE_COST_MULTIPLIER, BULLET_MASS, BULLET_SPEED, ENERGY_SCALE, FRAMERATE, GameObjectManager, GameObjectManagerProxy, GameStateManager, GlobalRender, GlobalRenderProxy, ShipStartCode, ShipUpdateCode, SHIP_DAMAGE_COST_MULTIPLIER, SHIP_INITIAL_DAMAGE, SHIP_INITIAL_MAX_ENERGY, SHIP_MASS, SHIP_MAX_ENERGY_COST_MULTIPLIER, SHIP_RESPAWN_TIME, SHIP_UPGRADE_DAMAGE_COST, SHIP_UPGRADE_MAX_ENERGY_COST, teamColors } from "./globals.js"
+import { ProxyMan } from "./objectProxies.js"
+import { Collider, Transform, Vector2D } from "./physics.js"
+import { Renderer } from "./renderer.js"
+import { compileCode } from "./safeEval.js"
+import { checkMemory, clamp, create_UUID, dist, energyDiff } from "./utils.js"
+
+export class Resources {
 
     static colors = ["#666666","#ADD8E6", "#00FF00"]
 
@@ -40,7 +49,7 @@ class Resources {
     }
 }
 
-class Asteroid extends GameObject {
+export class Asteroid extends GameObject {
 
     resources : Resources
 
@@ -87,7 +96,7 @@ class Asteroid extends GameObject {
 
 }
 
-class Obstacle extends GameObject {
+export class Obstacle extends GameObject {
 
     constructor(uuid : number,position : Vector2D,velocity : Vector2D,mass : number){
         super(uuid,"OBSTACLE",new Transform(mass,position,velocity),new Collider(Math.sqrt(mass)))
@@ -134,7 +143,7 @@ class Obstacle extends GameObject {
 
 }
 
-class EnergyCell extends GameObject{
+export class EnergyCell extends GameObject{
 
     resources : Resources
 
@@ -169,7 +178,7 @@ class EnergyCell extends GameObject{
     }
 }
 
-class Ship extends GameObject{
+export class Ship extends GameObject{
 
     team : number
     resources : Resources
@@ -338,9 +347,9 @@ class Ship extends GameObject{
 
         const startCode = compileCode(ShipStartCode)
 
-        startCode({ship : createShipProxy(this), 
+        startCode({ship : ProxyMan.createShipProxy(this), 
             //@ts-ignore
-            base : createBaseProxy(GameObjectManager.getBaseByTeam(this.team))})
+            base : ProxyMan.createBaseProxy(GameObjectManager.getBaseByTeam(this.team))})
     }
 
     update(){
@@ -348,9 +357,9 @@ class Ship extends GameObject{
         checkMemory(this)
 
         const updateCode = compileCode(ShipUpdateCode)
-        updateCode({ship : createShipProxy(this) , 
+        updateCode({ship : ProxyMan.createShipProxy(this) , 
             //@ts-ignore
-            base: createBaseProxy(GameObjectManager.getBaseByTeam(this.team)), 
+            base: ProxyMan.createBaseProxy(GameObjectManager.getBaseByTeam(this.team)), 
             Game : GameObjectManagerProxy, 
             Graphics : GlobalRenderProxy })
     }
@@ -412,7 +421,7 @@ class Ship extends GameObject{
     }
 }
 
-class Bullet extends GameObject {
+export class Bullet extends GameObject {
 
     static speed = BULLET_SPEED
     static offset = 5
@@ -472,7 +481,7 @@ class Bullet extends GameObject {
     }
 }
 
-class Base extends GameObject {
+export class Base extends GameObject {
 
     resources : Resources
     shipQueue : Array<Generator>
@@ -708,7 +717,7 @@ class Base extends GameObject {
         checkMemory(this)
 
         const startCode = compileCode(BaseStartCode)
-        startCode({base : createBaseProxy(this)})
+        startCode({base : ProxyMan.createBaseProxy(this)})
     }
 
     update(){
@@ -716,7 +725,7 @@ class Base extends GameObject {
         checkMemory(this)
 
         const updateCode = compileCode(BaseUpdateCode)
-        updateCode({base : createBaseProxy(this), Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy})
+        updateCode({base : ProxyMan.createBaseProxy(this), Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy})
     }
 
     // USER CALLABLE FUNCTIONS

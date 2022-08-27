@@ -2,100 +2,187 @@
  * IMMUTABLE (GAME CONFIG/BALANCE)
  */
 
-const W : number = 1080
-const H : number = 720
-const FRAMERATE : number = 60.0
-const MS : number = 1000.0 / FRAMERATE
+import { GameObject } from "./gameObject.js"
+import { ObjectManager } from "./objectManager.js"
+import { ProxyMan } from "./objectProxies.js"
+import { Renderer } from "./renderer.js"
+import { run } from "./runner.js"
+import { StateManager } from "./stateManager.js"
+
+export var W : number = 1080
+export var H : number = 720
+export var FRAMERATE : number = 60.0
+export var MS : number = 1000.0 / FRAMERATE
 
 // resources and obstacles
-const NUM_ASTEROIDS = 15
-const NUM_OBSTACLES = 25
-const NUM_ENERGY_CELLS = 8
+export var NUM_ASTEROIDS = 15
+export var NUM_OBSTACLES = 25
+export var NUM_ENERGY_CELLS = 8
 
-const OBSTACLE_MASS_RANGE : [number, number] = [20,200]
-const ASTEROID_METAL_RANGE : [number, number] = [10,100]
-const ASTEROID_WATER_RANGE : [number, number] = [10,100]
-const ENERGY_CELL_RANGE : [number, number] = [20,120]
-const SPEED_RANGE : [number, number] = [0.01,0.05]
+export var OBSTACLE_MASS_RANGE : [number, number] = [20,200]
+export var ASTEROID_METAL_RANGE : [number, number] = [10,100]
+export var ASTEROID_WATER_RANGE : [number, number] = [10,100]
+export var ENERGY_CELL_RANGE : [number, number] = [20,120]
+export var SPEED_RANGE : [number, number] = [0.01,0.05]
 
-const ASTEROID_RESPAWN_TIME = 450
-const OBSTACLE_RESPAWN_TIME = 300
-const ENERGY_CELL_RESPAWN_TIME = 600
+export var ASTEROID_RESPAWN_TIME = 450
+export var OBSTACLE_RESPAWN_TIME = 300
+export var ENERGY_CELL_RESPAWN_TIME = 600
 
 // multiplier for energy consumption
-const ENERGY_SCALE : number = 25
+export var ENERGY_SCALE : number = 25
 
 // BULLET
-const BULLET_MASS = 15
-const BULLET_SPEED = 0.125
+export var BULLET_MASS = 15
+export var BULLET_SPEED = 0.125
 
 // SHIP
-const SHIP_MASS = 50
-const SHIP_INITIAL_DAMAGE = 5
-const SHIP_INITIAL_MAX_ENERGY = 100
-const SHIP_UPGRADE_DAMAGE_COST = 50
-const SHIP_UPGRADE_MAX_ENERGY_COST = 50
-const SHIP_RESPAWN_TIME = 900
+export var SHIP_MASS = 50
+export var SHIP_INITIAL_DAMAGE = 5
+export var SHIP_INITIAL_MAX_ENERGY = 100
+export var SHIP_UPGRADE_DAMAGE_COST = 50
+export var SHIP_UPGRADE_MAX_ENERGY_COST = 50
+export var SHIP_RESPAWN_TIME = 900
 
-const SHIP_MAX_ENERGY_COST_MULTIPLIER = 1.5
-const SHIP_DAMAGE_COST_MULTIPLIER = 1.5
+export var SHIP_MAX_ENERGY_COST_MULTIPLIER = 1.5
+export var SHIP_DAMAGE_COST_MULTIPLIER = 1.5
 
 
 // BASE
 
-const BASE_MASS = 300
-const BASE_INITIAL_MAX_ENERGY = 250
+export var BASE_MASS = 300
+export var BASE_INITIAL_MAX_ENERGY = 250
 
-const BASE_INITIAL_MAX_HEALTH = 100
-const BASE_INITIAL_REPAIR_RATE = 0.01
+export var BASE_INITIAL_MAX_HEALTH = 100
+export var BASE_INITIAL_REPAIR_RATE = 0.01
 
-const BASE_INITIAL_REFINING_RATE = 0.01
-const BASE_INITIAL_REFINING_EFFICIENCY = 1.0
-const BASE_INITIAL_SHIP_COST = 200
+export var BASE_INITIAL_REFINING_RATE = 0.01
+export var BASE_INITIAL_REFINING_EFFICIENCY = 1.0
+export var BASE_INITIAL_SHIP_COST = 200
 
-const BASE_INITIAL_HEAL_RATE = 0.01 // how fast the base can heal ships
-const BASE_INITIAL_INTERACT_RADIUS = 50
+export var BASE_INITIAL_HEAL_RATE = 0.01 // how fast the base can heal ships
+export var BASE_INITIAL_INTERACT_RADIUS = 50
 
 // upgrade costs
-const BASE_INITIAL_UPGRADE_HEAL_RATE_COST = 250
-const BASE_INITIAL_UPGRADE_REPAIR_RATE_COST = 250
-const BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST = 250
-const BASE_INITIAL_UPGRADE_MAX_ENERGY_COST = 250
-const BASE_INITIAL_UPGRADE_MAX_HEALTH_COST = 250
-const BASE_INITIAL_UPGRADE_REFINING_RATE_COST = 250
-const BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST = 250
+export var BASE_INITIAL_UPGRADE_HEAL_RATE_COST = 250
+export var BASE_INITIAL_UPGRADE_REPAIR_RATE_COST = 250
+export var BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST = 250
+export var BASE_INITIAL_UPGRADE_MAX_ENERGY_COST = 250
+export var BASE_INITIAL_UPGRADE_MAX_HEALTH_COST = 250
+export var BASE_INITIAL_UPGRADE_REFINING_RATE_COST = 250
+export var BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST = 250
 
 // amount by which the cost of the upgrades increases
-const BASE_MAX_ENERGY_COST_MULTIPLIER = 1.5 
-const BASE_MAX_HEALTH_COST_MULTIPLIER = 1.5 
-const BASE_HEAL_RATE_COST_MULTIPLIER = 1.5
-const BASE_REPAIR_RATE_COST_MULTIPLIER = 1.5
-const BASE_INTERACT_RADIUS_COST_MULTIPLIER = 1.5
-const BASE_REFINING_RATE_COST_MULTIPLIER = 1.5
-const BASE_REFINING_EFFICIENCY_COST_MULTIPLIER = 1.5
+export var BASE_MAX_ENERGY_COST_MULTIPLIER = 1.5 
+export var BASE_MAX_HEALTH_COST_MULTIPLIER = 1.5 
+export var BASE_HEAL_RATE_COST_MULTIPLIER = 1.5
+export var BASE_REPAIR_RATE_COST_MULTIPLIER = 1.5
+export var BASE_INTERACT_RADIUS_COST_MULTIPLIER = 1.5
+export var BASE_REFINING_RATE_COST_MULTIPLIER = 1.5
+export var BASE_REFINING_EFFICIENCY_COST_MULTIPLIER = 1.5
 
 
 /**
  * MUTABLE
  */
-let GRAPHICS_ENABLED = true
-let GAME_STARTED = false
-let PAUSED : boolean = false
-let GlobalRender : Renderer
-let GlobalRenderProxy : Renderer
-let RenderQueue : { [key:number] : Array<Generator> } = {}
-let GameObjectManager : ObjectManager
-let GameObjectManagerProxy : ObjectManager
-let GameStateManager : StateManager
-let GameObjectList : Array<GameObject> = []
-const teamColors : Array<string> = ["#FF0000","#0000FF"]
+export var GRAPHICS_ENABLED = true
+export var GAME_STARTED = false
+export var PAUSED : boolean = false
+export var GlobalRender : Renderer
+export var GlobalRenderProxy : Renderer
+export var RenderQueue : { [key:number] : Array<Generator> } = {}
+export var GameObjectManager : ObjectManager
+export var GameObjectManagerProxy : ObjectManager
+export var GameStateManager : StateManager
+export var GameObjectList : Array<GameObject> = []
+export var teamColors : Array<string> = ["#FF0000","#0000FF"]
 
 // Ordered x positions of GameObjectList, cached for circleOverlap
-let xArray : Array<number> = []
+export var xArray : Array<number> = []
 
-let GlobalCanvas : HTMLCanvasElement
+export var GlobalCanvas : HTMLCanvasElement
 
-let BaseStartCode : string = ""
-let BaseUpdateCode : string = ""
-let ShipStartCode : string = ""
-let ShipUpdateCode : string = ""
+export var BaseStartCode : string = ""
+export var BaseUpdateCode : string = ""
+export var ShipStartCode : string = ""
+export var ShipUpdateCode : string = ""
+
+/*
+    SETTERS
+*/
+export var setPaused = function(value : boolean){
+    PAUSED = value
+}
+
+export var setBaseStart = function(code : string){
+    BaseStartCode = code
+}
+
+export var setBaseUpdate = function(code : string){
+    BaseUpdateCode = code
+}
+
+export var setShipStart = function(code : string){
+    ShipStartCode = code
+}
+
+export var setShipUpdate = function(code : string){
+    ShipUpdateCode = code
+}
+
+export var setGraphics = function(value : boolean){
+    GRAPHICS_ENABLED = value
+}
+
+export var setCanvasElement = function(canvasElement : HTMLCanvasElement){
+    GlobalCanvas = canvasElement
+    GlobalCanvas.width = W;
+    GlobalCanvas.height = H;
+}
+
+export var setGameStarted = function(value : boolean){
+    GAME_STARTED = value
+}
+
+export var setGameStateManager = function(value : StateManager){
+    GameStateManager = value
+}
+
+export var setGameObjectManager = function(value: ObjectManager){
+    GameObjectManager = value
+    GameObjectManagerProxy = ProxyMan.createObjectManagerProxy(GameObjectManager)
+}
+
+export var setRenderer = function(value : Renderer){
+    GlobalRender = value
+    GlobalRenderProxy = ProxyMan.createRendererProxy(GlobalRender)
+}
+
+export var resetGameState = function(){
+    GAME_STARTED = false
+    GameObjectList = []
+    RenderQueue = {}
+}
+
+export const clearRenderQueue = function (){
+    RenderQueue = {}
+}
+
+/**
+ * This mutates GameObjectList btw
+ */
+ export const sortGameObjectList = function(){
+    GameObjectList.sort(function(a,b){
+        const circleA = a.transform
+        const circleB = b.transform
+        return circleA.position.x - circleB.position.x
+    })
+
+    // save a cached array of X values for operations
+    xArray = GameObjectList.map((value) => value.transform.position.x)
+}
+
+export const spawn = function(obj : GameObject){
+    GameObjectList.push(obj)
+}
+

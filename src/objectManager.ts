@@ -1,4 +1,11 @@
-class ObjectManager{
+import { overlapCircle } from "./collisions.js"
+import { GameObject } from "./gameObject.js"
+import { ASTEROID_METAL_RANGE, ASTEROID_RESPAWN_TIME, ASTEROID_WATER_RANGE, ENERGY_CELL_RANGE, ENERGY_CELL_RESPAWN_TIME, GameObjectList, H, NUM_ASTEROIDS, NUM_ENERGY_CELLS, NUM_OBSTACLES,OBSTACLE_MASS_RANGE, OBSTACLE_RESPAWN_TIME, sortGameObjectList, spawn, SPEED_RANGE, W } from "./globals.js"
+import { Asteroid, Base, Bullet, EnergyCell, Obstacle, Ship } from "./objects.js"
+import { Vector2D } from "./physics.js"
+import { create_UUID, randomInRange } from "./utils.js"
+
+export class ObjectManager{
 
     static numAsteroids : number = NUM_ASTEROIDS
     static numObstacles : number = NUM_OBSTACLES

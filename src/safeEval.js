@@ -4,7 +4,7 @@
 
 const sandboxProxies = new WeakMap()
 
-const compileCode = function(src) {
+export const compileCode = function(src) {
   src = 'with (sandbox) {' + src + '}'
   const code = new Function('sandbox', src)
 

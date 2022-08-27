@@ -1,4 +1,9 @@
-class Serializer{
+import { GameObject } from "./gameObject.js"
+import { Asteroid, Base, Bullet, EnergyCell, Obstacle, Resources, Ship } from "./objects.js"
+import { Collider, Transform, Vector2D } from "./physics.js"
+import { create_UUID } from "./utils.js"
+
+export class Serializer{
 
     static serializeGameObjectList(gol : Array<GameObject>){
         const tempList = []

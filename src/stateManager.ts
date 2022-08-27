@@ -1,4 +1,7 @@
-class StateManager{
+import { GameObjectList, GameObjectManager } from "./globals.js"
+import { Ship } from "./objects.js"
+
+export class StateManager{
 
     deaths : [number, number]
     kills : [number, number]

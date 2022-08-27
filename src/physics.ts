@@ -1,7 +1,9 @@
+import { H, W } from "./globals.js"
+
 /**
  * ALL GAME OBJECT CLASSES WILL LIVE HERE FOR NOW
  */
-class Vector2D {
+export class Vector2D {
 
     type: string
     x : number
@@ -69,7 +71,7 @@ class Vector2D {
     }
 }
 
-class Transform {
+export class Transform {
 
     type : string
     mass : number
@@ -114,7 +116,7 @@ class Transform {
     }
 }
 
-class Collider {
+export class Collider {
     type : string
     radius : number
     constructor(radius : number){

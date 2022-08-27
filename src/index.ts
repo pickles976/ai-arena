@@ -1,3 +1,7 @@
+import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setGraphics, setPaused, setShipStart, setShipUpdate } from './globals.js'
+import { run, step } from './runner.js'
+import { Serializer } from './serializer.js'
+
 export var getGameInfo = function(){
     return GameStateManager.serialize()
 }
@@ -10,42 +14,42 @@ export var getShipsInfo = function(){
 export var togglePause = function(){
 
     if(PAUSED){
-        PAUSED = false
+        setPaused(false)
         console.log("Unpaused!")
         window.requestAnimationFrame(step);
     }else{
-        PAUSED = true
+        setPaused(true)
         console.log("Paused!")
     }
     
 }
 
 export var stepFrame = function(){
-    PAUSED = false
+    setPaused(false)
     window.requestAnimationFrame((function() {
         step()
-        PAUSED = true
+        setPaused(true)
     }))
 }
 
 export var setBaseStartCode = function(code : string){
-    BaseStartCode = code
+    setBaseStart(code)
 }
 
 export var setBaseUpdateCode = function(code : string){
-    BaseUpdateCode = code
+    setBaseUpdate(code)
 }
 
 export var setShipStartCode = function(code : string){
-    ShipStartCode = code
+    setShipStart(code)
 }
 
 export var setShipUpdateCode = function(code : string){
-    ShipUpdateCode = code
+    setShipUpdate(code)
 }
 
-export var run = function(){
-    runGame()
+export var runGame = function(){
+    run()
 }
 
 export var restart = function(){
@@ -60,10 +64,10 @@ export var setCanvas = function(element : HTMLCanvasElement){
     setCanvasElement(element)
 }
 
-export var testPackage = function(){
-    return "success!"
+export var setGraphicsEnabled = function(option : boolean){
+    setGraphics(option)
 }
 
-export var setGraphicsEnabled = function(option : boolean){
-    GRAPHICS_ENABLED = option
+export var testPackage = function(){
+    return "ai-arena package has loaded successfully!"
 }

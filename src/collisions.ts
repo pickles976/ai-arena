@@ -1,9 +1,13 @@
+import { GameObject } from "./gameObject.js";
+import { GameObjectList, GlobalRender, H, W, xArray } from "./globals.js";
+import { Vector2D } from "./physics.js";
+
 /**
  * nlog(n) collision detection for sorted array of circular objects
  * TODO: REMOVE gameObjArray argument, just use GameObjectList
  * @param {list<Circle>} circleArray 
  */
-const checkForCollisions = function(gameObjArray : Array<GameObject>){
+export const checkForCollisions = function(gameObjArray : Array<GameObject>){
 
     let i = 0;
     let pairs = []
@@ -140,7 +144,7 @@ const collide = function(p1 : Vector2D,p2 : Vector2D,v1 : Vector2D,v2 : Vector2D
  * @param {number} radius 
  * @returns 
  */
-const overlapCircle = function(position : Vector2D,radius : number){
+export const overlapCircle = function(position : Vector2D,radius : number){
 
     if (xArray.length <= 0){
         return []
@@ -279,4 +283,34 @@ const overlapCircle = function(position : Vector2D,radius : number){
     }
 
     return collisions
+}
+
+/**
+ * Find insertion point for k
+ * @param {list} array 
+ * @param {number} k 
+ */
+const binarySearch = function(array : Array<number>,k : number){
+
+    // Lower and upper bounds
+    let start = 0;
+    let end = array.length - 1;
+ 
+    // Traverse the search space
+    while (start <= end) {
+        let mid = Math.floor((start + end) / 2);
+ 
+        // If K is found
+        if (array[mid] == k)
+            return mid;
+ 
+        else if (array[mid] < k)
+            start = mid + 1;
+ 
+        else
+            end = mid - 1;
+    }
+
+    return end + 1;
+
 }

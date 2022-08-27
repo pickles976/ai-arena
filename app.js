@@ -1,4 +1,5 @@
-import {testPackage, setGraphicsEnabled} from './dist/index.js'
+import {setCanvas, testPackage, runGame} from './dist/index.js'
 
 console.log(testPackage())
-setGraphicsEnabled(true)
+setCanvas(document.getElementById("game-canvas"))
+runGame()

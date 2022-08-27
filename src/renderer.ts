@@ -12,7 +12,10 @@
  *   4 : effects in front
  *   5 : debug drawing }
  */
- class Renderer{
+import { H, RenderQueue, W } from "./globals.js"
+import { Vector2D } from "./physics.js"
+
+ export class Renderer{
 
     H : number
     W : number
