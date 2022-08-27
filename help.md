@@ -41,7 +41,7 @@ circle is compared against the X array, and the indices are used to return an ar
 - [x] Inject user AI code
 - [x] Convert to Typescript
 - [x] Safely sandbox user AI code
-- [ ] Clean up and convert to ES module
+- [x] Clean up and convert to ES module
 - [ ] Allow users to write code in browser
 - [ ] Port to Node.js
 - [ ] Sync via websockets

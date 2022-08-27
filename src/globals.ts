@@ -6,7 +6,6 @@ import { GameObject } from "./gameObject.js"
 import { ObjectManager } from "./objectManager.js"
 import { ProxyMan } from "./objectProxies.js"
 import { Renderer } from "./renderer.js"
-import { run } from "./runner.js"
 import { StateManager } from "./stateManager.js"
 
 export var W : number = 1080
@@ -100,12 +99,14 @@ export var teamColors : Array<string> = ["#FF0000","#0000FF"]
 // Ordered x positions of GameObjectList, cached for circleOverlap
 export var xArray : Array<number> = []
 
-export var GlobalCanvas : HTMLCanvasElement
-
 export var BaseStartCode : string = ""
 export var BaseUpdateCode : string = ""
 export var ShipStartCode : string = ""
 export var ShipUpdateCode : string = ""
+
+// HTML ELEMENTS
+export var GlobalCanvas : HTMLCanvasElement
+export var DOMCallbacks : Function = function(){}
 
 /*
     SETTERS
@@ -186,3 +187,6 @@ export const spawn = function(obj : GameObject){
     GameObjectList.push(obj)
 }
 
+export var setDOMCallBacks = function(value : Function){
+    DOMCallbacks = value
+}

@@ -1,9 +1,9 @@
-import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setGraphics, setPaused, setShipStart, setShipUpdate } from './globals.js'
+import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, setShipStart, setShipUpdate } from './globals.js'
 import { run, step } from './runner.js'
 import { Serializer } from './serializer.js'
 
 export var getGameInfo = function(){
-    return GameStateManager.serialize()
+    return JSON.parse(GameStateManager.serialize())
 }
 
 export var getShipsInfo = function(){
@@ -40,12 +40,12 @@ export var setBaseUpdateCode = function(code : string){
     setBaseUpdate(code)
 }
 
-export var setShipStartCode = function(code : string){
-    setShipStart(code)
-}
-
 export var setShipUpdateCode = function(code : string){
     setShipUpdate(code)
+}
+
+export var setShipStartCode = function(code : string){
+    setShipStart(code)
 }
 
 export var runGame = function(){
@@ -70,4 +70,8 @@ export var setGraphicsEnabled = function(option : boolean){
 
 export var testPackage = function(){
     return "ai-arena package has loaded successfully!"
+}
+
+export var setUICallbacks = function(value : Function){
+    setDOMCallBacks(value)    
 }

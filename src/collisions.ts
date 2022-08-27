@@ -181,7 +181,7 @@ export const overlapCircle = function(position : Vector2D,radius : number){
         }
 
         // POSSIBLE COLLISION
-        if (Math.abs(dist) < (radius + r2)){
+        if (Math.abs(dist) <= (radius + r2)){
             // the checking object will always be first in the pair
             possible.push(GameObjectList[index])
             collision = true
@@ -216,7 +216,7 @@ export const overlapCircle = function(position : Vector2D,radius : number){
         }
 
         // POSSIBLE COLLISION
-        if (Math.abs(dist) < (radius + r2)){
+        if (Math.abs(dist) <= (radius + r2)){
             // the checking object will always be first in the pair
             possible.push(GameObjectList[index])
             collision = true
@@ -243,7 +243,7 @@ export const overlapCircle = function(position : Vector2D,radius : number){
         let dist = position.subtract(c2Pos).magnitude
 
         // check for wraparound collision in the Y direction
-        if (dist > (radius + r2)){
+        if (dist >= (radius + r2)){
 
             let tempC2 = c2Pos.copy()
 
@@ -263,7 +263,7 @@ export const overlapCircle = function(position : Vector2D,radius : number){
         }
 
         //check for collision
-        if (dist < (radius + r2)){
+        if (dist <= (radius + r2)){
             collisions.push(obj)
         }
 

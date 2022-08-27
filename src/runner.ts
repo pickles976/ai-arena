@@ -1,5 +1,6 @@
+import e from 'express'
 import { checkForCollisions } from './collisions.js'
-import { clearRenderQueue, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, RenderQueue, resetGameState, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, sortGameObjectList, spawn, W } from './globals.js'
+import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, RenderQueue, resetGameState, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, ShipUpdateCode, sortGameObjectList, spawn, W } from './globals.js'
 import { ObjectManager } from './objectManager.js'
 import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'
@@ -45,6 +46,7 @@ export const step = function(){
     const frameStart = performance.now()
 
     updateField()
+    DOMCallbacks()
 
     if (GRAPHICS_ENABLED){
         render()
@@ -102,6 +104,8 @@ const updateField = function(){
         const value = GameObjectList[i]
 
         if(value.type === "SHIP" && value instanceof Ship)
+            value.update()
+        else if(value.type === "BASE" && value instanceof Base)
             value.update()
     }
 
