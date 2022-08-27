@@ -684,7 +684,7 @@ class Base extends GameObject {
     }
 
     queueShip(){
-        function* spawnShipCoroutine(self : Base,numFrames : number){
+        function* spawnShipCoroutine(self : Base,numFrames : number) : any {
             for (let i = 0; i < numFrames; i++){
                 yield;
             }

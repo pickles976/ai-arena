@@ -178,7 +178,7 @@ class ObjectManager{
      */
     private queueObject(type : string,numFrames : number){
 
-        function* queueObjectCoroutine(self : ObjectManager,type : string,numFrames : number){
+        function* queueObjectCoroutine(self : ObjectManager,type : string,numFrames : number) : any{
             for(let i = 0; i < numFrames; i++){
                 yield;
             }

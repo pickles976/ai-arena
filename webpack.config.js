@@ -1,29 +1,25 @@
+//webpack.config.js
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.ts',
-  devtool: 'inline-source-map',
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-    ],
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+  mode: "development",
+  devtool: "inline-source-map",
+  entry: {
+    main: "./src/index.ts",
   },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, './dist'),
+    filename: "ai-arena-bundle.js" // <--- Will be compiled to this single file
   },
-  devServer: {
-    static: {
-      directory:'./',
-    },
-    compress: true,
-    port: 9000,
+  resolve: {
+    extensions: [".ts", ".tsx", ".js"],
   },
+  module: {
+    rules: [
+      { 
+        test: /\.tsx?$/,
+        loader: "ts-loader"
+      }
+    ]
+  }
 };

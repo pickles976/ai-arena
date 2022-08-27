@@ -1,19 +1,16 @@
 {
-    "compilerOptions": {
-      "module": "commonjs",
-      "target": "ES6",
-      "allowJs": true,
-      "noEmitOnError": true,
-      "noImplicitAny": true,
-      "strictNullChecks": true,
-      "noImplicitThis": true,
-      "removeComments": true,
-      "preserveConstEnums": true,
-      "sourceMap": true,
-      "declaration": true,
-      "moduleResolution": "node",
-      "outDir": "./dist",
-      "rootDir": "."
-    },
-    "include": ["src"]
-  }
+  "compilerOptions": {
+    "module": "commonjs",
+    "lib": ["es2021", "dom"],
+    "allowJs": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "removeComments": true,
+    "outDir": "./dist",
+    "sourceRoot": "./src",
+    "sourceMap": true,
+    "declaration": true,
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "**/__tests__/*"]
+}
