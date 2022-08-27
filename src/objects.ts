@@ -11,8 +11,6 @@ const sharedContext = {
     console : console, 
     Vector2D : Vector2D,
     dist : dist,
-    H : H,
-    W : W,
 }
 
 export class Resources {
@@ -384,10 +382,13 @@ export class Ship extends GameObject{
     }
 
     shoot(direction : Vector2D){
-        // instantiate object
-        this.resources.energy -= this.damage
-        const bullet = new Bullet(create_UUID(),this.transform.position.add(direction.normal().multiply(Bullet.offset + this.collider.radius)), direction.normal().multiply(Bullet.speed), this.damage, this.uuid)
-        spawn(bullet)
+        if (direction !== null && direction !== undefined && direction.type === "VECTOR2D" && direction instanceof Vector2D){
+            // instantiate object
+            this.resources.energy -= this.damage
+            const bullet = new Bullet(create_UUID(),this.transform.position.add(direction.normal().multiply(Bullet.offset + this.collider.radius)), direction.normal().multiply(BULLET_SPEED), this.damage, this.uuid)
+            // console.log(bullet)
+            spawn(bullet)
+        }
     }
 
     upgradeMaxEnergy(){
@@ -416,24 +417,27 @@ export class Ship extends GameObject{
     // multiplying by our desired speed gives us the top speed
     // subtracting our current velocity gives us dV
     seekTarget(target: GameObject, speed: number){
-        const desiredSpeed = speed / FRAMERATE
-        const desiredVelocity = target.transform.position.subtract(this.transform.position).normal().multiply(desiredSpeed).add(target.transform.velocity)
-        const steering = desiredVelocity.subtract(this.transform.velocity)
-        this.applyThrust(steering,1.0)
+        if (target !== null && target !== undefined && target instanceof GameObject && speed !== null && speed !== undefined){
+            const desiredSpeed = speed / FRAMERATE
+            const desiredVelocity = target.transform.position.subtract(this.transform.position).normal().multiply(desiredSpeed).add(target.transform.velocity)
+            const steering = desiredVelocity.subtract(this.transform.velocity)
+            this.applyThrust(steering,1.0)
+        }
     }
 
     moveTo(position : Vector2D, speed: number){
-        const desiredSpeed = speed / FRAMERATE
-        const diffVector = position.subtract(this.transform.position)
-        const desiredVelocity = diffVector.normal().multiply(desiredSpeed)
-        const steering = desiredVelocity.subtract(this.transform.velocity)
-        this.applyThrust(steering,1.0)
+        if (position !== null && position !== undefined && position instanceof Vector2D && speed !== null && speed !== undefined){
+            const desiredSpeed = speed / FRAMERATE
+            const diffVector = position.subtract(this.transform.position)
+            const desiredVelocity = diffVector.normal().multiply(desiredSpeed)
+            const steering = desiredVelocity.subtract(this.transform.velocity)
+            this.applyThrust(steering,1.0)
+        }
     }
 }
 
 export class Bullet extends GameObject {
 
-    static speed = BULLET_SPEED
     static offset = 5
     damage : number
     parent : number
