@@ -87,6 +87,7 @@ export var BASE_REFINING_EFFICIENCY_COST_MULTIPLIER = 1.5
 export var GRAPHICS_ENABLED = true
 export var GAME_STARTED = false
 export var PAUSED : boolean = false
+export var REALTIME : boolean = true
 export var GlobalRender : Renderer
 export var GlobalRenderProxy : Renderer
 export var RenderQueue : { [key:number] : Array<Generator> } = {}
@@ -104,6 +105,29 @@ export var BaseUpdateCode : string = ""
 export var ShipStartCode : string = ""
 export var ShipUpdateCode : string = ""
 
+interface CodeStorage {
+    BaseStartCode : string
+    BaseUpdateCode : string
+    ShipStartCode : string
+    ShipUpdateCode : string
+}
+
+export var UserCode : CodeStorage[] = [
+    {
+        BaseStartCode : "",
+        BaseUpdateCode : "",
+        ShipStartCode : "",
+        ShipUpdateCode : ""
+    },
+    {
+        BaseStartCode : "",
+        BaseUpdateCode : "",
+        ShipStartCode : "",
+        ShipUpdateCode : ""
+    }
+]
+
+
 // HTML ELEMENTS
 export var GlobalCanvas : HTMLCanvasElement
 export var DOMCallbacks : Function = function(){}
@@ -115,20 +139,25 @@ export var setPaused = function(value : boolean){
     PAUSED = value
 }
 
-export var setBaseStart = function(code : string){
-    BaseStartCode = code
+export var setRealtime = function(value : boolean){
+    REALTIME = value
 }
 
-export var setBaseUpdate = function(code : string){
-    BaseUpdateCode = code
+export var setBaseStart = function(team: number, code : string){
+    UserCode[team]['BaseStartCode'] = code
 }
 
-export var setShipStart = function(code : string){
-    ShipStartCode = code
+export var setBaseUpdate = function(team: number, code : string){
+    UserCode[team]['BaseUpdateCode'] = code
 }
 
-export var setShipUpdate = function(code : string){
-    ShipUpdateCode = code
+export var setShipStart = function(team: number, code : string){
+    UserCode[team]['ShipStartCode'] = code
+}
+
+export var setShipUpdate = function(team: number, code : string){
+    UserCode[team]['ShipUpdateCode'] = code
+    
 }
 
 export var setGraphics = function(value : boolean){

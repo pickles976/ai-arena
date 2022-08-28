@@ -1,11 +1,11 @@
 import { overlapCircle } from "./collisions.js"
 import { GameObject } from "./gameObject.js"
-import { spawn, BaseStartCode, BaseUpdateCode, BASE_HEAL_RATE_COST_MULTIPLIER, BASE_INITIAL_HEAL_RATE, BASE_INITIAL_INTERACT_RADIUS, BASE_INITIAL_MAX_ENERGY, BASE_INITIAL_MAX_HEALTH, BASE_INITIAL_REFINING_EFFICIENCY, BASE_INITIAL_REFINING_RATE, BASE_INITIAL_REPAIR_RATE, BASE_INITIAL_SHIP_COST, BASE_INITIAL_UPGRADE_HEAL_RATE_COST, BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST, BASE_INITIAL_UPGRADE_MAX_ENERGY_COST, BASE_INITIAL_UPGRADE_MAX_HEALTH_COST, BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST, BASE_INITIAL_UPGRADE_REFINING_RATE_COST, BASE_INITIAL_UPGRADE_REPAIR_RATE_COST, BASE_INTERACT_RADIUS_COST_MULTIPLIER, BASE_MASS, BASE_MAX_ENERGY_COST_MULTIPLIER, BASE_MAX_HEALTH_COST_MULTIPLIER, BASE_REFINING_EFFICIENCY_COST_MULTIPLIER, BASE_REFINING_RATE_COST_MULTIPLIER, BASE_REPAIR_RATE_COST_MULTIPLIER, BULLET_MASS, BULLET_SPEED, ENERGY_SCALE, FRAMERATE, GameObjectManager, GameObjectManagerProxy, GameStateManager, GlobalRender, GlobalRenderProxy, ShipStartCode, ShipUpdateCode, SHIP_DAMAGE_COST_MULTIPLIER, SHIP_INITIAL_DAMAGE, SHIP_INITIAL_MAX_ENERGY, SHIP_MASS, SHIP_MAX_ENERGY_COST_MULTIPLIER, SHIP_RESPAWN_TIME, SHIP_UPGRADE_DAMAGE_COST, SHIP_UPGRADE_MAX_ENERGY_COST, teamColors, H, W } from "./globals.js"
+import { spawn, BaseStartCode, BaseUpdateCode, BASE_HEAL_RATE_COST_MULTIPLIER, BASE_INITIAL_HEAL_RATE, BASE_INITIAL_INTERACT_RADIUS, BASE_INITIAL_MAX_ENERGY, BASE_INITIAL_MAX_HEALTH, BASE_INITIAL_REFINING_EFFICIENCY, BASE_INITIAL_REFINING_RATE, BASE_INITIAL_REPAIR_RATE, BASE_INITIAL_SHIP_COST, BASE_INITIAL_UPGRADE_HEAL_RATE_COST, BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST, BASE_INITIAL_UPGRADE_MAX_ENERGY_COST, BASE_INITIAL_UPGRADE_MAX_HEALTH_COST, BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST, BASE_INITIAL_UPGRADE_REFINING_RATE_COST, BASE_INITIAL_UPGRADE_REPAIR_RATE_COST, BASE_INTERACT_RADIUS_COST_MULTIPLIER, BASE_MASS, BASE_MAX_ENERGY_COST_MULTIPLIER, BASE_MAX_HEALTH_COST_MULTIPLIER, BASE_REFINING_EFFICIENCY_COST_MULTIPLIER, BASE_REFINING_RATE_COST_MULTIPLIER, BASE_REPAIR_RATE_COST_MULTIPLIER, BULLET_MASS, BULLET_SPEED, ENERGY_SCALE, FRAMERATE, GameObjectManager, GameObjectManagerProxy, GameStateManager, GlobalRender, GlobalRenderProxy, ShipStartCode, ShipUpdateCode, SHIP_DAMAGE_COST_MULTIPLIER, SHIP_INITIAL_DAMAGE, SHIP_INITIAL_MAX_ENERGY, SHIP_MASS, SHIP_MAX_ENERGY_COST_MULTIPLIER, SHIP_RESPAWN_TIME, SHIP_UPGRADE_DAMAGE_COST, SHIP_UPGRADE_MAX_ENERGY_COST, teamColors, H, W, UserCode } from "./globals.js"
 import { ProxyMan } from "./objectProxies.js"
 import { Collider, Transform, Vector2D } from "./physics.js"
 import { Renderer } from "./renderer.js"
 import { compileCode } from "./safeEval.js"
-import { checkMemory, clamp, create_UUID, dist, energyDiff } from "./utils.js"
+import { checkMemory, clamp, create_UUID, dist, energyDiff, validNumber, validVector } from "./utils.js"
 
 const sharedContext = {
     console : console, 
@@ -339,6 +339,10 @@ export class Ship extends GameObject{
         })
     }
 
+    toData(){
+        return JSON.parse(JSON.stringify(this))
+    }
+
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
@@ -351,8 +355,8 @@ export class Ship extends GameObject{
 
         checkMemory(this)
 
-        const startCode = compileCode(ShipStartCode)
-
+        const shipStartCode = UserCode[this.team].ShipStartCode
+        const startCode = compileCode(shipStartCode)
         startCode({ship : ProxyMan.createShipProxy(this), 
             //@ts-ignore
             base : ProxyMan.createBaseProxy(GameObjectManager.getBaseByTeam(this.team)),
@@ -363,7 +367,8 @@ export class Ship extends GameObject{
 
         checkMemory(this)
 
-        const updateCode = compileCode(ShipUpdateCode)
+        const shipUpdateCode = UserCode[this.team].ShipUpdateCode
+        const updateCode = compileCode(shipUpdateCode)
         updateCode({ship : ProxyMan.createShipProxy(this) , 
             //@ts-ignore
             base: ProxyMan.createBaseProxy(GameObjectManager.getBaseByTeam(this.team)), 
@@ -372,8 +377,6 @@ export class Ship extends GameObject{
             ...sharedContext })
     }
 
-    // USER-CALLABLE FUNCTIONS 
-
     applyThrust(vector : Vector2D,percentage : number){
         if (this.transform.acceleration.magnitude <= 0.01){
             const pct = clamp(percentage,0,1)
@@ -381,12 +384,13 @@ export class Ship extends GameObject{
         } 
     }
 
+    // USER-CALLABLE FUNCTIONS 
+
     shoot(direction : Vector2D){
-        if (direction !== null && direction !== undefined && direction.type === "VECTOR2D" && direction instanceof Vector2D){
+        if (validVector(direction)){
             // instantiate object
             this.resources.energy -= this.damage
             const bullet = new Bullet(create_UUID(),this.transform.position.add(direction.normal().multiply(Bullet.offset + this.collider.radius)), direction.normal().multiply(BULLET_SPEED), this.damage, this.uuid)
-            // console.log(bullet)
             spawn(bullet)
         }
     }
@@ -417,7 +421,7 @@ export class Ship extends GameObject{
     // multiplying by our desired speed gives us the top speed
     // subtracting our current velocity gives us dV
     seekTarget(target: GameObject, speed: number){
-        if (target !== null && target !== undefined && target instanceof GameObject && speed !== null && speed !== undefined){
+        if (target !== null && target !== undefined && target instanceof GameObject){
             const desiredSpeed = speed / FRAMERATE
             const desiredVelocity = target.transform.position.subtract(this.transform.position).normal().multiply(desiredSpeed).add(target.transform.velocity)
             const steering = desiredVelocity.subtract(this.transform.velocity)
@@ -426,7 +430,7 @@ export class Ship extends GameObject{
     }
 
     moveTo(position : Vector2D, speed: number){
-        if (position !== null && position !== undefined && position instanceof Vector2D && speed !== null && speed !== undefined){
+        if (validVector(position) && validNumber(speed)){
             const desiredSpeed = speed / FRAMERATE
             const diffVector = position.subtract(this.transform.position)
             const desiredVelocity = diffVector.normal().multiply(desiredSpeed)
@@ -724,11 +728,16 @@ export class Base extends GameObject {
             this.team])
     }
 
+    toData(){
+        return JSON.parse(JSON.stringify(this))
+    }
+
     start(){
 
         checkMemory(this)
 
-        const startCode = compileCode(BaseStartCode)
+        const baseStartCode = UserCode[this.team].BaseStartCode
+        const startCode = compileCode(baseStartCode)
         startCode({base : ProxyMan.createBaseProxy(this), ...sharedContext})
     }
 
@@ -736,7 +745,8 @@ export class Base extends GameObject {
 
         checkMemory(this)
 
-        const updateCode = compileCode(BaseUpdateCode)
+        const baseUpdateCode = UserCode[this.team].BaseUpdateCode
+        const updateCode = compileCode(baseUpdateCode)
         updateCode({base : ProxyMan.createBaseProxy(this), Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy, ...sharedContext})
     }
 
@@ -799,6 +809,7 @@ export class Base extends GameObject {
     }
 
     spawnShip(energy : number){
-        this.trySpawnShip(energy,false)
+        if (validNumber(energy))
+            this.trySpawnShip(energy,false)
     }
 }

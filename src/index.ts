@@ -7,8 +7,13 @@ export var getGameInfo = function(){
 }
 
 export var getShipsInfo = function(){
-    return { "team0" : GameObjectManager.getShipsByTeam(0).filter((x) => x.toString()),
-            "team1" : GameObjectManager.getShipsByTeam(1).filter((x) => x.toString())}
+    return { "team0" : GameObjectManager.getShipsByTeam(0).filter((x) => x.toData()),
+            "team1" : GameObjectManager.getShipsByTeam(1).filter((x) => x.toData())}
+}
+
+export var getBasesInfo = function(){
+    return { "team0" : GameObjectManager.getBaseByTeam(0).toData(),
+            "team1" : GameObjectManager.getBaseByTeam(1).toData()}
 }
 
 export var togglePause = function(){
@@ -32,20 +37,21 @@ export var stepFrame = function(){
     }))
 }
 
-export var setBaseStartCode = function(code : string){
-    setBaseStart(code)
+export var setBaseStartCode = function(team: number, code : string){
+    
+    setBaseStart(team,code)
 }
 
-export var setBaseUpdateCode = function(code : string){
-    setBaseUpdate(code)
+export var setBaseUpdateCode = function(team: number,code : string){
+    setBaseUpdate(team,code)
 }
 
-export var setShipUpdateCode = function(code : string){
-    setShipUpdate(code)
+export var setShipUpdateCode = function(team: number,code : string){
+    setShipUpdate(team,code)
 }
 
-export var setShipStartCode = function(code : string){
-    setShipStart(code)
+export var setShipStartCode = function(team: number,code : string){
+    setShipStart(team,code)
 }
 
 export var runGame = function(){

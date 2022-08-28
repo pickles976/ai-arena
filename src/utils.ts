@@ -55,3 +55,17 @@ export const checkMemory = function(obj : Ship | Base){
         alert("You used up too much memory!")
     }
 }
+
+export const validVector = function(direction : Vector2D){
+    return (direction !== null && 
+        direction !== undefined && 
+        direction.type === "VECTOR2D" && 
+        direction instanceof Vector2D && 
+        +direction.x != NaN && 
+        +direction.y != NaN && 
+        +direction.magnitude != NaN)
+}
+
+export const validNumber = function(num : number){
+    return (num !== null && num !== undefined && +num != NaN)
+}
