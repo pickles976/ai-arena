@@ -40,28 +40,28 @@ export const initializeGameState = function(){
  */
 export const step = function(){
 
-    if(!PAUSED){
+    if(!PAUSED && GAME_STARTED){
 
-    const frameStart = performance.now()
+        const frameStart = performance.now()
 
-    updateField()
-    DOMCallbacks()
+        updateField()
+        DOMCallbacks()
 
-    if (GRAPHICS_ENABLED){
-        render()
-    }
+        if (GRAPHICS_ENABLED){
+            render()
+        }
 
-    clearRenderQueue()
+        clearRenderQueue()
 
-    let elapsed = performance.now() - frameStart
+        let elapsed = performance.now() - frameStart
 
-    if (REALTIME){
-        sleep(MS - elapsed).then(() => {
+        if (REALTIME){
+            sleep(MS - elapsed).then(() => {
+                window.requestAnimationFrame(step);
+            })
+        }else{
             window.requestAnimationFrame(step);
-        })
-    }else{
-        window.requestAnimationFrame(step);
-    }
+        }
 
 
     }
@@ -142,6 +142,11 @@ export const run = function(){
         initializeGameState()
         window.requestAnimationFrame(step);
     }
+}
+
+export const stop = function(){
+    setGameStarted(false)
+    resetGameState()
 }
 
 const checkWinCondition = function(){

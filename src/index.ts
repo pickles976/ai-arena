@@ -1,5 +1,5 @@
 import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate } from './globals.js'
-import { run, step } from './runner.js'
+import { run, step, stop } from './runner.js'
 import { Serializer } from './serializer.js'
 
 export var getGameInfo = function(){
@@ -56,6 +56,10 @@ export var setShipStartCode = function(team: number,code : string){
 
 export var runGame = function(){
     run()
+}
+
+export var stopGame = function(){
+    stop()
 }
 
 export var restart = function(){
