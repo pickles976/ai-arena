@@ -47,7 +47,7 @@ export const step = function(){
     updateField()
     DOMCallbacks()
 
-    if (GRAPHICS_ENABLED === true){
+    if (GRAPHICS_ENABLED){
         render()
     }
 
@@ -55,11 +55,14 @@ export const step = function(){
 
     let elapsed = performance.now() - frameStart
 
-    if (REALTIME === true){
-        sleep(MS - elapsed)
+    if (REALTIME){
+        sleep(MS - elapsed).then(() => {
+            window.requestAnimationFrame(step);
+        })
+    }else{
+        window.requestAnimationFrame(step);
     }
-    
-    window.requestAnimationFrame(step);
+
 
     }
 
