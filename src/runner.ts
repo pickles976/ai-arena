@@ -8,7 +8,6 @@ import { Renderer } from './renderer.js'
 import { StateManager } from './stateManager.js'
 import { create_UUID, sleep } from './utils.js'
 
-
 export const initializeGameState = function(){
 
     setGameStarted(true)
@@ -48,16 +47,15 @@ export const step = function(){
     updateField()
     DOMCallbacks()
 
-    if (GRAPHICS_ENABLED){
+    if (GRAPHICS_ENABLED === true){
         render()
     }
 
     clearRenderQueue()
 
     let elapsed = performance.now() - frameStart
-    // console.log(elapsed)
 
-    if (REALTIME){
+    if (REALTIME === true){
         sleep(MS - elapsed)
     }
     

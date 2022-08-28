@@ -352,9 +352,6 @@ export class Ship extends GameObject{
     }
 
     start(){
-
-        checkMemory(this)
-
         const shipStartCode = UserCode[this.team].ShipStartCode
         const startCode = compileCode(shipStartCode)
         startCode({ship : ProxyMan.createShipProxy(this), 
@@ -364,9 +361,6 @@ export class Ship extends GameObject{
     }
 
     update(){
-
-        checkMemory(this)
-
         const shipUpdateCode = UserCode[this.team].ShipUpdateCode
         const updateCode = compileCode(shipUpdateCode)
         updateCode({ship : ProxyMan.createShipProxy(this) , 
@@ -733,18 +727,12 @@ export class Base extends GameObject {
     }
 
     start(){
-
-        checkMemory(this)
-
         const baseStartCode = UserCode[this.team].BaseStartCode
         const startCode = compileCode(baseStartCode)
         startCode({base : ProxyMan.createBaseProxy(this), ...sharedContext})
     }
 
     update(){
-
-        checkMemory(this)
-
         const baseUpdateCode = UserCode[this.team].BaseUpdateCode
         const updateCode = compileCode(baseUpdateCode)
         updateCode({base : ProxyMan.createBaseProxy(this), Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy, ...sharedContext})

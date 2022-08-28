@@ -139,7 +139,7 @@ export var setPaused = function(value : boolean){
     PAUSED = value
 }
 
-export var setRealtime = function(value : boolean){
+export var realTime = function(value : boolean){
     REALTIME = value
 }
 
