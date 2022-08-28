@@ -1,6 +1,6 @@
 import { overlapCircle } from "./collisions.js"
 import { GameObject } from "./gameObject.js"
-import { spawn, BaseStartCode, BaseUpdateCode, BASE_HEAL_RATE_COST_MULTIPLIER, BASE_INITIAL_HEAL_RATE, BASE_INITIAL_INTERACT_RADIUS, BASE_INITIAL_MAX_ENERGY, BASE_INITIAL_MAX_HEALTH, BASE_INITIAL_REFINING_EFFICIENCY, BASE_INITIAL_REFINING_RATE, BASE_INITIAL_REPAIR_RATE, BASE_INITIAL_SHIP_COST, BASE_INITIAL_UPGRADE_HEAL_RATE_COST, BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST, BASE_INITIAL_UPGRADE_MAX_ENERGY_COST, BASE_INITIAL_UPGRADE_MAX_HEALTH_COST, BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST, BASE_INITIAL_UPGRADE_REFINING_RATE_COST, BASE_INITIAL_UPGRADE_REPAIR_RATE_COST, BASE_INTERACT_RADIUS_COST_MULTIPLIER, BASE_MASS, BASE_MAX_ENERGY_COST_MULTIPLIER, BASE_MAX_HEALTH_COST_MULTIPLIER, BASE_REFINING_EFFICIENCY_COST_MULTIPLIER, BASE_REFINING_RATE_COST_MULTIPLIER, BASE_REPAIR_RATE_COST_MULTIPLIER, BULLET_MASS, BULLET_SPEED, ENERGY_SCALE, FRAMERATE, GameObjectManager, GameObjectManagerProxy, GameStateManager, GlobalRender, GlobalRenderProxy, ShipStartCode, ShipUpdateCode, SHIP_DAMAGE_COST_MULTIPLIER, SHIP_INITIAL_DAMAGE, SHIP_INITIAL_MAX_ENERGY, SHIP_MASS, SHIP_MAX_ENERGY_COST_MULTIPLIER, SHIP_RESPAWN_TIME, SHIP_UPGRADE_DAMAGE_COST, SHIP_UPGRADE_MAX_ENERGY_COST, teamColors, H, W, UserCode } from "./globals.js"
+import { spawn, BaseStartCode, BaseUpdateCode, BASE_HEAL_RATE_COST_MULTIPLIER, BASE_INITIAL_HEAL_RATE, BASE_INITIAL_INTERACT_RADIUS, BASE_INITIAL_MAX_ENERGY, BASE_INITIAL_MAX_HEALTH, BASE_INITIAL_REFINING_EFFICIENCY, BASE_INITIAL_REFINING_RATE, BASE_INITIAL_REPAIR_RATE, BASE_INITIAL_SHIP_COST, BASE_INITIAL_UPGRADE_HEAL_RATE_COST, BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST, BASE_INITIAL_UPGRADE_MAX_ENERGY_COST, BASE_INITIAL_UPGRADE_MAX_HEALTH_COST, BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST, BASE_INITIAL_UPGRADE_REFINING_RATE_COST, BASE_INITIAL_UPGRADE_REPAIR_RATE_COST, BASE_INTERACT_RADIUS_COST_MULTIPLIER, BASE_MASS, BASE_MAX_ENERGY_COST_MULTIPLIER, BASE_MAX_HEALTH_COST_MULTIPLIER, BASE_REFINING_EFFICIENCY_COST_MULTIPLIER, BASE_REFINING_RATE_COST_MULTIPLIER, BASE_REPAIR_RATE_COST_MULTIPLIER, BULLET_MASS, BULLET_SPEED, ENERGY_SCALE, FRAMERATE, GameObjectManager, GameObjectManagerProxy, GameStateManager, GlobalRender, GlobalRenderProxy, ShipStartCode, ShipUpdateCode, SHIP_DAMAGE_COST_MULTIPLIER, SHIP_INITIAL_DAMAGE, SHIP_INITIAL_MAX_ENERGY, SHIP_MASS, SHIP_MAX_ENERGY_COST_MULTIPLIER, SHIP_RESPAWN_TIME, SHIP_UPGRADE_DAMAGE_COST, SHIP_UPGRADE_MAX_ENERGY_COST, teamColors, H, W, UserCode, resourceColors, obstacleColor, bulletColor } from "./globals.js"
 import { ProxyMan } from "./objectProxies.js"
 import { Collider, Transform, Vector2D } from "./physics.js"
 import { Renderer } from "./renderer.js"
@@ -14,8 +14,6 @@ const sharedContext = {
 }
 
 export class Resources {
-
-    static colors = ["#666666","#ADD8E6", "#00FF00"]
 
     type : string
     metal : number
@@ -77,7 +75,7 @@ export class Asteroid extends GameObject {
 
         // draw the resources in the asteroid as colored rings
         for(let i = 0; i < 2; i++){
-            renderer.drawCircle(this.transform.position,total*this.collider.radius,Resources.colors[i])
+            renderer.drawCircle(this.transform.position,total*this.collider.radius,resourceColors[i])
             total -= ratio[i]
         }
     }
@@ -114,7 +112,7 @@ export class Obstacle extends GameObject {
 
     render(renderer : Renderer){
         // draw the obstacle
-        renderer.drawCircle(this.transform.position,this.collider.radius,"#A52A2A")
+        renderer.drawCircle(this.transform.position,this.collider.radius,obstacleColor)
     }
 
     breakUp(){
@@ -164,7 +162,7 @@ export class EnergyCell extends GameObject{
 
     render(){
         // draw the resources in the asteroid as colored rings
-        GlobalRender.drawCircle(this.transform.position,this.collider.radius,Resources.colors[2])
+        GlobalRender.drawCircle(this.transform.position,this.collider.radius,resourceColors[2])
     }
 
     getResources(){
@@ -453,7 +451,7 @@ export class Bullet extends GameObject {
 
     render(renderer : Renderer){
         // draw the resources in the asteroid as colored rings
-        renderer.drawCircle(this.transform.position,this.collider.radius,"#FFFF00")
+        renderer.drawCircle(this.transform.position,this.collider.radius,bulletColor)
     }
 
     collide(otherObject : GameObject){

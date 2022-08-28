@@ -12,7 +12,7 @@
  *   4 : effects in front
  *   5 : debug drawing }
  */
-import { H, RenderQueue, W } from "./globals.js"
+import { backgroundColor, H, RenderQueue, W } from "./globals.js"
 import { Vector2D } from "./physics.js"
 
  export class Renderer{
@@ -44,7 +44,7 @@ import { Vector2D } from "./physics.js"
     // Draws a big black square over the background
     newFrame(){
         function* newFrameCoroutine(self : Renderer){
-            self.ctx.fillStyle = "#000000";
+            self.ctx.fillStyle = backgroundColor;
             self.ctx.fillRect(0, 0, W, H);
         }
 

@@ -95,7 +95,13 @@ export var GameObjectManager : ObjectManager
 export var GameObjectManagerProxy : ObjectManager
 export var GameStateManager : StateManager
 export var GameObjectList : Array<GameObject> = []
+
+// COLORS
 export var teamColors : Array<string> = ["#FF0000","#0000FF"]
+export var resourceColors : Array<string> = ["#666666","#ADD8E6", "#00FF00"]
+export var obstacleColor : string = "#A52A2A"
+export var bulletColor : string = "#FFFF00"
+export var backgroundColor : string = "#000000"
 
 // Ordered x positions of GameObjectList, cached for circleOverlap
 export var xArray : Array<number> = []
