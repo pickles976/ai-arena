@@ -92,7 +92,6 @@ export class Asteroid extends GameObject {
         const temp = this.resources.getResources()
         return JSON.stringify([this.type,
             this.uuid,
-            this.age,
             this.transform.position.serialize(),
             this.transform.velocity.serialize(),
             temp["metal"],
@@ -141,7 +140,6 @@ export class Obstacle extends GameObject {
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
-            this.age,
             this.transform.position.serialize(),
             this.transform.velocity.serialize(),
             parseFloat(this.transform.mass.toFixed(2))])
@@ -178,7 +176,6 @@ export class EnergyCell extends GameObject{
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
-            this.age,
             this.transform.position.serialize(),
             this.transform.velocity.serialize(),
             this.resources.getResources()["energy"]])
@@ -347,7 +344,6 @@ export class Ship extends GameObject{
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
-            this.age,
             this.transform.position.serialize(),
             this.resources.getResources()["energy"],
             this.team])
@@ -488,7 +484,6 @@ export class Bullet extends GameObject {
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
-            this.age,
             this.transform.position.serialize(),
             this.transform.velocity.serialize(),
             this.damage,
@@ -627,8 +622,6 @@ export class Base extends GameObject {
         if (this.health < 0){
             this.destroy()
         }
-
-        this.age++
     }
     
     damage(amount : number){
@@ -722,7 +715,6 @@ export class Base extends GameObject {
     serialize(){   
         return JSON.stringify([this.type,
             this.uuid,
-            this.age,
             this.transform.position.serialize(),
             this.resources.getResources()["energy"],
             this.team])
