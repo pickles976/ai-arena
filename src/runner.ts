@@ -45,13 +45,14 @@ export const step = function(){
         const frameStart = performance.now()
 
         updateField()
-        DOMCallbacks()
 
         if (GRAPHICS_ENABLED){
             render()
         }
 
         clearRenderQueue()
+
+        DOMCallbacks()
 
         let elapsed = performance.now() - frameStart
 
