@@ -34,8 +34,7 @@ export const randomInRange = function(min : number,max : number){
 }
 
 export const create_UUID = function(){
-    var uuid = (Math.random() * 1000000000).toFixed(0)
-    return parseFloat(uuid);
+    return Math.floor(Math.random() * 1000000000)
 }
 
 export const dist = function(obj1 : GameObject,obj2 : GameObject){

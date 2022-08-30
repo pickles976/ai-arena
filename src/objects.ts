@@ -622,6 +622,8 @@ export class Base extends GameObject {
         if (this.health < 0){
             this.destroy()
         }
+
+        this.age++
     }
     
     damage(amount : number){
