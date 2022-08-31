@@ -1,4 +1,4 @@
-import { H, W } from "./globals.js"
+import { H, VELOCITY_FACTOR, W } from "./globals.js"
 
 /**
  * ALL GAME OBJECT CLASSES WILL LIVE HERE FOR NOW
@@ -89,7 +89,7 @@ export class Transform {
 
     simulate(deltaTime : number){
 
-        this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime).divide(50000));
+        this.velocity = this.velocity.add(this.acceleration.multiply(deltaTime).divide(VELOCITY_FACTOR));
 
         this.acceleration = new Vector2D(0,0)
 

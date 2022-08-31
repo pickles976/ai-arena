@@ -1,10 +1,9 @@
 // @ts-nocheck
-const BaseStart = function(base){
+export const BaseStartTeam1 = `
     console.log("Base Start!")
-}
+`
 
-const BaseUpdate = function(base, Game, Graphics){
-
+export const BaseUpdateTeam1 = `
     const energyPerShip = 100
     const shipEnergy = 50
 
@@ -33,19 +32,17 @@ const BaseUpdate = function(base, Game, Graphics){
     }
 
     Graphics.drawText(base.resources.toString() + ' Health: ' + base.health.toFixed(2),base.transform.position.subtract(new Vector2D(100,0)),12,"#FFFFFF")
-}
+`
 
-const Start = function(ship, base){
-
+export const ShipStartTeam1 = `
     ship.target = {}
     ship.state = "IDLE"
     ship.arr = []
     ship.shootCooldown = 10
     ship.shootTimer = 0
+`
 
-}
-
-const Update = function(ship, base, Game, Graphics){
+export const ShipUpdateTeam1 = `
 
     const speed = 2.5
     ship.shootTimer--
@@ -183,4 +180,12 @@ const Update = function(ship, base, Game, Graphics){
     Graphics.drawText(ship.state,ship.transform.position.subtract(new Vector2D(0,1).multiply(-10)),8,"#FFFFFF")
     if (ship.target != undefined && ship.target.transform != undefined)
         Graphics.drawLine(ship.transform.position,ship.target.transform.position,"#00FF00")
-}
+`
+
+export const BaseStartTeam0 = ''
+
+export const BaseUpdateTeam0 = ''
+
+export const ShipStartTeam0 = ''
+
+export const ShipUpdateTeam0 = ''

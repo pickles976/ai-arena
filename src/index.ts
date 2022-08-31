@@ -1,4 +1,4 @@
-import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate } from './globals.js'
+import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet } from './globals.js'
 import { run, step, stop } from './runner.js'
 import { Serializer } from './serializer.js'
 
@@ -88,4 +88,8 @@ export var setUICallbacks = function(value : Function){
 
 export var setRealTime = function(value : boolean){
     realTime(value)
+}
+
+export var setFramerate = function(value : number){
+    framerateSet(value)
 }

@@ -2,6 +2,7 @@
  * IMMUTABLE (GAME CONFIG/BALANCE)
  */
 
+import { BaseStartTeam0, BaseStartTeam1, BaseUpdateTeam0, BaseUpdateTeam1, ShipStartTeam0, ShipStartTeam1, ShipUpdateTeam0, ShipUpdateTeam1 } from "./aiControls.js"
 import { GameObject } from "./gameObject.js"
 import { ObjectManager } from "./objectManager.js"
 import { ProxyMan } from "./objectProxies.js"
@@ -10,8 +11,11 @@ import { StateManager } from "./stateManager.js"
 
 export var W : number = 1080
 export var H : number = 720
-export var FRAMERATE : number = 60.0
+export var FRAMERATE : number = 30.0
 export var MS : number = 1000.0 / FRAMERATE
+
+// 50,000 for 60 FPS
+export var VELOCITY_FACTOR = FRAMERATE * 1000
 
 // resources and obstacles
 export var NUM_ASTEROIDS = 15
@@ -22,11 +26,13 @@ export var OBSTACLE_MASS_RANGE : [number, number] = [20,200]
 export var ASTEROID_METAL_RANGE : [number, number] = [10,100]
 export var ASTEROID_WATER_RANGE : [number, number] = [10,100]
 export var ENERGY_CELL_RANGE : [number, number] = [20,120]
-export var SPEED_RANGE : [number, number] = [0.01,0.05]
 
-export var ASTEROID_RESPAWN_TIME = 450
-export var OBSTACLE_RESPAWN_TIME = 300
-export var ENERGY_CELL_RESPAWN_TIME = 600
+// 0.01, 0.05 for 60 FPS
+export var SPEED_RANGE : [number, number] = [0.0002 * FRAMERATE,0.001 * FRAMERATE]
+
+export var ASTEROID_RESPAWN_TIME = 7.5 * FRAMERATE
+export var OBSTACLE_RESPAWN_TIME = 5 * FRAMERATE
+export var ENERGY_CELL_RESPAWN_TIME = 10 * FRAMERATE
 
 // multiplier for energy consumption
 export var ENERGY_SCALE : number = 25
@@ -41,7 +47,7 @@ export var SHIP_INITIAL_DAMAGE = 5
 export var SHIP_INITIAL_MAX_ENERGY = 100
 export var SHIP_UPGRADE_DAMAGE_COST = 50
 export var SHIP_UPGRADE_MAX_ENERGY_COST = 50
-export var SHIP_RESPAWN_TIME = 900
+export var SHIP_RESPAWN_TIME = 15 * FRAMERATE
 
 export var SHIP_MAX_ENERGY_COST_MULTIPLIER = 1.5
 export var SHIP_DAMAGE_COST_MULTIPLIER = 1.5
@@ -120,16 +126,16 @@ interface CodeStorage {
 
 export var UserCode : CodeStorage[] = [
     {
-        BaseStartCode : "",
-        BaseUpdateCode : "",
-        ShipStartCode : "",
-        ShipUpdateCode : ""
+        BaseStartCode : BaseStartTeam0,
+        BaseUpdateCode : BaseUpdateTeam0,
+        ShipStartCode : ShipStartTeam0,
+        ShipUpdateCode : ShipUpdateTeam0
     },
     {
-        BaseStartCode : "",
-        BaseUpdateCode : "",
-        ShipStartCode : "",
-        ShipUpdateCode : ""
+        BaseStartCode : BaseStartTeam1,
+        BaseUpdateCode : BaseUpdateTeam1,
+        ShipStartCode : ShipStartTeam1,
+        ShipUpdateCode : ShipUpdateTeam1
     }
 ]
 
@@ -143,6 +149,10 @@ export var DOMCallbacks : Function = function(){}
 */
 export var setPaused = function(value : boolean){
     PAUSED = value
+}
+
+export var framerateSet = function(value : number){
+    FRAMERATE = value
 }
 
 export var realTime = function(value : boolean){
