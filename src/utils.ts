@@ -60,11 +60,11 @@ export const validVector = function(direction : Vector2D){
         direction !== undefined && 
         direction.type === "VECTOR2D" && 
         direction instanceof Vector2D && 
-        +direction.x != NaN && 
-        +direction.y != NaN && 
-        +direction.magnitude != NaN)
+        validNumber(direction.x) && 
+        validNumber(direction.y) && 
+        validNumber(direction.magnitude))
 }
 
 export const validNumber = function(num : number){
-    return (num !== null && num !== undefined && +num != NaN)
+    return (num !== null && num !== undefined && !isNaN(+num))
 }
