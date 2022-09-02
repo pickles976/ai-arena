@@ -7,6 +7,7 @@ import { GameObject } from "./gameObject.js"
 import { ObjectManager } from "./objectManager.js"
 import { ProxyMan } from "./objectProxies.js"
 import { Renderer } from "./renderer.js"
+import { compileCode } from "./safeEval.js"
 import { StateManager } from "./stateManager.js"
 
 export var W : number = 1080
@@ -112,16 +113,18 @@ export var backgroundColor : string = "#000000"
 // Ordered x positions of GameObjectList, cached for circleOverlap
 export var xArray : Array<number> = []
 
-export var BaseStartCode : string = ""
-export var BaseUpdateCode : string = ""
-export var ShipStartCode : string = ""
-export var ShipUpdateCode : string = ""
-
 interface CodeStorage {
     BaseStartCode : string
     BaseUpdateCode : string
     ShipStartCode : string
     ShipUpdateCode : string
+}
+
+interface CompiledCodeStorage {
+    BaseStartCode : Function
+    BaseUpdateCode : Function
+    ShipStartCode : Function
+    ShipUpdateCode : Function
 }
 
 export var UserCode : CodeStorage[] = [
@@ -136,6 +139,21 @@ export var UserCode : CodeStorage[] = [
         BaseUpdateCode : BaseUpdateTeam1,
         ShipStartCode : ShipStartTeam1,
         ShipUpdateCode : ShipUpdateTeam1
+    }
+]
+
+export var UserCompiledCode : CompiledCodeStorage[] = [
+    {
+        BaseStartCode : compileCode(BaseStartTeam0),
+        BaseUpdateCode : compileCode(BaseUpdateTeam0),
+        ShipStartCode : compileCode(ShipStartTeam0),
+        ShipUpdateCode : compileCode(ShipUpdateTeam0)
+    },
+    {
+        BaseStartCode : compileCode(BaseStartTeam1),
+        BaseUpdateCode : compileCode(BaseUpdateTeam1),
+        ShipStartCode : compileCode(ShipStartTeam1),
+        ShipUpdateCode : compileCode(ShipUpdateTeam1)
     }
 ]
 
@@ -161,18 +179,22 @@ export var realTime = function(value : boolean){
 
 export var setBaseStart = function(team: number, code : string){
     UserCode[team]['BaseStartCode'] = code
+    UserCompiledCode[team]['BaseStartCode'] = compileCode(code)
 }
 
 export var setBaseUpdate = function(team: number, code : string){
     UserCode[team]['BaseUpdateCode'] = code
+    UserCompiledCode[team]['BaseUpdateCode'] = compileCode(code)
 }
 
 export var setShipStart = function(team: number, code : string){
     UserCode[team]['ShipStartCode'] = code
+    UserCompiledCode[team]['ShipStartCode'] = compileCode(code)
 }
 
 export var setShipUpdate = function(team: number, code : string){
     UserCode[team]['ShipUpdateCode'] = code
+    UserCompiledCode[team]['ShipUpdateCode'] = compileCode(code)
     
 }
 

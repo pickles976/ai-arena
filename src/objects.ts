@@ -1,11 +1,11 @@
 import { overlapCircle } from "./collisions.js"
 import { GameObject } from "./gameObject.js"
-import { spawn, BaseStartCode, BaseUpdateCode, BASE_HEAL_RATE_COST_MULTIPLIER, BASE_INITIAL_HEAL_RATE, BASE_INITIAL_INTERACT_RADIUS, BASE_INITIAL_MAX_ENERGY, BASE_INITIAL_MAX_HEALTH, BASE_INITIAL_REFINING_EFFICIENCY, BASE_INITIAL_REFINING_RATE, BASE_INITIAL_REPAIR_RATE, BASE_INITIAL_SHIP_COST, BASE_INITIAL_UPGRADE_HEAL_RATE_COST, BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST, BASE_INITIAL_UPGRADE_MAX_ENERGY_COST, BASE_INITIAL_UPGRADE_MAX_HEALTH_COST, BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST, BASE_INITIAL_UPGRADE_REFINING_RATE_COST, BASE_INITIAL_UPGRADE_REPAIR_RATE_COST, BASE_INTERACT_RADIUS_COST_MULTIPLIER, BASE_MASS, BASE_MAX_ENERGY_COST_MULTIPLIER, BASE_MAX_HEALTH_COST_MULTIPLIER, BASE_REFINING_EFFICIENCY_COST_MULTIPLIER, BASE_REFINING_RATE_COST_MULTIPLIER, BASE_REPAIR_RATE_COST_MULTIPLIER, BULLET_MASS, BULLET_SPEED, ENERGY_SCALE, FRAMERATE, GameObjectManager, GameObjectManagerProxy, GameStateManager, GlobalRender, GlobalRenderProxy, ShipStartCode, ShipUpdateCode, SHIP_DAMAGE_COST_MULTIPLIER, SHIP_INITIAL_DAMAGE, SHIP_INITIAL_MAX_ENERGY, SHIP_MASS, SHIP_MAX_ENERGY_COST_MULTIPLIER, SHIP_RESPAWN_TIME, SHIP_UPGRADE_DAMAGE_COST, SHIP_UPGRADE_MAX_ENERGY_COST, teamColors, H, W, UserCode, resourceColors, obstacleColor, bulletColor } from "./globals.js"
+import { spawn, BASE_HEAL_RATE_COST_MULTIPLIER, BASE_INITIAL_HEAL_RATE, BASE_INITIAL_INTERACT_RADIUS, BASE_INITIAL_MAX_ENERGY, BASE_INITIAL_MAX_HEALTH, BASE_INITIAL_REFINING_EFFICIENCY, BASE_INITIAL_REFINING_RATE, BASE_INITIAL_REPAIR_RATE, BASE_INITIAL_SHIP_COST, BASE_INITIAL_UPGRADE_HEAL_RATE_COST, BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST, BASE_INITIAL_UPGRADE_MAX_ENERGY_COST, BASE_INITIAL_UPGRADE_MAX_HEALTH_COST, BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST, BASE_INITIAL_UPGRADE_REFINING_RATE_COST, BASE_INITIAL_UPGRADE_REPAIR_RATE_COST, BASE_INTERACT_RADIUS_COST_MULTIPLIER, BASE_MASS, BASE_MAX_ENERGY_COST_MULTIPLIER, BASE_MAX_HEALTH_COST_MULTIPLIER, BASE_REFINING_EFFICIENCY_COST_MULTIPLIER, BASE_REFINING_RATE_COST_MULTIPLIER, BASE_REPAIR_RATE_COST_MULTIPLIER, BULLET_MASS, BULLET_SPEED, ENERGY_SCALE, FRAMERATE, GameObjectManager, GameObjectManagerProxy, GameStateManager, GlobalRender, GlobalRenderProxy, SHIP_DAMAGE_COST_MULTIPLIER, SHIP_INITIAL_DAMAGE, SHIP_INITIAL_MAX_ENERGY, SHIP_MASS, SHIP_MAX_ENERGY_COST_MULTIPLIER, SHIP_RESPAWN_TIME, SHIP_UPGRADE_DAMAGE_COST, SHIP_UPGRADE_MAX_ENERGY_COST, teamColors, resourceColors, obstacleColor, bulletColor, UserCompiledCode, resetGameState } from "./globals.js"
 import { ProxyMan } from "./objectProxies.js"
 import { Collider, Transform, Vector2D } from "./physics.js"
 import { Renderer } from "./renderer.js"
-import { compileCode } from "./safeEval.js"
-import { checkMemory, clamp, create_UUID, dist, energyDiff, validNumber, validVector } from "./utils.js"
+import { stop } from "./runner.js"
+import { clamp, create_UUID, dist, energyDiff, validNumber, validVector } from "./utils.js"
 
 const sharedContext = {
     console : console, 
@@ -350,23 +350,39 @@ export class Ship extends GameObject{
     }
 
     start(){
-        const shipStartCode = UserCode[this.team].ShipStartCode
-        const startCode = compileCode(shipStartCode)
-        startCode({ship : ProxyMan.createShipProxy(this), 
-            //@ts-ignore
-            base : ProxyMan.createBaseProxy(GameObjectManager.getBaseByTeam(this.team)),
-            ...sharedContext})
+        const startCode = UserCompiledCode[this.team].ShipStartCode
+
+        try 
+        {
+            startCode({ship : ProxyMan.createShipProxy(this), 
+                //@ts-ignore
+                base : ProxyMan.createBaseProxy(GameObjectManager.getBaseByTeam(this.team)),
+                ...sharedContext})
+        }
+        catch (e)
+        {
+            alert("Failure in ship.start() \n" + e)
+            resetGameState()
+        }
     }
 
     update(){
-        const shipUpdateCode = UserCode[this.team].ShipUpdateCode
-        const updateCode = compileCode(shipUpdateCode)
-        updateCode({ship : ProxyMan.createShipProxy(this) , 
-            //@ts-ignore
-            base: ProxyMan.createBaseProxy(GameObjectManager.getBaseByTeam(this.team)), 
-            Game : GameObjectManagerProxy, 
-            Graphics : GlobalRenderProxy,
-            ...sharedContext })
+        const updateCode = UserCompiledCode[this.team].ShipUpdateCode
+
+        try
+        {
+            updateCode({ship : ProxyMan.createShipProxy(this) , 
+                //@ts-ignore
+                base: ProxyMan.createBaseProxy(GameObjectManager.getBaseByTeam(this.team)), 
+                Game : GameObjectManagerProxy, 
+                Graphics : GlobalRenderProxy,
+                ...sharedContext })
+        }
+        catch (e)
+        {
+            alert("Failure in ship.update() \n" + e)
+            resetGameState()
+        }
     }
 
     applyThrust(vector : Vector2D,percentage : number){
@@ -725,15 +741,31 @@ export class Base extends GameObject {
     }
 
     start(){
-        const baseStartCode = UserCode[this.team].BaseStartCode
-        const startCode = compileCode(baseStartCode)
-        startCode({base : ProxyMan.createBaseProxy(this), ...sharedContext})
+        const startCode = UserCompiledCode[this.team].BaseStartCode
+
+        try
+        {
+            startCode({base : ProxyMan.createBaseProxy(this), ...sharedContext})
+        }
+        catch (e)
+        {
+            alert("Failure in base.start() \n " + e)
+            resetGameState()
+        }
     }
 
     update(){
-        const baseUpdateCode = UserCode[this.team].BaseUpdateCode
-        const updateCode = compileCode(baseUpdateCode)
-        updateCode({base : ProxyMan.createBaseProxy(this), Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy, ...sharedContext})
+        const updateCode = UserCompiledCode[this.team].BaseUpdateCode
+
+        try 
+        {
+            updateCode({base : ProxyMan.createBaseProxy(this), Game : GameObjectManagerProxy, Graphics : GlobalRenderProxy, ...sharedContext})
+        }
+        catch (e)
+        {
+            alert("Failure in base.update() \n " + e)
+            resetGameState()
+        }
     }
 
     // USER CALLABLE FUNCTIONS

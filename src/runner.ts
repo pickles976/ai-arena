@@ -1,6 +1,5 @@
-import e from 'express'
 import { checkForCollisions } from './collisions.js'
-import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, REALTIME, RenderQueue, resetGameState, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, ShipUpdateCode, sortGameObjectList, spawn, W } from './globals.js'
+import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, REALTIME, RenderQueue, resetGameState, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, sortGameObjectList, spawn, W } from './globals.js'
 import { ObjectManager } from './objectManager.js'
 import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'
@@ -47,7 +46,13 @@ export const step = function(){
         updateField()
 
         if (GRAPHICS_ENABLED){
-            render()
+            try {
+                render()
+            } 
+            catch (e)
+            {
+                alert("Failed to render \n" + e)
+            }
         }
 
         clearRenderQueue()
