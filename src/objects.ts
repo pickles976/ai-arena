@@ -361,7 +361,7 @@ export class Ship extends GameObject{
         }
         catch (e)
         {
-            alert(`Failure in ship.start() \n Error: ${e}`)
+            alert(`Failure in ship.start() \n Error: ${e} \n Your code failed to compile`)
             resetGameState()
         }
     }
@@ -380,7 +380,7 @@ export class Ship extends GameObject{
         }
         catch (e)
         {
-            alert(`Failure in ship.update() \n Error: ${e}`)
+            alert(`Failure in ship.update() \n Error: ${e} \n Your code failed to compile`)
             resetGameState()
         }
     }
@@ -758,7 +758,7 @@ export class Base extends GameObject {
         }
         catch (e)
         {
-            alert(`Failure in base.start() \n Error: ${e}`)
+            alert(`Failure in base.start() \n Error: ${e} Your code failed to compile`)
             resetGameState()
         }
     }
@@ -772,7 +772,7 @@ export class Base extends GameObject {
         }
         catch (e)
         {
-            alert(`Failure in base.update() \n Error: ${e}`)
+            alert(`Failure in base.update() \n Error: ${e} \n Your code failed to compile`)
             resetGameState()
         }
     }
