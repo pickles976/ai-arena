@@ -4,15 +4,19 @@
 const sandboxProxies = new WeakMap()
 
 export const compileCode = function(src) {
-  src = 'with (sandbox) {' + src + '}'
-  const code = new Function('sandbox', src)
+  try {
+    src = 'with (sandbox) {' + src + '}'
+    const code = new Function('sandbox', src)
 
-  return function (sandbox) {
-    if (!sandboxProxies.has(sandbox)) {
-      const sandboxProxy = new Proxy(sandbox, {has, get})
-      sandboxProxies.set(sandbox, sandboxProxy)
+    return function (sandbox) {
+      if (!sandboxProxies.has(sandbox)) {
+        const sandboxProxy = new Proxy(sandbox, {has, get})
+        sandboxProxies.set(sandbox, sandboxProxy)
+      }
+      return code(sandboxProxies.get(sandbox))
     }
-    return code(sandboxProxies.get(sandbox))
+  } catch (e) {
+    alert(`Code failed to compile: \n Error: ${e}`)
   }
 }
 

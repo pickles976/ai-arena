@@ -51,7 +51,7 @@ export const step = function(){
             } 
             catch (e)
             {
-                alert("Failed to render \n" + e)
+                alert(`Failed to render \n Error: ${e}`)
             }
         }
 

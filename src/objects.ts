@@ -361,7 +361,7 @@ export class Ship extends GameObject{
         }
         catch (e)
         {
-            alert("Failure in ship.start() \n" + e)
+            alert(`Failure in ship.start() \n Error: ${e}`)
             resetGameState()
         }
     }
@@ -380,7 +380,7 @@ export class Ship extends GameObject{
         }
         catch (e)
         {
-            alert("Failure in ship.update() \n" + e)
+            alert(`Failure in ship.update() \n Error: ${e}`)
             resetGameState()
         }
     }
@@ -401,7 +401,8 @@ export class Ship extends GameObject{
             const bullet = new Bullet(create_UUID(),this.transform.position.add(direction.normal().multiply(Bullet.offset + this.collider.radius)), direction.normal().multiply(BULLET_SPEED), this.damage, this.uuid)
             spawn(bullet)
         }else{
-            alert("Invalid input in ship.shoot()! \n" + direction.toString())
+            alert(`Invalid input in ship.shoot()! \n Direction: ${direction}`)
+            resetGameState()
         }
     }
 
@@ -437,7 +438,8 @@ export class Ship extends GameObject{
             const steering = desiredVelocity.subtract(this.transform.velocity)
             this.applyThrust(steering,1.0)
         }else{
-            alert("Invalid input in ship.seekTarget()! \n" + target.toString() + " " + speed.toString())
+            alert(`Invalid input in ship.seekTarget()! \n Target: ${target} Speed: ${speed}`)
+            resetGameState()
         }
     }
 
@@ -449,7 +451,8 @@ export class Ship extends GameObject{
             const steering = desiredVelocity.subtract(this.transform.velocity)
             this.applyThrust(steering,1.0)
         }else{
-            alert("Invalid input in ship.moveTo()! \n" + position.toString() + " " + speed.toString())
+            alert(`Invalid input in ship.moveTo()! \n Position: ${position} Speed: ${speed}`)
+            resetGameState()
         }
     }
 }
@@ -755,7 +758,7 @@ export class Base extends GameObject {
         }
         catch (e)
         {
-            alert("Failure in base.start() \n " + e)
+            alert(`Failure in base.start() \n Error: ${e}`)
             resetGameState()
         }
     }
@@ -769,7 +772,7 @@ export class Base extends GameObject {
         }
         catch (e)
         {
-            alert("Failure in base.update() \n " + e)
+            alert(`Failure in base.update() \n Error: ${e}`)
             resetGameState()
         }
     }

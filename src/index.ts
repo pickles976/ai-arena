@@ -38,7 +38,6 @@ export var stepFrame = function(){
 }
 
 export var setBaseStartCode = function(team: number, code : string){
-    
     setBaseStart(team,code)
 }
 

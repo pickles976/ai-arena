@@ -1,5 +1,5 @@
 import { GameObject } from "./gameObject.js";
-import { GameObjectList, GlobalRender, H, W, xArray } from "./globals.js";
+import { GameObjectList, GlobalRender, H, resetGameState, W, xArray } from "./globals.js";
 import { Vector2D } from "./physics.js";
 import { validNumber, validVector } from "./utils.js";
 
@@ -289,7 +289,8 @@ export const overlapCircle = function(position : Vector2D,radius : number){
     
     }
 
-    alert("Invalid input for OverlapCircle!")
+    alert(`Invalid input for OverlapCircle! \n Position: ${position.toString()} Radius: ${radius.toString()}`)
+    resetGameState()
     return []
 }
 
