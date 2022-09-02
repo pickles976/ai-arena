@@ -4,13 +4,13 @@ import { spawn, BASE_HEAL_RATE_COST_MULTIPLIER, BASE_INITIAL_HEAL_RATE, BASE_INI
 import { ProxyMan } from "./objectProxies.js"
 import { Collider, Transform, Vector2D } from "./physics.js"
 import { Renderer } from "./renderer.js"
-import { stop } from "./runner.js"
 import { clamp, create_UUID, dist, energyDiff, validNumber, validVector } from "./utils.js"
 
 const sharedContext = {
     console : console, 
     Vector2D : Vector2D,
     dist : dist,
+    overlapCircle: overlapCircle,
 }
 
 export class Resources {
@@ -400,6 +400,8 @@ export class Ship extends GameObject{
             this.resources.energy -= this.damage
             const bullet = new Bullet(create_UUID(),this.transform.position.add(direction.normal().multiply(Bullet.offset + this.collider.radius)), direction.normal().multiply(BULLET_SPEED), this.damage, this.uuid)
             spawn(bullet)
+        }else{
+            alert("Invalid input in ship.shoot()! \n" + direction.toString())
         }
     }
 
@@ -434,6 +436,8 @@ export class Ship extends GameObject{
             const desiredVelocity = target.transform.position.subtract(this.transform.position).normal().multiply(desiredSpeed).add(target.transform.velocity)
             const steering = desiredVelocity.subtract(this.transform.velocity)
             this.applyThrust(steering,1.0)
+        }else{
+            alert("Invalid input in ship.seekTarget()! \n" + target.toString() + " " + speed.toString())
         }
     }
 
@@ -444,6 +448,8 @@ export class Ship extends GameObject{
             const desiredVelocity = diffVector.normal().multiply(desiredSpeed)
             const steering = desiredVelocity.subtract(this.transform.velocity)
             this.applyThrust(steering,1.0)
+        }else{
+            alert("Invalid input in ship.moveTo()! \n" + position.toString() + " " + speed.toString())
         }
     }
 }

@@ -1,6 +1,7 @@
 import { GameObject } from "./gameObject.js";
 import { GameObjectList, GlobalRender, H, W, xArray } from "./globals.js";
 import { Vector2D } from "./physics.js";
+import { validNumber, validVector } from "./utils.js";
 
 /**
  * nlog(n) collision detection for sorted array of circular objects
@@ -146,143 +147,150 @@ const collide = function(p1 : Vector2D,p2 : Vector2D,v1 : Vector2D,v2 : Vector2D
  */
 export const overlapCircle = function(position : Vector2D,radius : number){
 
-    if (xArray.length <= 0){
-        return []
-    }
+    if(validVector(position) && validNumber(radius)){
 
-    const i = binarySearch(xArray,position.x)
+        if (xArray.length <= 0){
+            return []
+        }
+
+        const i = binarySearch(xArray,position.x)
+        
+        const possible = []
+
+        // loop backwards and forwards through array
+        let collision = true
+        let j = 1
+
+        // iterate backwards
+        while (collision){
+
+            collision = false
+            let index = i - j
+
+            // IF WE HAVE LOOPED AROUND
+            if (index < 0){
+                index += GameObjectList.length
+            }
+
+            let c2 = GameObjectList[index].transform
+            let r2 = GameObjectList[index].collider.radius
+            let dist = 100000;
+
+            // normal collision
+            if (index < i){
+                dist = position.x - c2.position.x
+            } else {
+                dist = position.x + W - c2.position.x
+            }
+
+            // POSSIBLE COLLISION
+            if (Math.abs(dist) < (radius + r2)){
+                // the checking object will always be first in the pair
+                possible.push(GameObjectList[index])
+                collision = true
+            }
+
+            j++
+        }
+
+        collision = true
+        j = 0
+
+        // iterate forwards
+        while (collision){
+
+            collision = false
+            let index = i + j
+
+            // IF WE HAVE LOOPED AROUND
+            if (index >= GameObjectList.length){
+                index -= GameObjectList.length
+            }
+
+            let c2 = GameObjectList[index].transform
+            let r2 = GameObjectList[index].collider.radius
+            let dist = 100000;
+
+            // normal collision
+            if (index >= i){
+                dist = position.x - c2.position.x
+            } else {
+                dist = position.x + W - c2.position.x
+            }
+
+            // POSSIBLE COLLISION
+            if (Math.abs(dist) < (radius + r2)){
+                // the checking object will always be first in the pair
+                possible.push(GameObjectList[index])
+                collision = true
+            }
+
+            j++
+        }
+
+        const collisions = []
+        let k = 0
+        while(k < possible.length){
+
+            const obj = possible[k]
+            const c2 = obj.transform
+            let r2 = obj.collider.radius
+            let c2Pos = c2.position
+
+            // check if it's a wraparound collision in the X direction
+            if (position.x < c2.position.x){
+                c2Pos = new Vector2D(c2.position.x - W,c2.position.y)
+            }
+
+            // temporary distance calculation
+            let dist = position.subtract(c2Pos).magnitude
+
+            // check for wraparound collision in the Y direction
+            if (dist > (radius + r2)){
+
+                let tempC2 = c2Pos.copy()
+
+                // shift the C2 up or down
+                if (position.y < c2.position.y){
+                    tempC2.y -= H
+                }else{
+                    tempC2.y += H
+                }
+
+                // check if there is collision after the shift
+                let tempDist = position.subtract(tempC2).magnitude
+                if (tempDist < (radius + r2)){
+                    dist = tempDist // update with shift
+                    c2Pos = tempC2
+                }
+            }
+
+            //check for collision
+            if (dist < (radius + r2)){
+                collisions.push(obj)
+            }
+
+            k++;
+        }
+
+        const debug = false
+        if (debug){
+            const color = "rgba(255, 255, 0, 0.5)"
+            GlobalRender.drawCircle(position,radius,color)
+            possible.map((c) => {
+                GlobalRender.drawLine(position,c.transform.position,"rgba(255, 255, 255, 0.5)")
+            })
+            collisions.map((c) => {
+                GlobalRender.drawLine(position,c.transform.position,color)
+            })
+        }
+
+        return collisions
     
-    const possible = []
-
-    // loop backwards and forwards through array
-    let collision = true
-    let j = 1
-
-    // iterate backwards
-    while (collision){
-
-        collision = false
-        let index = i - j
-
-        // IF WE HAVE LOOPED AROUND
-        if (index < 0){
-            index += GameObjectList.length
-        }
-
-        let c2 = GameObjectList[index].transform
-        let r2 = GameObjectList[index].collider.radius
-        let dist = 100000;
-
-        // normal collision
-        if (index < i){
-            dist = position.x - c2.position.x
-        } else {
-            dist = position.x + W - c2.position.x
-        }
-
-        // POSSIBLE COLLISION
-        if (Math.abs(dist) < (radius + r2)){
-            // the checking object will always be first in the pair
-            possible.push(GameObjectList[index])
-            collision = true
-        }
-
-        j++
     }
 
-    collision = true
-    j = 0
-
-    // iterate forwards
-    while (collision){
-
-        collision = false
-        let index = i + j
-
-        // IF WE HAVE LOOPED AROUND
-        if (index >= GameObjectList.length){
-            index -= GameObjectList.length
-        }
-
-        let c2 = GameObjectList[index].transform
-        let r2 = GameObjectList[index].collider.radius
-        let dist = 100000;
-
-        // normal collision
-        if (index >= i){
-            dist = position.x - c2.position.x
-        } else {
-            dist = position.x + W - c2.position.x
-        }
-
-        // POSSIBLE COLLISION
-        if (Math.abs(dist) < (radius + r2)){
-            // the checking object will always be first in the pair
-            possible.push(GameObjectList[index])
-            collision = true
-        }
-
-        j++
-    }
-
-    const collisions = []
-    let k = 0
-    while(k < possible.length){
-
-        const obj = possible[k]
-        const c2 = obj.transform
-        let r2 = obj.collider.radius
-        let c2Pos = c2.position
-
-        // check if it's a wraparound collision in the X direction
-        if (position.x < c2.position.x){
-            c2Pos = new Vector2D(c2.position.x - W,c2.position.y)
-        }
-
-        // temporary distance calculation
-        let dist = position.subtract(c2Pos).magnitude
-
-        // check for wraparound collision in the Y direction
-        if (dist > (radius + r2)){
-
-            let tempC2 = c2Pos.copy()
-
-            // shift the C2 up or down
-            if (position.y < c2.position.y){
-                tempC2.y -= H
-            }else{
-                tempC2.y += H
-            }
-
-            // check if there is collision after the shift
-            let tempDist = position.subtract(tempC2).magnitude
-            if (tempDist < (radius + r2)){
-                dist = tempDist // update with shift
-                c2Pos = tempC2
-            }
-        }
-
-        //check for collision
-        if (dist < (radius + r2)){
-            collisions.push(obj)
-        }
-
-        k++;
-    }
-
-    const debug = false
-    if (debug){
-        const color = "rgba(255, 255, 0, 0.5)"
-        GlobalRender.drawCircle(position,radius,color)
-        possible.map((c) => {
-            GlobalRender.drawLine(position,c.transform.position,"rgba(255, 255, 255, 0.5)")
-        })
-        collisions.map((c) => {
-            GlobalRender.drawLine(position,c.transform.position,color)
-        })
-    }
-
-    return collisions
+    alert("Invalid input for OverlapCircle!")
+    return []
 }
 
 /**
