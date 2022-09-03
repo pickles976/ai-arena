@@ -1,5 +1,5 @@
-import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet } from './globals.js'
-import { run, step, stop } from './runner.js'
+import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet, MS } from './globals.js'
+import { run, stop } from './runner.js'
 import { Serializer } from './serializer.js'
 
 export var getGameInfo = function(){
@@ -21,7 +21,6 @@ export var togglePause = function(){
     if(PAUSED){
         setPaused(false)
         console.log("Unpaused!")
-        window.requestAnimationFrame(step);
     }else{
         setPaused(true)
         console.log("Paused!")
@@ -31,10 +30,7 @@ export var togglePause = function(){
 
 export var stepFrame = function(){
     setPaused(false)
-    window.requestAnimationFrame((function() {
-        step()
-        setPaused(true)
-    }))
+    setTimeout(() => setPaused(true),MS)
 }
 
 export var setBaseStartCode = function(team: number, code : string){

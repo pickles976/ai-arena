@@ -32,30 +32,28 @@ export const initializeGameState = function(){
 
 }
 
-export const physicsLoop = function(){
-    setTimeout(step,clamp(MS/TICKS_PER_FRAME,0,1000))
-}
-
 export const renderLoop = function(){
-
-    const frameStart = performance.now()
 
     if (GRAPHICS_ENABLED){
         try {
-            render()
+
+            const frameStart = performance.now()
+            if(!PAUSED && GAME_STARTED){
+                render()
+                clearRenderQueue()
+                DOMCallbacks()
+            }
+
+            let elapsed = performance.now() - frameStart
+            // console.log(`Render step took ${elapsed}ms`)
+            setTimeout(()=>window.requestAnimationFrame(renderLoop),clamp(MS - elapsed,0,1000))
+
         } 
         catch (e)
         {
             alert(`Failed to render \n Error: ${e}`)
         }
     }
-
-    clearRenderQueue()
-    DOMCallbacks()
-
-    let elapsed = performance.now() - frameStart
-    // console.log(`Render step took ${elapsed}ms`)
-    setTimeout(()=>window.requestAnimationFrame(renderLoop),clamp(MS - elapsed,0,1000))
 }
 
 // 60 FPS
@@ -63,7 +61,9 @@ export const renderLoop = function(){
 /**
  * CONTROLS THE LOGIC FOR EACH FRAME
  */
-export const step = function(){
+export const physicsLoop = function(){
+
+    const frameStart = performance.now()
 
     if(!PAUSED && GAME_STARTED){
 
@@ -72,11 +72,11 @@ export const step = function(){
         clearRenderQueue()
         updateField()
 
-        let elapsed = performance.now() - frameStart
-        // console.log(`Physics step took ${elapsed}ms`)
     }
 
-    physicsLoop()
+    let elapsed = performance.now() - frameStart
+    // console.log(`Physics step took ${elapsed}ms`)
+    setTimeout(physicsLoop,clamp((MS/TICKS_PER_FRAME) - elapsed,0,1000))
 
 }
 
