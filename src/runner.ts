@@ -1,11 +1,11 @@
 import { checkForCollisions } from './collisions.js'
-import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, REALTIME, RenderQueue, resetGameState, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, sortGameObjectList, spawn, W } from './globals.js'
+import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, REALTIME, RenderQueue, resetGameState, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, sortGameObjectList, spawn, TICKS_PER_FRAME, W } from './globals.js'
 import { ObjectManager } from './objectManager.js'
 import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'
 import { Renderer } from './renderer.js'
 import { StateManager } from './stateManager.js'
-import { create_UUID, sleep } from './utils.js'
+import { clamp, create_UUID, sleep } from './utils.js'
 
 export const initializeGameState = function(){
 
@@ -32,6 +32,32 @@ export const initializeGameState = function(){
 
 }
 
+export const physicsLoop = function(){
+    setTimeout(step,clamp(MS/TICKS_PER_FRAME,0,1000))
+}
+
+export const renderLoop = function(){
+
+    const frameStart = performance.now()
+
+    if (GRAPHICS_ENABLED){
+        try {
+            render()
+        } 
+        catch (e)
+        {
+            alert(`Failed to render \n Error: ${e}`)
+        }
+    }
+
+    clearRenderQueue()
+    DOMCallbacks()
+
+    let elapsed = performance.now() - frameStart
+    // console.log(`Render step took ${elapsed}ms`)
+    setTimeout(()=>window.requestAnimationFrame(renderLoop),clamp(MS - elapsed,0,1000))
+}
+
 // 60 FPS
 // 16.66ms/frame
 /**
@@ -43,34 +69,14 @@ export const step = function(){
 
         const frameStart = performance.now()
 
+        clearRenderQueue()
         updateField()
 
-        if (GRAPHICS_ENABLED){
-            try {
-                render()
-            } 
-            catch (e)
-            {
-                alert(`Failed to render \n Error: ${e}`)
-            }
-        }
-
-        clearRenderQueue()
-
-        DOMCallbacks()
-
         let elapsed = performance.now() - frameStart
-
-        if (REALTIME){
-            sleep(MS - elapsed).then(() => {
-                window.requestAnimationFrame(step);
-            })
-        }else{
-            window.requestAnimationFrame(step);
-        }
-
-
+        // console.log(`Physics step took ${elapsed}ms`)
     }
+
+    physicsLoop()
 
 }
 
@@ -146,7 +152,8 @@ const render = function(){
 export const run = function(){
     if (GAME_STARTED === false){
         initializeGameState()
-        window.requestAnimationFrame(step);
+        physicsLoop()
+        renderLoop()
     }
 }
 

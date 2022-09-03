@@ -14,6 +14,7 @@ export var W : number = 1080
 export var H : number = 720
 export var FRAMERATE : number = 30.0
 export var MS : number = 1000.0 / FRAMERATE
+export var TICKS_PER_FRAME : number = 1
 
 // 50,000 for 60 FPS
 export var VELOCITY_FACTOR = FRAMERATE * 1000
@@ -171,6 +172,10 @@ export var setPaused = function(value : boolean){
 
 export var framerateSet = function(value : number){
     FRAMERATE = value
+}
+
+export var ticksPerFrameSet = function(value : number){
+    TICKS_PER_FRAME = value
 }
 
 export var realTime = function(value : boolean){
