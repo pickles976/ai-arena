@@ -162,6 +162,7 @@ export var UserCompiledCode : CompiledCodeStorage[] = [
 // HTML ELEMENTS
 export var GlobalCanvas : HTMLCanvasElement
 export var DOMCallbacks : Function = function(){}
+export var PhysCallbacks : Function = function(){}
 
 /*
     SETTERS
@@ -261,4 +262,8 @@ export const spawn = function(obj : GameObject){
 
 export var setDOMCallBacks = function(value : Function){
     DOMCallbacks = value
+}
+
+export var setPhysCallBacks = function(value : Function){
+    PhysCallbacks = value
 }
