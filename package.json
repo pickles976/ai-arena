@@ -1,6 +1,6 @@
 {
   "name": "ai-arena",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "The user has total control over the memory that they create. Users can create their own functions and fields inside of gameobjects. However any default fields/functions are read-only access. A player can read their team or uuid, but they cannot modify it.",
   "main": "dist/index.js",
   "type": "module",
