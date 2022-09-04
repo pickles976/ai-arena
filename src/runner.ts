@@ -7,6 +7,10 @@ import { Renderer } from './renderer.js'
 import { StateManager } from './stateManager.js'
 import { clamp, create_UUID, sleep } from './utils.js'
 
+let requestFrameID : number = null
+let physicsTimeout : NodeJS.Timeout = null
+let renderTimeout : NodeJS.Timeout = null
+
 export const initializeGameState = function(){
 
     setGameStarted(true)
@@ -46,7 +50,8 @@ export const renderLoop = function(){
 
             let elapsed = performance.now() - frameStart
             // console.log(`Render step took ${elapsed}ms`)
-            setTimeout(()=>window.requestAnimationFrame(renderLoop),clamp(MS - elapsed,0,1000))
+
+            renderTimeout = setTimeout(()=>requestFrameID = window.requestAnimationFrame(renderLoop),clamp(MS - elapsed,0,1000))
 
         } 
         catch (e)
@@ -76,7 +81,7 @@ export const physicsLoop = function(){
 
     let elapsed = performance.now() - frameStart
     // console.log(`Physics step took ${elapsed}ms`)
-    setTimeout(physicsLoop,clamp((MS/TICKS_PER_FRAME) - elapsed,0,1000))
+    physicsTimeout = setTimeout(physicsLoop,clamp((MS/TICKS_PER_FRAME) - elapsed,0,1000))
 
 }
 
@@ -152,6 +157,16 @@ const render = function(){
 export const run = function(){
     if (GAME_STARTED === false){
         initializeGameState()
+
+        if(requestFrameID != null)
+            cancelAnimationFrame(requestFrameID)
+
+        if(renderTimeout != null)
+            clearTimeout(renderTimeout)
+
+        if(physicsTimeout != null)
+            clearTimeout(physicsTimeout)
+
         physicsLoop()
         renderLoop()
     }
