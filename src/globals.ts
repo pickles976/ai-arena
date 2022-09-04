@@ -267,3 +267,7 @@ export var setDOMCallBacks = function(value : Function){
 export var setPhysCallBacks = function(value : Function){
     PhysCallbacks = value
 }
+
+export var setGameObjectList = function(goList :  GameObject[]){
+    GameObjectList = goList
+}

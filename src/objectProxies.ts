@@ -1,3 +1,4 @@
+import { DummyRenderer } from "./dummyRenderer.js"
 import { GameObject } from "./gameObject.js"
 import { ObjectManager } from "./objectManager.js"
 import { Base, Ship } from "./objects.js"
@@ -11,9 +12,9 @@ import { Serializer } from "./serializer.js"
  */
 export class ProxyMan{
 
-    static createRendererProxy = function(renderer : Renderer){
+    static createRendererProxy = function(renderer : Renderer | DummyRenderer){
 
-        const whiteList = ["H","W","drawText","drawLine","drawCircle",
+        const whiteList = ["drawText","drawLine","drawCircle",
         "drawCircleTransparent"]
 
         const rendererHandler : ProxyHandler<Renderer> = {
@@ -232,7 +233,7 @@ export class ProxyMan{
 
     static createObjectManagerProxy = function(gameManager : ObjectManager){
 
-        const whiteList = ["getAsteroids" , "getClosestAsteroid" , "getObstacle", "getClosestObstacle", 
+        const whiteList = ["H","W","getAsteroids" , "getClosestAsteroid" , "getObstacle", "getClosestObstacle", 
         "getEnergyCells", "getClosestEnergyCell", "getShips", "getShipsByTeam", 
         "getBullets","getBases","getBaseByTeam"]
 

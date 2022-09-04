@@ -1,5 +1,7 @@
 import { checkForCollisions } from './collisions.js'
-import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, sortGameObjectList, spawn, TICKS_PER_FRAME, W } from './globals.js'
+import { DummyRenderer } from './dummyRenderer.js'
+import { GameObject } from './gameObject.js'
+import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, sortGameObjectList, spawn, TICKS_PER_FRAME, W } from './globals.js'
 import { ObjectManager } from './objectManager.js'
 import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'
@@ -10,6 +12,11 @@ import { clamp, create_UUID, sleep } from './utils.js'
 let requestFrameID : number = null
 let physicsTimeout : NodeJS.Timeout = null
 let renderTimeout : NodeJS.Timeout = null
+
+export const setGameState = function(goList : GameObject[]){
+    setGameObjectList(goList)
+    GameObjectManager.indexObjects(GameObjectList)
+}
 
 export const initializeGameState = function(){
 
@@ -32,7 +39,11 @@ export const initializeGameState = function(){
     // populate the game field
     GameObjectManager.start()
 
-    setRenderer(new Renderer(GlobalCanvas))
+    if (GRAPHICS_ENABLED)
+        setRenderer(new Renderer(H,W,GlobalCanvas))
+    else
+        // @ts-ignore
+        setRenderer(new DummyRenderer())
 
 }
 

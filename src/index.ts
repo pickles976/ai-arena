@@ -1,5 +1,6 @@
+import { GameObject } from './gameObject.js'
 import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet, MS, setPhysCallBacks } from './globals.js'
-import { run, stop } from './runner.js'
+import { run, setGameState, stop } from './runner.js'
 import { Serializer } from './serializer.js'
 
 export var getGameInfo = function(){
@@ -95,4 +96,8 @@ export var setFramerate = function(value : number){
 
 export var setTicksPerFrame = function(value : number){
     ticksPerFrameSet(value)
+}
+
+export var loadGameState = function(value : GameObject[]){
+    setGameState(value)
 }

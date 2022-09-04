@@ -21,9 +21,9 @@ import { Vector2D } from "./physics.js"
     W : number
     ctx : CanvasRenderingContext2D
 
-    constructor(canvas : HTMLCanvasElement){
-        this.H = canvas.height
-        this.W = canvas.width
+    constructor(H : number,W : number,canvas : HTMLCanvasElement){
+        this.H = H
+        this.W = W
         this.ctx = canvas.getContext("2d") ?? new CanvasRenderingContext2D()
     }
 
