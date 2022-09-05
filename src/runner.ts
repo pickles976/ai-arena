@@ -10,7 +10,7 @@ import { StateManager } from './stateManager.js'
 import { clamp, create_UUID } from './utils.js'
 
 let requestFrameID : number = null
-let physicsTimeout : NodeJS.Timeout = null
+let physicsTimeout : NodeJS.Timeout[] = []
 let renderTimeout : NodeJS.Timeout = null
 
 export const setGameState = function(goList : GameObject[]){
@@ -93,7 +93,8 @@ export const physicsLoop = function(){
     let elapsed = performance.now() - frameStart
     // console.log(`Physics step took ${elapsed}ms`)
     // console.log(clamp((MS/TICKS_PER_FRAME) - elapsed,0,1000))
-    physicsTimeout = setTimeout(physicsLoop,clamp((MS/TICKS_PER_FRAME) - elapsed,0,1000))
+    physicsTimeout.shift()
+    physicsTimeout.push(setTimeout(physicsLoop,clamp(MS - elapsed,0,1000)))
 
 }
 
@@ -172,12 +173,17 @@ const render = function(){
 export const run = function(){
     if (GAME_STARTED === false){
         initializeGameState()
-
-        clearTimeouts()
-
-        physicsLoop()
-        renderLoop()
+        setupLoops()
     }
+}
+
+export const setupLoops = function(){
+    clearTimeouts()
+    // set multiple timeouts over interval. So one timeout at 16ms, one at 32ms, etc
+    for(let i = 0; i < TICKS_PER_FRAME; i++){
+        physicsTimeout.push(setTimeout(physicsLoop,(MS / TICKS_PER_FRAME) * i))
+    }
+    renderLoop()
 }
 
 const clearTimeouts = function(){
@@ -194,8 +200,9 @@ const clearRenderTimeouts = function(){
 }
 
 const clearPhysTimeouts = function(){
-    if(physicsTimeout != null)
-        clearTimeout(physicsTimeout)
+    for (let timeout of physicsTimeout){
+        clearTimeout(timeout)
+    }
 }
 
 export const stop = function(){

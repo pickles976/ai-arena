@@ -195,9 +195,9 @@ export class EnergyCell extends GameObject{
         super.simulate(deltaTime)
     }
 
-    render(){
+    render(renderer : Renderer){
         // draw the resources in the asteroid as colored rings
-        GlobalRender.drawCircle(this.transform.position,this.collider.radius,resourceColors[2])
+        renderer.drawCircle(this.transform.position,this.collider.radius,resourceColors[2])
     }
 
     getResources(){
@@ -274,7 +274,7 @@ export class Ship extends GameObject{
         const position = this.transform.position
 
         // draw the resources in the asteroid as colored rings
-        GlobalRender.drawCircle(position,this.collider.radius,teamColors[this.team])
+        renderer.drawCircle(position,this.collider.radius,teamColors[this.team])
 
         // draw applyThrust effect
         if (acceleration.y != 0){
