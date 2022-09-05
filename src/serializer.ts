@@ -5,6 +5,19 @@ import { create_UUID } from "./utils.js"
 
 export class Serializer{
 
+    static minifyGameObjectList(gol : Array<GameObject>){
+        const tempList = []
+        for(const i in gol){
+            tempList.push(gol[i].minify())
+        }
+        return JSON.stringify(tempList)
+    }
+
+    static deminifyGameObjectList(str : string){
+        const list = JSON.parse(str)
+        return list.map((item : string) => Serializer.deserializeMini(item))
+    }
+
     static serializeGameObjectList(gol : Array<GameObject>){
         const tempList = []
         for(const i in gol){
@@ -21,6 +34,11 @@ export class Serializer{
     static deserialize(str : string){
         const list = JSON.parse(str)
         return this.listToObj(list)
+    }
+
+    static deserializeMini(str : string){
+        const list = JSON.parse(str)
+        return this.listToObjMini(list)
     }
 
     // recursively traverse the list of objects
@@ -66,6 +84,52 @@ export class Serializer{
                     return new Base(...args)
                 case "DEAD":
                     return null
+                default:
+                    return list
+            }
+        }
+        return list
+    }
+
+    static listToObjMini(list : Array<any>){
+        if (list !== undefined && list !== null && list.slice !== undefined){
+            const args = list.slice(1)
+            for(const i in args){
+                args[i] = Serializer.deserializeMini(args[i])
+            }
+
+            /* It's fine, just trust me */
+            switch(list[0]){
+                case 0:
+                    /* @ts-ignore */
+                    return new Vector2D(...args)
+                case 1:
+                    /* @ts-ignore */
+                    return new Transform(...args)
+                case 2:
+                    /* @ts-ignore */
+                    return new Collider(...args)
+                case 3:
+                    /* @ts-ignore */
+                    return new Resources(...args)
+                case 4:
+                    /* @ts-ignore */
+                    return new Asteroid(...args)
+                case 5:
+                    /* @ts-ignore */
+                    return new Obstacle(...args)
+                case 6:
+                    /* @ts-ignore */
+                    return new EnergyCell(...args)
+                case 7:
+                    /* @ts-ignore */
+                    return new Ship(...args)
+                case 8:
+                    /* @ts-ignore */
+                    return new Bullet(...args)
+                case 9:
+                    /* @ts-ignore */
+                    return new Base(...args)
                 default:
                     return list
             }

@@ -43,6 +43,14 @@ export class Resources {
         }
     }
 
+    getResourcesMini(){
+        return {
+            "m" : parseFloat(this.metal.toFixed(0)),
+            "w" : parseFloat(this.water.toFixed(0)),
+            "e" : parseFloat(this.energy.toFixed(0)),
+        }
+    }
+
     toString(){
         return JSON.stringify(this.getResources())
     }
@@ -52,6 +60,13 @@ export class Resources {
         return JSON.stringify([this.type,temp["metal"],
         temp["water"],
         temp["energy"]])
+    }
+
+    minify(){
+        const temp = this.getResourcesMini()
+        return JSON.stringify([3,temp["m"],
+        temp["w"],
+        temp["e"]])
     }
 }
 
@@ -98,6 +113,16 @@ export class Asteroid extends GameObject {
             this.transform.velocity.serialize(),
             temp["metal"],
             temp["water"]])
+    }
+
+    minify(){
+        const temp = this.resources.getResourcesMini()
+        return JSON.stringify([4,
+            this.uuid,
+            this.transform.position.minify(),
+            this.transform.velocity.minify(),
+            temp["m"],
+            temp["w"]])
     }
 
 }
@@ -147,6 +172,14 @@ export class Obstacle extends GameObject {
             parseFloat(this.transform.mass.toFixed(2))])
     }
 
+    minify(){   
+        return JSON.stringify([5,
+            this.uuid,
+            this.transform.position.minify(),
+            this.transform.velocity.minify(),
+            parseFloat(this.transform.mass.toFixed(0))])
+    }
+
 }
 
 export class EnergyCell extends GameObject{
@@ -182,6 +215,14 @@ export class EnergyCell extends GameObject{
             this.transform.velocity.serialize(),
             this.resources.getResources()["energy"]])
     }
+
+    minify(){   
+        return JSON.stringify([6,
+            this.uuid,
+            this.transform.position.minify(),
+            this.transform.velocity.minify(),
+            this.resources.getResourcesMini()["e"]])
+    }
 }
 
 export class Ship extends GameObject{
@@ -206,8 +247,6 @@ export class Ship extends GameObject{
         // upgrade costs
         this.upgradeMaxEnergyCost = SHIP_UPGRADE_MAX_ENERGY_COST
         this.upgradeDamageCost = SHIP_UPGRADE_DAMAGE_COST
-
-        this.start()
     }
 
     simulate(deltaTime : number){
@@ -348,6 +387,14 @@ export class Ship extends GameObject{
             this.uuid,
             this.transform.position.serialize(),
             this.resources.getResources()["energy"],
+            this.team])
+    }
+
+    minify(){   
+        return JSON.stringify([7,
+            this.uuid,
+            this.transform.position.minify(),
+            this.resources.getResourcesMini()["e"],
             this.team])
     }
 
@@ -516,6 +563,15 @@ export class Bullet extends GameObject {
             this.damage,
             this.parent])
     }
+
+    minify(){   
+        return JSON.stringify([8,
+            this.uuid,
+            this.transform.position.minify(),
+            this.transform.velocity.minify(),
+            this.damage,
+            this.parent])
+    }
 }
 
 export class Base extends GameObject {
@@ -578,8 +634,6 @@ export class Base extends GameObject {
         this.upgradeRefiningEfficiencyCost = BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST
         this.upgradeRepairRateCost = BASE_INITIAL_UPGRADE_REPAIR_RATE_COST
         this.upgradeMaxHealthCost = BASE_INITIAL_UPGRADE_MAX_HEALTH_COST
-
-        this.start()
     }
 
     refineWater(deltaTime : number){
@@ -744,6 +798,14 @@ export class Base extends GameObject {
             this.uuid,
             this.transform.position.serialize(),
             this.resources.getResources()["energy"],
+            this.team])
+    }
+
+    minify(){   
+        return JSON.stringify([8,
+            this.uuid,
+            this.transform.position.minify(),
+            this.resources.getResourcesMini()["e"],
             this.team])
     }
 

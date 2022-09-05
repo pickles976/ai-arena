@@ -153,7 +153,8 @@ const render = function(){
     // call the rendering functions for each object. This doesn't actually render,
     // it queues up rendering calls in the queue
     for(let i = 0; i < GameObjectList.length; i++){
-        GameObjectList[i].render(GlobalRender)
+        if(GameObjectList[i] != null)
+            GameObjectList[i].render(GlobalRender)
     }
 
     GlobalRender.newFrame()

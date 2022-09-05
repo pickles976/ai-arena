@@ -258,6 +258,11 @@ export const clearRenderQueue = function (){
 
 export const spawn = function(obj : GameObject){
     GameObjectList.push(obj)
+
+    if(obj.type === "SHIP" || obj.type === "BASE"){
+        //@ts-ignore
+        obj.start()
+    }
 }
 
 export var setDOMCallBacks = function(value : Function){
