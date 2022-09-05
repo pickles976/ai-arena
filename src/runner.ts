@@ -7,7 +7,7 @@ import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'
 import { Renderer } from './renderer.js'
 import { StateManager } from './stateManager.js'
-import { clamp, create_UUID, sleep } from './utils.js'
+import { clamp, create_UUID } from './utils.js'
 
 let requestFrameID : number = null
 let physicsTimeout : NodeJS.Timeout = null
@@ -83,8 +83,6 @@ export const physicsLoop = function(){
     const frameStart = performance.now()
 
     if(!PAUSED && GAME_STARTED){
-
-        const frameStart = performance.now()
 
         clearRenderQueue()
         updateField()
