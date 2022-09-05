@@ -234,9 +234,11 @@ export class Ship extends GameObject{
     upgradeMaxEnergyCost : number
     upgradeDamageCost : number
 
-    constructor(uuid : number,position : Vector2D,energy : number,team : number){
+    constructor(uuid : number,position : Vector2D,velocity : Vector2D, acceleration: Vector2D, energy : number,team : number){
 
-        super(uuid,"SHIP",new Transform(SHIP_MASS,position,new Vector2D(0,0)),new Collider(Math.sqrt(SHIP_MASS)))
+        const temp = new Transform(SHIP_MASS,position,velocity)
+        temp.acceleration = acceleration
+        super(uuid,"SHIP",temp,new Collider(Math.sqrt(SHIP_MASS)))
         this.team = team
         this.resources = new Resources(0,0,energy)
 
@@ -248,7 +250,7 @@ export class Ship extends GameObject{
         this.upgradeMaxEnergyCost = SHIP_UPGRADE_MAX_ENERGY_COST
         this.upgradeDamageCost = SHIP_UPGRADE_DAMAGE_COST
         
-        this.start()
+        // this.start()
     }
 
     simulate(deltaTime : number){
@@ -388,6 +390,8 @@ export class Ship extends GameObject{
         return JSON.stringify([this.type,
             this.uuid,
             this.transform.position.serialize(),
+            this.transform.velocity.serialize(),
+            this.transform.acceleration.serialize(),
             this.resources.getResources()["energy"],
             this.team])
     }
@@ -396,6 +400,8 @@ export class Ship extends GameObject{
         return JSON.stringify([7,
             this.uuid,
             this.transform.position.minify(),
+            this.transform.velocity.minify(),
+            this.transform.acceleration.minify(),
             this.resources.getResourcesMini()["e"],
             this.team])
     }
@@ -637,7 +643,7 @@ export class Base extends GameObject {
         this.upgradeRepairRateCost = BASE_INITIAL_UPGRADE_REPAIR_RATE_COST
         this.upgradeMaxHealthCost = BASE_INITIAL_UPGRADE_MAX_HEALTH_COST
 
-        this.start()
+        // this.start()
     }
 
     refineWater(deltaTime : number){
@@ -768,7 +774,7 @@ export class Base extends GameObject {
         const angle = 360 / 32
         for(let i = 0; i < 32; i++){
             let pos = new Vector2D(0,1).multiply(this.collider.radius * 1.5).rotate(angle*i).add(this.transform.position)
-            const obj = new Ship(create_UUID(),pos,energy,this.team)
+            const obj = new Ship(create_UUID(),pos,new Vector2D(0,0), new Vector2D(0,0),energy,this.team)
             if (overlapCircle(pos,obj.collider.radius*1.2).length < 1){
 
                 // SPAWNING

@@ -1,5 +1,5 @@
 import { GameObject } from './gameObject.js'
-import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet, MS, setPhysCallBacks, TICKS_PER_FRAME } from './globals.js'
+import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet, MS, setPhysCallBacks, TICKS_PER_FRAME, setIsStreaming } from './globals.js'
 import { run, setGameState, stop } from './runner.js'
 import { Serializer } from './serializer.js'
 
@@ -67,8 +67,8 @@ export var getGameState = function(){
 }
 
 export var getGameStateString = function(){
-    // return Serializer.minifyGameObjectList(GameObjectList)
-    return Serializer.serializeGameObjectList(GameObjectList)
+    return Serializer.minifyGameObjectList(GameObjectList)
+    // return Serializer.serializeGameObjectList(GameObjectList)
 }
 
 export var setCanvas = function(element : HTMLCanvasElement){
@@ -104,11 +104,15 @@ export var setTicksPerFrame = function(value : number){
 }
 
 export var loadGameStateFromString = function(gameState : string){
-    // let objList : GameObject[] = Serializer.deminifyGameObjectList(gameState)
-    let objList : GameObject[] = Serializer.deserializeGameObjectList(gameState)
+    let objList : GameObject[] = Serializer.deminifyGameObjectList(gameState)
+    // let objList : GameObject[] = Serializer.deserializeGameObjectList(gameState)
     setGameState(objList)
 }
 
 export var getTicksPerFrame = function(){
     return TICKS_PER_FRAME
+}
+
+export var setStreaming = function(value : boolean){
+    setIsStreaming(value)
 }

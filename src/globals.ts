@@ -96,6 +96,7 @@ export var GRAPHICS_ENABLED = true
 export var GAME_STARTED = false
 export var PAUSED : boolean = false
 export var REALTIME : boolean = true
+export var STREAMING : boolean = false // if we are showing a game running on the server
 export var GlobalRender : Renderer
 export var GlobalRenderProxy : Renderer
 export var RenderQueue : { [key:number] : Array<Generator> } = {}
@@ -259,10 +260,10 @@ export const clearRenderQueue = function (){
 export const spawn = function(obj : GameObject){
     GameObjectList.push(obj)
 
-    // if(obj.type === "SHIP" || obj.type === "BASE"){
-    //     //@ts-ignore
-    //     obj.start()
-    // }
+    if(!STREAMING && (obj.type === "SHIP" || obj.type === "BASE")){
+        //@ts-ignore
+        obj.start()
+    }
 }
 
 export var setDOMCallBacks = function(value : Function){
@@ -275,4 +276,8 @@ export var setPhysCallBacks = function(value : Function){
 
 export var setGameObjectList = function(goList :  GameObject[]){
     GameObjectList = goList
+}
+
+export var setIsStreaming = function(value :  boolean){
+    STREAMING = value
 }

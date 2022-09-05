@@ -163,7 +163,7 @@ export class Serializer{
 
         console.log("Test Ship serialization")
         const parentUUID = create_UUID()
-        console.log(Serializer.deserialize(new Ship(create_UUID(),vec,20,0).serialize()))
+        console.log(Serializer.deserialize(new Ship(create_UUID(),vec,new Vector2D(0,0),new Vector2D(0,0),20,0).serialize()))
 
         console.log("Test Bullet serialization")
         console.log(Serializer.deserialize(new Bullet(create_UUID(),vec,vec,20,parentUUID).serialize()))

@@ -1,7 +1,7 @@
 import { checkForCollisions } from './collisions.js'
 import { DummyRenderer } from './dummyRenderer.js'
 import { GameObject } from './gameObject.js'
-import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, sortGameObjectList, spawn, TICKS_PER_FRAME, W } from './globals.js'
+import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, sortGameObjectList, spawn, STREAMING, TICKS_PER_FRAME, W } from './globals.js'
 import { ObjectManager } from './objectManager.js'
 import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'
@@ -14,6 +14,7 @@ let physicsTimeout : NodeJS.Timeout = null
 let renderTimeout : NodeJS.Timeout = null
 
 export const setGameState = function(goList : GameObject[]){
+    clearPhysTimeouts()
     setGameObjectList(goList)
     GameObjectManager.indexObjects(GameObjectList)
 }
@@ -33,8 +34,8 @@ export const initializeGameState = function(){
 
     GameObjectManager.indexObjects(GameObjectList)
 
-    spawn(new Ship(create_UUID(),new Vector2D(W/4,H/4),100,0))
-    spawn(new Ship(create_UUID(),new Vector2D(3*W/4,3*H/4),100,1))
+    spawn(new Ship(create_UUID(),new Vector2D(W/4,H/4),new Vector2D(0,0),new Vector2D(0,0),100,0))
+    spawn(new Ship(create_UUID(),new Vector2D(3*W/4,3*H/4),new Vector2D(0,0),new Vector2D(0,0),100,1))
 
     // populate the game field
     GameObjectManager.start()
@@ -93,6 +94,7 @@ export const physicsLoop = function(){
 
     let elapsed = performance.now() - frameStart
     // console.log(`Physics step took ${elapsed}ms`)
+    // console.log(clamp((MS/TICKS_PER_FRAME) - elapsed,0,1000))
     physicsTimeout = setTimeout(physicsLoop,clamp((MS/TICKS_PER_FRAME) - elapsed,0,1000))
 
 }
@@ -134,13 +136,15 @@ const updateField = function(){
     GameObjectManager.update()
 
     // RUN AI LOGIC
-    for(let i = GameObjectList.length - 1; i >= 0; i--){
-        const value = GameObjectList[i]
+    if (!STREAMING){
+        for(let i = GameObjectList.length - 1; i >= 0; i--){
+            const value = GameObjectList[i]
 
-        if(value.type === "SHIP" && value instanceof Ship)
-            value.update()
-        else if(value.type === "BASE" && value instanceof Base)
-            value.update()
+            if(value.type === "SHIP" && value instanceof Ship)
+                value.update()
+            else if(value.type === "BASE" && value instanceof Base)
+                value.update()
+        }
     }
 
 }
@@ -171,18 +175,29 @@ export const run = function(){
     if (GAME_STARTED === false){
         initializeGameState()
 
-        if(requestFrameID != null)
-            cancelAnimationFrame(requestFrameID)
-
-        if(renderTimeout != null)
-            clearTimeout(renderTimeout)
-
-        if(physicsTimeout != null)
-            clearTimeout(physicsTimeout)
+        clearTimeouts()
 
         physicsLoop()
         renderLoop()
     }
+}
+
+const clearTimeouts = function(){
+    clearPhysTimeouts()
+    clearRenderTimeouts()
+}
+
+const clearRenderTimeouts = function(){
+    if(requestFrameID != null)
+        cancelAnimationFrame(requestFrameID)
+
+    if(renderTimeout != null)
+        clearTimeout(renderTimeout)
+}
+
+const clearPhysTimeouts = function(){
+    if(physicsTimeout != null)
+        clearTimeout(physicsTimeout)
 }
 
 export const stop = function(){
