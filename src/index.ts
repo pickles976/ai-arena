@@ -67,7 +67,8 @@ export var getGameState = function(){
 }
 
 export var getGameStateString = function(){
-    return Serializer.minifyGameObjectList(GameObjectList)
+    // return Serializer.minifyGameObjectList(GameObjectList)
+    return Serializer.serializeGameObjectList(GameObjectList)
 }
 
 export var setCanvas = function(element : HTMLCanvasElement){
@@ -103,8 +104,8 @@ export var setTicksPerFrame = function(value : number){
 }
 
 export var loadGameStateFromString = function(gameState : string){
-    const objList : GameObject[] = Serializer.deminifyGameObjectList(gameState)
-    console.log(objList)
+    // let objList : GameObject[] = Serializer.deminifyGameObjectList(gameState)
+    let objList : GameObject[] = Serializer.deserializeGameObjectList(gameState)
     setGameState(objList)
 }
 

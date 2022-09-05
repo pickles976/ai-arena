@@ -247,6 +247,8 @@ export class Ship extends GameObject{
         // upgrade costs
         this.upgradeMaxEnergyCost = SHIP_UPGRADE_MAX_ENERGY_COST
         this.upgradeDamageCost = SHIP_UPGRADE_DAMAGE_COST
+        
+        this.start()
     }
 
     simulate(deltaTime : number){
@@ -634,6 +636,8 @@ export class Base extends GameObject {
         this.upgradeRefiningEfficiencyCost = BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST
         this.upgradeRepairRateCost = BASE_INITIAL_UPGRADE_REPAIR_RATE_COST
         this.upgradeMaxHealthCost = BASE_INITIAL_UPGRADE_MAX_HEALTH_COST
+
+        this.start()
     }
 
     refineWater(deltaTime : number){
@@ -802,7 +806,7 @@ export class Base extends GameObject {
     }
 
     minify(){   
-        return JSON.stringify([8,
+        return JSON.stringify([9,
             this.uuid,
             this.transform.position.minify(),
             this.resources.getResourcesMini()["e"],
