@@ -92,6 +92,7 @@ export var BASE_REFINING_EFFICIENCY_COST_MULTIPLIER = 1.5
 /**
  * MUTABLE
  */
+export var NODEJS = false
 export var GRAPHICS_ENABLED = true
 export var GAME_STARTED = false
 export var PAUSED : boolean = false
@@ -164,6 +165,7 @@ export var UserCompiledCode : CompiledCodeStorage[] = [
 export var GlobalCanvas : HTMLCanvasElement
 export var DOMCallbacks : Function = function(){}
 export var PhysCallbacks : Function = function(){}
+export var GameEndCallbacks : Function = function(){}
 
 /*
     SETTERS
@@ -280,4 +282,12 @@ export var setGameObjectList = function(goList :  GameObject[]){
 
 export var setIsStreaming = function(value :  boolean){
     STREAMING = value
+}
+
+export var setGameEndCallback = function(value : Function){
+    GameEndCallbacks = value
+}
+
+export var setNodeJS = function(value : boolean){
+    NODEJS = value
 }

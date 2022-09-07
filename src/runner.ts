@@ -1,7 +1,7 @@
 import { checkForCollisions } from './collisions.js'
 import { DummyRenderer } from './dummyRenderer.js'
 import { GameObject } from './gameObject.js'
-import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setRenderer, sortGameObjectList, spawn, STREAMING, TICKS_PER_FRAME, W } from './globals.js'
+import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setNodeJS, setRenderer, sortGameObjectList, spawn, STREAMING, TICKS_PER_FRAME, W } from './globals.js'
 import { ObjectManager } from './objectManager.js'
 import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'

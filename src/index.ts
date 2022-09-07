@@ -1,10 +1,14 @@
 import { GameObject } from './gameObject.js'
-import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet, MS, setPhysCallBacks, TICKS_PER_FRAME, setIsStreaming } from './globals.js'
+import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet, MS, setPhysCallBacks, TICKS_PER_FRAME, setIsStreaming, setNodeJS } from './globals.js'
 import { run, setGameState, setupLoops, stop } from './runner.js'
 import { Serializer } from './serializer.js'
 
 export var getGameInfo = function(){
     return JSON.parse(GameStateManager.serialize())
+}
+
+export var getGameInfoString = function(){
+    return GameStateManager.serialize()
 }
 
 export var getShipsInfo = function(){
@@ -119,4 +123,8 @@ export var getTicksPerFrame = function(){
 
 export var setStreaming = function(value : boolean){
     setIsStreaming(value)
+}
+
+export var setNode = function(value : boolean){
+    setNodeJS(value)
 }
