@@ -11,6 +11,14 @@ export var getGameInfoString = function(){
     return GameStateManager.serialize()
 }
 
+export var getScorePacket = function(){
+    return GameStateManager.packet()
+}
+
+export var loadScorePacket = function(arr : Float32Array){
+    GameStateManager.loadFromPacket(arr)
+}
+
 export var getShipsInfo = function(){
     return { "team0" : GameObjectManager.getShipsByTeam(0).filter((x) => x.toData()),
             "team1" : GameObjectManager.getShipsByTeam(1).filter((x) => x.toData())}

@@ -62,6 +62,18 @@ export class StateManager{
 
     }
 
+    packet(){
+        const temp = [this.kills[0], this.deaths[0], this.metal[0], this.energy[0], this.kills[1], this.deaths[1], this.metal[1], this.energy[1]]
+        return Float32Array.from(temp)
+    }
+
+    loadFromPacket(arr : Float32Array){
+        this.kills = [arr[0],arr[4]]
+        this.deaths = [arr[1],arr[5]]
+        this.metal = [arr[2],arr[6]]
+        this.energy = [arr[3],arr[7]]
+    }
+
     recordKill(uuid : number){
         const killerShip = GameObjectList.find((x) => x.uuid == uuid)
         if (killerShip instanceof Ship)
