@@ -43,14 +43,6 @@ export class Resources {
         }
     }
 
-    getResourcesMini(){
-        return {
-            "m" : parseFloat(this.metal.toFixed(0)),
-            "w" : parseFloat(this.water.toFixed(0)),
-            "e" : parseFloat(this.energy.toFixed(0)),
-        }
-    }
-
     toString(){
         return JSON.stringify(this.getResources())
     }
@@ -60,13 +52,6 @@ export class Resources {
         return JSON.stringify([this.type,temp["metal"],
         temp["water"],
         temp["energy"]])
-    }
-
-    minify(){
-        const temp = this.getResourcesMini()
-        return JSON.stringify([3,temp["m"],
-        temp["w"],
-        temp["e"]])
     }
 
     packet(){
@@ -117,16 +102,6 @@ export class Asteroid extends GameObject {
             this.transform.velocity.serialize(),
             temp["metal"],
             temp["water"]])
-    }
-
-    minify(){
-        const temp = this.resources.getResourcesMini()
-        return JSON.stringify([4,
-            this.uuid,
-            this.transform.position.minify(),
-            this.transform.velocity.minify(),
-            temp["m"],
-            temp["w"]])
     }
 
     packet(){
@@ -186,14 +161,6 @@ export class Obstacle extends GameObject {
             parseFloat(this.transform.mass.toFixed(2))])
     }
 
-    minify(){   
-        return JSON.stringify([5,
-            this.uuid,
-            this.transform.position.minify(),
-            this.transform.velocity.minify(),
-            parseFloat(this.transform.mass.toFixed(0))])
-    }
-
     packet(){   
         return [1,
             this.uuid,
@@ -236,14 +203,6 @@ export class EnergyCell extends GameObject{
             this.transform.position.serialize(),
             this.transform.velocity.serialize(),
             this.resources.getResources()["energy"]])
-    }
-
-    minify(){   
-        return JSON.stringify([6,
-            this.uuid,
-            this.transform.position.minify(),
-            this.transform.velocity.minify(),
-            this.resources.getResourcesMini()["e"]])
     }
 
     packet(){   
@@ -426,16 +385,6 @@ export class Ship extends GameObject{
             this.team])
     }
 
-    minify(){   
-        return JSON.stringify([7,
-            this.uuid,
-            this.transform.position.minify(),
-            this.transform.velocity.minify(),
-            this.transform.acceleration.minify(),
-            this.resources.getResourcesMini()["e"],
-            this.team])
-    }
-
     packet(){   
         return [3,
             this.uuid,
@@ -608,15 +557,6 @@ export class Bullet extends GameObject {
             this.uuid,
             this.transform.position.serialize(),
             this.transform.velocity.serialize(),
-            this.damage,
-            this.parent])
-    }
-
-    minify(){   
-        return JSON.stringify([8,
-            this.uuid,
-            this.transform.position.minify(),
-            this.transform.velocity.minify(),
             this.damage,
             this.parent])
     }
@@ -857,14 +797,6 @@ export class Base extends GameObject {
             this.uuid,
             this.transform.position.serialize(),
             this.resources.getResources()["energy"],
-            this.team])
-    }
-
-    minify(){   
-        return JSON.stringify([5,
-            this.uuid,
-            this.transform.position.minify(),
-            this.resources.getResourcesMini()["e"],
             this.team])
     }
 

@@ -34,10 +34,6 @@ export class GameObject {
         
     }
 
-    minify(){
-        
-    }
-
     packet() : Array<any>{
         return []
     }

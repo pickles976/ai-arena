@@ -70,10 +70,6 @@ export class Vector2D {
         return JSON.stringify([this.type, parseFloat(this.x.toFixed(4)), parseFloat(this.y.toFixed(4))])
     }
 
-    minify(){
-        return JSON.stringify([0, parseFloat(this.x.toFixed(1)), parseFloat(this.y.toFixed(1))])
-    }
-
     packet(){
         return [this.x,this.y]
     }
@@ -123,13 +119,6 @@ export class Transform {
             this.velocity.serialize()])
     }
 
-    minify(){
-        return JSON.stringify([1,
-            this.mass.toFixed(0),
-            this.position.minify(),
-            this.velocity.minify()])
-    }
-
     packet(){
         return [this.mass,...this.position.packet(),...this.velocity.packet()]
     }
@@ -146,10 +135,5 @@ export class Collider {
     serialize(){
         return JSON.stringify([2,
             this.radius.toFixed(1)])
-    }
-
-    minify(){
-        return JSON.stringify([2,
-            this.radius.toFixed(0)])
     }
 }

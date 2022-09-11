@@ -70,11 +70,6 @@ export var getGameState = function(){
     return Serializer.deserializeGameObjectList(Serializer.serializeGameObjectList(GameObjectList))
 }
 
-export var getGameStateString = function(){
-    return Serializer.minifyGameObjectList(GameObjectList)
-    // return Serializer.serializeGameObjectList(GameObjectList)
-}
-
 export var getPackets = function(){
     return Serializer.packetifyGameObjectList(GameObjectList)
 }
@@ -114,12 +109,6 @@ export var setTicksPerFrame = function(value : number){
 
 export var updateGameSpeed = function(){
     setupLoops()
-}
-
-export var loadGameStateFromString = function(gameState : string){
-    let objList : GameObject[] = Serializer.deminifyGameObjectList(gameState)
-    // let objList : GameObject[] = Serializer.deserializeGameObjectList(gameState)
-    setGameState(objList)
 }
 
 export var loadPackets = function(gameState : Float32Array){
