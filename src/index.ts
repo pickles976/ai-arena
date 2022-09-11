@@ -1,5 +1,5 @@
 import { GameObject } from './gameObject.js'
-import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet, MS, setPhysCallBacks, TICKS_PER_FRAME, setIsStreaming, setNodeJS } from './globals.js'
+import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet, MS, setPhysCallBacks, TICKS_PER_FRAME, setIsStreaming, setNodeJS, setGameEndCallback } from './globals.js'
 import { run, setGameState, setupLoops, stop } from './runner.js'
 import { Serializer } from './serializer.js'
 
@@ -11,14 +11,6 @@ export var getGameInfoString = function(){
     return GameStateManager.serialize()
 }
 
-export var getScorePacket = function(){
-    return GameStateManager.packet()
-}
-
-export var loadScorePacket = function(arr : Float32Array){
-    GameStateManager.loadFromPacket(arr)
-}
-
 export var getShipsInfo = function(){
     return { "team0" : GameObjectManager.getShipsByTeam(0).filter((x) => x.toData()),
             "team1" : GameObjectManager.getShipsByTeam(1).filter((x) => x.toData())}
@@ -27,6 +19,18 @@ export var getShipsInfo = function(){
 export var getBasesInfo = function(){
     return { "team0" : GameObjectManager.getBaseByTeam(0).toData(),
             "team1" : GameObjectManager.getBaseByTeam(1).toData()}
+}
+
+export var getWinner = function(){
+    if (GameObjectManager.getBaseByTeam(0) === undefined){
+        return 0
+    }
+
+    if (GameObjectManager.getBaseByTeam(1) === undefined){
+        return 1
+    }
+
+    return 2
 }
 
 export var togglePause = function(){
@@ -78,10 +82,6 @@ export var getGameState = function(){
     return Serializer.deserializeGameObjectList(Serializer.serializeGameObjectList(GameObjectList))
 }
 
-export var getPackets = function(){
-    return Serializer.packetifyGameObjectList(GameObjectList)
-}
-
 export var setCanvas = function(element : HTMLCanvasElement){
     setCanvasElement(element)
 }
@@ -119,11 +119,6 @@ export var updateGameSpeed = function(){
     setupLoops()
 }
 
-export var loadPackets = function(gameState : Float32Array){
-    let objList : GameObject[] = Serializer.unpacketify(gameState)
-    setGameState(objList)
-}
-
 export var getTicksPerFrame = function(){
     return TICKS_PER_FRAME
 }
@@ -134,4 +129,25 @@ export var setStreaming = function(value : boolean){
 
 export var setNode = function(value : boolean){
     setNodeJS(value)
+}
+
+export var getGamePacket = function(){
+    return Serializer.packetifyGameObjectList(GameObjectList)
+}
+
+export var loadGamePacket = function(gameState : Float32Array){
+    let objList : GameObject[] = Serializer.unpacketify(gameState)
+    setGameState(objList)
+}
+
+export var getScorePacket = function(){
+    return GameStateManager.packet()
+}
+
+export var loadScorePacket = function(arr : Float32Array){
+    GameStateManager.loadFromPacket(arr)
+}
+
+export var onGameEnd = function(value : Function){
+    setGameEndCallback(value)
 }
