@@ -68,6 +68,10 @@ export class Resources {
         temp["w"],
         temp["e"]])
     }
+
+    packet(){
+        return [this.metal,this.water,this.energy]
+    }
 }
 
 export class Asteroid extends GameObject {
@@ -125,6 +129,16 @@ export class Asteroid extends GameObject {
             temp["w"]])
     }
 
+    packet(){
+        const temp = this.resources.getResources()
+        return [0,
+            this.uuid,
+            ...this.transform.position.packet(),
+            ...this.transform.velocity.packet(),
+            temp["metal"],
+            temp["water"]]
+    }
+
 }
 
 export class Obstacle extends GameObject {
@@ -180,6 +194,14 @@ export class Obstacle extends GameObject {
             parseFloat(this.transform.mass.toFixed(0))])
     }
 
+    packet(){   
+        return [1,
+            this.uuid,
+            ...this.transform.position.packet(),
+            ...this.transform.velocity.packet(),
+            this.transform.mass]
+    }
+
 }
 
 export class EnergyCell extends GameObject{
@@ -222,6 +244,14 @@ export class EnergyCell extends GameObject{
             this.transform.position.minify(),
             this.transform.velocity.minify(),
             this.resources.getResourcesMini()["e"]])
+    }
+
+    packet(){   
+        return [2,
+            this.uuid,
+            ...this.transform.position.packet(),
+            ...this.transform.velocity.packet(),
+            this.resources.getResources()["energy"]]
     }
 }
 
@@ -406,6 +436,16 @@ export class Ship extends GameObject{
             this.team])
     }
 
+    packet(){   
+        return [3,
+            this.uuid,
+            ...this.transform.position.packet(),
+            ...this.transform.velocity.packet(),
+            ...this.transform.acceleration.packet(),
+            this.resources.getResources()["energy"],
+            this.team]
+    }
+
     start(){
         const startCode = UserCompiledCode[this.team].ShipStartCode
 
@@ -579,6 +619,15 @@ export class Bullet extends GameObject {
             this.transform.velocity.minify(),
             this.damage,
             this.parent])
+    }
+
+    packet(){   
+        return [4,
+            this.uuid,
+            ...this.transform.position.packet(),
+            ...this.transform.velocity.packet(),
+            this.damage,
+            this.parent]
     }
 }
 
@@ -812,11 +861,19 @@ export class Base extends GameObject {
     }
 
     minify(){   
-        return JSON.stringify([9,
+        return JSON.stringify([5,
             this.uuid,
             this.transform.position.minify(),
             this.resources.getResourcesMini()["e"],
             this.team])
+    }
+
+    packet(){   
+        return [5,
+            this.uuid,
+            ...this.transform.position.packet(),
+            this.resources.getResources()["energy"],
+            this.team]
     }
 
     toData(){

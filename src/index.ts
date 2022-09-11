@@ -75,6 +75,10 @@ export var getGameStateString = function(){
     // return Serializer.serializeGameObjectList(GameObjectList)
 }
 
+export var getPackets = function(){
+    return Serializer.packetifyGameObjectList(GameObjectList)
+}
+
 export var setCanvas = function(element : HTMLCanvasElement){
     setCanvasElement(element)
 }
@@ -84,6 +88,7 @@ export var setGraphicsEnabled = function(option : boolean){
 }
 
 export var testPackage = function(){
+    Serializer.test()
     return "ai-arena package has loaded successfully!"
 }
 
@@ -114,6 +119,11 @@ export var updateGameSpeed = function(){
 export var loadGameStateFromString = function(gameState : string){
     let objList : GameObject[] = Serializer.deminifyGameObjectList(gameState)
     // let objList : GameObject[] = Serializer.deserializeGameObjectList(gameState)
+    setGameState(objList)
+}
+
+export var loadPackets = function(gameState : Float32Array){
+    let objList : GameObject[] = Serializer.unpacketify(gameState)
     setGameState(objList)
 }
 
