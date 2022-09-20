@@ -43,11 +43,4 @@ circle is compared against the X array, and the indices are used to return an ar
 - [x] Safely sandbox user AI code
 - [x] Clean up and convert to ES module
 - [x] Allow users to write code in browser
-- [ ] Port to Node.js
-- [ ] Sync via websockets
-- [ ] Add client prediction
-- [ ] Add IDE to page
-- [ ] Allow user to send code to backend
-- [ ] Add database w/ user auth
-- [ ] Port game to Rust
-- [ ] Upgrade to 3D
+- [x] Add IDE to page

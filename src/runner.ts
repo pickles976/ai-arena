@@ -137,11 +137,19 @@ const updateField = function(){
     // RUN AI LOGIC
     if (!STREAMING){
         for(let i = GameObjectList.length - 1; i >= 0; i--){
+
             const value = GameObjectList[i]
 
             if((value.type === "SHIP" && value instanceof Ship) || (value.type === "BASE" && value instanceof Base))
             {
+                const start = performance.now()
                 value.update()
+
+                // if user code ran too long, make that user lose
+                if(performance.now() - start > 0.5){
+                    console.log('user code ran too long')
+                    GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
+                }
             }
 
         }
@@ -215,7 +223,6 @@ const checkWinCondition = function(){
     if(GameObjectManager.getBaseByTeam(0) === undefined){
         alert("Team 1 has won!")
         resetGameState()
-
     } else if(GameObjectManager.getBaseByTeam(1) === undefined){
         alert("Team 0 has won!")
         resetGameState()
