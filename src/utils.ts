@@ -50,9 +50,12 @@ export const checkMemory = function(obj : Ship | Base){
     // console.log(obj.uuid + " memory is " + kiloBytes.toFixed(2) + "kB")
 
     if (kiloBytes > 8){
-        GameObjectManager.getBaseByTeam(obj.team)?.destroy()
-        alert("You used up too much memory!")
+        // GameObjectManager.getBaseByTeam(obj.team)?.destroy()
+        console.log("You used up too much memory!")
+        return true
     }
+
+    return false
 }
 
 export const validVector = function(direction : Vector2D){

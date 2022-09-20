@@ -7,7 +7,7 @@ import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'
 import { Renderer } from './renderer.js'
 import { StateManager } from './stateManager.js'
-import { clamp, create_UUID } from './utils.js'
+import { checkMemory, clamp, create_UUID } from './utils.js'
 
 let requestFrameID : number = null
 let physicsTimeout : NodeJS.Timeout[] = []
@@ -146,7 +146,7 @@ const updateField = function(){
                 value.update()
 
                 // if user code ran too long, make that user lose
-                if(performance.now() - start > 0.5){
+                if((performance.now() - start > 0.5) || checkMemory(value)){
                     console.log('user code ran too long')
                     GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
                 }
