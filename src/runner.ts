@@ -15,8 +15,10 @@ let renderTimeout : NodeJS.Timeout = null
 
 const FIRST_FRAME_TIMEOUT = USER_CODE_TIMEOUT * 10
 let frame = 0
-let codeCount = 0
-let runTimeTotal = 0
+let codeCountTeam0 = 0
+let runTimeTotalTeam0 = 0
+let codeCountTeam1 = 0
+let runTimeTotalTeam1 = 0
 
 export const setGameState = function(goList : GameObject[]){
     clearPhysTimeouts()
@@ -52,7 +54,8 @@ export const initializeGameState = function(){
         setRenderer(new DummyRenderer())
 
     frame = 0
-    runTimeTotal = 0
+    runTimeTotalTeam0 = 0
+    runTimeTotalTeam1 = 0
 
 }
 
@@ -156,9 +159,16 @@ const updateField = function(){
                 const elapsed = performance.now() - start
 
                 // average time user code takes to run
-                runTimeTotal += elapsed
-                codeCount++
-                let avg = runTimeTotal / codeCount
+                let avg = 0
+                if(value.team == 0){
+                    runTimeTotalTeam0 += elapsed
+                    codeCountTeam0++
+                    avg = runTimeTotalTeam0 / codeCountTeam0
+                }else{
+                    runTimeTotalTeam1 += elapsed
+                    codeCountTeam1++
+                    avg = runTimeTotalTeam1 / codeCountTeam1
+                }
 
                 // account for memory initialization at start of game
                 const CODE_TIMEOUT = (frame <= 1 ? FIRST_FRAME_TIMEOUT : USER_CODE_TIMEOUT)

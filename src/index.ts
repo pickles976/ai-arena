@@ -1,5 +1,5 @@
 import { GameObject } from './gameObject.js'
-import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet, MS, setPhysCallBacks, TICKS_PER_FRAME, setIsStreaming, setNodeJS, setGameEndCallback, setUserCodeTimeout } from './globals.js'
+import { GameObjectList, GameObjectManager, GameStateManager, PAUSED, resetGameState, setBaseStart, setBaseUpdate, setCanvasElement, setDOMCallBacks, setGraphics, setPaused, realTime, setShipStart, setShipUpdate, framerateSet, ticksPerFrameSet, MS, setPhysCallBacks, TICKS_PER_FRAME, setIsStreaming, setNodeJS, setGameEndCallback, setUserCodeTimeout, USER_CODE_TIMEOUT } from './globals.js'
 import { run, setGameState, setupLoops, stop } from './runner.js'
 import { Serializer } from './serializer.js'
 
@@ -154,4 +154,8 @@ export var onGameEnd = function(value : Function){
 
 export var userCodeTimeoutSet = function(value : number){
     setUserCodeTimeout(value)
+}
+
+export var getUserCodeTimeout = function(){
+    return USER_CODE_TIMEOUT
 }
