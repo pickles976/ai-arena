@@ -1,7 +1,7 @@
 import { checkForCollisions } from './collisions.js'
 import { DummyRenderer } from './dummyRenderer.js'
 import { GameObject } from './gameObject.js'
-import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, NODEJS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setNodeJS, setRenderer, sortGameObjectList, spawn, STREAMING, TICKS_PER_FRAME, W } from './globals.js'
+import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, NODEJS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setNodeJS, setRenderer, sortGameObjectList, spawn, STREAMING, TICKS_PER_FRAME, USER_CODE_TIMEOUT, W } from './globals.js'
 import { ObjectManager } from './objectManager.js'
 import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'
@@ -146,8 +146,13 @@ const updateField = function(){
                 value.update()
 
                 // if user code ran too long, make that user lose
-                if((performance.now() - start > 0.5) || checkMemory(value)){
-                    console.log('user code ran too long')
+                if((performance.now() - start > USER_CODE_TIMEOUT)){
+                    console.log('user code ran too long!')
+                    alert('user code ran too long!')
+                    GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
+                }else if(checkMemory(value)){
+                    console.log('user code used up too much memory!')
+                    alert('user code used up too much memory!')
                     GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
                 }
             }

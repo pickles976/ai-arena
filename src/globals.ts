@@ -98,6 +98,8 @@ export var GAME_STARTED = false
 export var PAUSED : boolean = false
 export var REALTIME : boolean = true
 export var STREAMING : boolean = false // if we are showing a game running on the server
+export var USER_CODE_TIMEOUT : number = 0.5 // how many ms user code will timeout in
+
 export var GlobalRender : Renderer
 export var GlobalRenderProxy : Renderer
 export var RenderQueue : { [key:number] : Array<Generator> } = {}
@@ -290,4 +292,8 @@ export var setGameEndCallback = function(value : Function){
 
 export var setNodeJS = function(value : boolean){
     NODEJS = value
+}
+
+export var setUserCodeTimeout = function(value : number){
+    USER_CODE_TIMEOUT = value
 }
