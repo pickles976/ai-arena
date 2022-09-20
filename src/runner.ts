@@ -1,7 +1,7 @@
 import { checkForCollisions } from './collisions.js'
 import { DummyRenderer } from './dummyRenderer.js'
 import { GameObject } from './gameObject.js'
-import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, NODEJS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setNodeJS, setRenderer, sortGameObjectList, spawn, STREAMING, TICKS_PER_FRAME, USER_CODE_TIMEOUT, W } from './globals.js'
+import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GameStateManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, NODEJS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setNodeJS, setRenderer, setUserCodeTimeout, sortGameObjectList, spawn, STREAMING, TICKS_PER_FRAME, USER_CODE_MAX_SIZE, USER_CODE_TIMEOUT, W } from './globals.js'
 import { ObjectManager } from './objectManager.js'
 import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'
@@ -12,6 +12,11 @@ import { checkMemory, clamp, create_UUID } from './utils.js'
 let requestFrameID : number = null
 let physicsTimeout : NodeJS.Timeout[] = []
 let renderTimeout : NodeJS.Timeout = null
+
+const FIRST_FRAME_TIMEOUT = USER_CODE_TIMEOUT * 10
+let frame = 0
+let codeCount = 0
+let runTimeTotal = 0
 
 export const setGameState = function(goList : GameObject[]){
     clearPhysTimeouts()
@@ -45,6 +50,9 @@ export const initializeGameState = function(){
     else
         // @ts-ignore
         setRenderer(new DummyRenderer())
+
+    frame = 0
+    runTimeTotal = 0
 
 }
 
@@ -95,7 +103,7 @@ export const physicsLoop = function(){
     // console.log(clamp((MS/TICKS_PER_FRAME) - elapsed,0,1000))
     physicsTimeout.shift()
     physicsTimeout.push(setTimeout(physicsLoop,clamp(MS - elapsed,0,1000)))
-
+    frame++
 }
 
 /**
@@ -142,18 +150,32 @@ const updateField = function(){
 
             if((value.type === "SHIP" && value instanceof Ship) || (value.type === "BASE" && value instanceof Base))
             {
+                // how long does user codde take to run?
                 const start = performance.now()
                 value.update()
+                const elapsed = performance.now() - start
+
+                // average time user code takes to run
+                runTimeTotal += elapsed
+                codeCount++
+                let avg = runTimeTotal / codeCount
+
+                // account for memory initialization at start of game
+                const CODE_TIMEOUT = (frame <= 1 ? FIRST_FRAME_TIMEOUT : USER_CODE_TIMEOUT)
 
                 // if user code ran too long, make that user lose
-                if((performance.now() - start > USER_CODE_TIMEOUT)){
-                    console.log('user code ran too long!')
-                    alert('user code ran too long!')
+                if(elapsed > CODE_TIMEOUT && avg > CODE_TIMEOUT){
+                    console.log(`user code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`)
+                    alert(`user code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`)
                     GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
+                    checkWinCondition()
+                    break;
                 }else if(checkMemory(value)){
-                    console.log('user code used up too much memory!')
-                    alert('user code used up too much memory!')
+                    console.log(`user code used more than ${USER_CODE_MAX_SIZE} kb`)
+                    alert(`user code used more than ${USER_CODE_MAX_SIZE} kb`)
                     GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
+                    checkWinCondition()
+                    break;
                 }
             }
 
@@ -225,11 +247,6 @@ export const stop = function(){
 }
 
 const checkWinCondition = function(){
-    if(GameObjectManager.getBaseByTeam(0) === undefined){
-        alert("Team 1 has won!")
-        resetGameState()
-    } else if(GameObjectManager.getBaseByTeam(1) === undefined){
-        alert("Team 0 has won!")
-        resetGameState()
-    }
+    // this checks if the base is dead and ends the game
+    GameStateManager.update()
 }

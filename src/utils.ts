@@ -3,7 +3,7 @@
  */
 
 import { GameObject } from "./gameObject.js";
-import { ENERGY_SCALE,GameObjectManager} from "./globals.js";
+import { ENERGY_SCALE,GameObjectManager, USER_CODE_MAX_SIZE} from "./globals.js";
 import { Base, Ship } from "./objects.js";
 import { Vector2D } from "./physics.js";
 
@@ -49,7 +49,7 @@ export const checkMemory = function(obj : Ship | Base){
 
     // console.log(obj.uuid + " memory is " + kiloBytes.toFixed(2) + "kB")
 
-    if (kiloBytes > 8){
+    if (kiloBytes > USER_CODE_MAX_SIZE){
         // GameObjectManager.getBaseByTeam(obj.team)?.destroy()
         console.log("You used up too much memory!")
         return true

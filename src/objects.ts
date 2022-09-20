@@ -13,6 +13,7 @@ const sharedContext = {
     dist : dist,
     H : Math.floor(H), // H and W are already whole numbers, we do this to return a copy
     W : Math.floor(W),
+    performance: performance,
 }
 
 export class Resources {

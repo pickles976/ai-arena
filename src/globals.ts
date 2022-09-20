@@ -98,7 +98,8 @@ export var GAME_STARTED = false
 export var PAUSED : boolean = false
 export var REALTIME : boolean = true
 export var STREAMING : boolean = false // if we are showing a game running on the server
-export var USER_CODE_TIMEOUT : number = 0.5 // how many ms user code will timeout in
+export var USER_CODE_TIMEOUT : number = 1.0 // how many ms user code will timeout in
+export var USER_CODE_MAX_SIZE : number = 8.0 //kb
 
 export var GlobalRender : Renderer
 export var GlobalRenderProxy : Renderer
