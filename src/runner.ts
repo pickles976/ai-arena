@@ -1,7 +1,7 @@
 import { checkForCollisions } from './collisions.js'
 import { DummyRenderer } from './dummyRenderer.js'
 import { GameObject } from './gameObject.js'
-import { clearRenderQueue, DOMCallbacks, GameObjectList, GameObjectManager, GameStateManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, NODEJS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setNodeJS, setRenderer, setUserCodeTimeout, sortGameObjectList, spawn, STREAMING, TICKS_PER_FRAME, USER_CODE_MAX_SIZE, USER_CODE_TIMEOUT, W } from './globals.js'
+import { clearRenderQueue, DOMCallbacks, GameEndCallbacks, GameObjectList, GameObjectManager, GameStateManager, GAME_STARTED, GlobalCanvas, GlobalRender, GRAPHICS_ENABLED, H, MS, NODEJS, PAUSED, PhysCallbacks, REALTIME, RenderQueue, resetGameState, setGameObjectList, setGameObjectManager, setGameStarted, setGameStateManager, setNodeJS, setRenderer, setUserCodeTimeout, sortGameObjectList, spawn, STREAMING, TICKS_PER_FRAME, USER_CODE_MAX_SIZE, USER_CODE_TIMEOUT, W } from './globals.js'
 import { ObjectManager } from './objectManager.js'
 import { Base, Ship } from './objects.js'
 import { Vector2D } from './physics.js'
@@ -15,10 +15,8 @@ let renderTimeout : NodeJS.Timeout = null
 
 const FIRST_FRAME_TIMEOUT = USER_CODE_TIMEOUT * 10
 let frame = 0
-let codeCountTeam0 = 0
-let runTimeTotalTeam0 = 0
-let codeCountTeam1 = 0
-let runTimeTotalTeam1 = 0
+let durationArrayTeam0 = new Array(100).fill(USER_CODE_TIMEOUT / 2)
+let durationArrayTeam1 = new Array(100).fill(USER_CODE_TIMEOUT / 2)
 
 export const setGameState = function(goList : GameObject[]){
     clearPhysTimeouts()
@@ -54,8 +52,8 @@ export const initializeGameState = function(){
         setRenderer(new DummyRenderer())
 
     frame = 0
-    runTimeTotalTeam0 = 0
-    runTimeTotalTeam1 = 0
+    durationArrayTeam0 = new Array(100).fill(USER_CODE_TIMEOUT / 2)
+    durationArrayTeam1 = new Array(100).fill(USER_CODE_TIMEOUT / 2)
 
 }
 
@@ -161,13 +159,13 @@ const updateField = function(){
                 // average time user code takes to run
                 let avg = 0
                 if(value.team == 0){
-                    runTimeTotalTeam0 += elapsed
-                    codeCountTeam0++
-                    avg = runTimeTotalTeam0 / codeCountTeam0
+                    durationArrayTeam0.shift()
+                    durationArrayTeam0.push(elapsed)
+                    avg = durationArrayTeam0.reduce((partialSum, a) => partialSum + a, 0) / durationArrayTeam0.length;
                 }else{
-                    runTimeTotalTeam1 += elapsed
-                    codeCountTeam1++
-                    avg = runTimeTotalTeam1 / codeCountTeam1
+                    durationArrayTeam1.shift()
+                    durationArrayTeam1.push(elapsed)
+                    avg = durationArrayTeam1.reduce((partialSum, a) => partialSum + a, 0) / durationArrayTeam1.length;
                 }
 
                 // account for memory initialization at start of game
@@ -175,16 +173,16 @@ const updateField = function(){
 
                 // if user code ran too long, make that user lose
                 if(elapsed > CODE_TIMEOUT && avg > CODE_TIMEOUT){
-                    console.log(`user code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`)
-                    alert(`user code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`)
+                    console.log(`Player ${value.team} ${value.type} Update code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`)
+                    alert(`Player ${value.team} ${value.type} Update code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`)
                     GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
-                    checkWinCondition()
+                    GameEndCallbacks(value.team)
                     break;
                 }else if(checkMemory(value)){
-                    console.log(`user code used more than ${USER_CODE_MAX_SIZE} kb`)
-                    alert(`user code used more than ${USER_CODE_MAX_SIZE} kb`)
+                    console.log(`Player ${value.team} ${value.type} Update code used more than ${USER_CODE_MAX_SIZE} kb`)
+                    alert(`Player ${value.team} ${value.type} Update code used more than ${USER_CODE_MAX_SIZE} kb`)
                     GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
-                    checkWinCondition()
+                    GameEndCallbacks(value.team)
                     break;
                 }
             }

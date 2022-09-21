@@ -21,18 +21,6 @@ export var getBasesInfo = function(){
             "team1" : GameObjectManager.getBaseByTeam(1).toData()}
 }
 
-export var getWinner = function(){
-    if (GameObjectManager.getBaseByTeam(0) === undefined){
-        return 0
-    }
-
-    if (GameObjectManager.getBaseByTeam(1) === undefined){
-        return 1
-    }
-
-    return 2
-}
-
 export var togglePause = function(){
 
     if(PAUSED){

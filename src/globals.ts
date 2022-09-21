@@ -266,8 +266,17 @@ export const spawn = function(obj : GameObject){
     GameObjectList.push(obj)
 
     if(!STREAMING && (obj.type === "SHIP" || obj.type === "BASE")){
+        const start = performance.now()
         //@ts-ignore
         obj.start()
+        const elapsed = performance.now() - start
+
+        if (elapsed > USER_CODE_TIMEOUT * 2){
+            //@ts-ignore
+            console.log(`Player ${obj.team} ${obj.type} start code timed out`)
+            //@ts-ignore
+            GameEndCallbacks(obj.team)
+        }
     }
 }
 

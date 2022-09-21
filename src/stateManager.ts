@@ -39,7 +39,7 @@ export class StateManager{
         for(const i in this.deaths){
             if(GameObjectManager.getBaseByTeam(parseInt(i)) === undefined || GameObjectManager.getBaseByTeam(parseInt(i)).type === "DEAD") {
                 console.log(i + " has lost")
-                GameEndCallbacks()
+                GameEndCallbacks(i)
             }
         }
     }
