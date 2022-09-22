@@ -26,7 +26,7 @@ export const setGameState = function(goList : GameObject[]){
 
 export const initializeGameState = function(){
 
-    console.log("Initializing game state!")
+    console.log("Initializing game state...")
 
     setGameStarted(true)
 
@@ -56,6 +56,8 @@ export const initializeGameState = function(){
     frame = 0
     durationArrayTeam0 = new Array(100).fill(USER_CODE_TIMEOUT / 2)
     durationArrayTeam1 = new Array(100).fill(USER_CODE_TIMEOUT / 2)
+
+    console.log('Game state initialized!')
 
 }
 
@@ -153,38 +155,44 @@ const updateField = function(){
 
             if((value.type === "SHIP" && value instanceof Ship) || (value.type === "BASE" && value instanceof Base))
             {
-                // how long does user codde take to run?
-                const start = performance.now()
-                value.update()
-                const elapsed = performance.now() - start
+                try {
+                    // how long does user codde take to run?
+                    const start = performance.now()
+                    value.update()
+                    const elapsed = performance.now() - start
 
-                // average time user code takes to run
-                let avg = 0
-                if(value.team == 0){
-                    durationArrayTeam0.shift()
-                    durationArrayTeam0.push(elapsed)
-                    avg = durationArrayTeam0.reduce((partialSum, a) => partialSum + a, 0) / durationArrayTeam0.length;
-                }else{
-                    durationArrayTeam1.shift()
-                    durationArrayTeam1.push(elapsed)
-                    avg = durationArrayTeam1.reduce((partialSum, a) => partialSum + a, 0) / durationArrayTeam1.length;
+                    // average time user code takes to run
+                    let avg = 0
+                    if(value.team == 0){
+                        durationArrayTeam0.shift()
+                        durationArrayTeam0.push(elapsed)
+                        avg = durationArrayTeam0.reduce((partialSum, a) => partialSum + a, 0) / durationArrayTeam0.length;
+                    }else{
+                        durationArrayTeam1.shift()
+                        durationArrayTeam1.push(elapsed)
+                        avg = durationArrayTeam1.reduce((partialSum, a) => partialSum + a, 0) / durationArrayTeam1.length;
+                    }
+
+                    // account for memory initialization at start of game
+                    const CODE_TIMEOUT = (frame <= 1 ? FIRST_FRAME_TIMEOUT : USER_CODE_TIMEOUT)
+
+                    // if user code ran too long, make that user lose
+                    if(elapsed > CODE_TIMEOUT && avg > CODE_TIMEOUT){
+                        console.log(`Player ${value.team} ${value.type} Update code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`)
+                        alert(`Player ${value.team} ${value.type} Update code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`)
+                        GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
+                        GameEndCallbacks(value.team)
+                        break;
+                    }else if(checkMemory(value)){
+                        console.log(`Player ${value.team} ${value.type} Update code used more than ${USER_CODE_MAX_SIZE} kb`)
+                        alert(`Player ${value.team} ${value.type} Update code used more than ${USER_CODE_MAX_SIZE} kb`)
+                        GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
+                        GameEndCallbacks(value.team)
+                        break;
+                    }
                 }
-
-                // account for memory initialization at start of game
-                const CODE_TIMEOUT = (frame <= 1 ? FIRST_FRAME_TIMEOUT : USER_CODE_TIMEOUT)
-
-                // if user code ran too long, make that user lose
-                if(elapsed > CODE_TIMEOUT && avg > CODE_TIMEOUT){
-                    console.log(`Player ${value.team} ${value.type} Update code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`)
-                    alert(`Player ${value.team} ${value.type} Update code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`)
-                    GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
-                    GameEndCallbacks(value.team)
-                    break;
-                }else if(checkMemory(value)){
-                    console.log(`Player ${value.team} ${value.type} Update code used more than ${USER_CODE_MAX_SIZE} kb`)
-                    alert(`Player ${value.team} ${value.type} Update code used more than ${USER_CODE_MAX_SIZE} kb`)
-                    GameObjectManager.getBaseByTeam(value.team).type = "DEAD"
-                    GameEndCallbacks(value.team)
+                catch(e){
+                    console.log('User code failed to run. Game exiting...')
                     break;
                 }
             }

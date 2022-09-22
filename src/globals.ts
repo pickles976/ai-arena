@@ -261,6 +261,7 @@ export const spawn = function(obj : GameObject){
     GameObjectList.push(obj)
 
     if(!STREAMING && (obj.type === "SHIP" || obj.type === "BASE")){
+        console.log('Initializing player-controlled code')
         const start = performance.now()
         //@ts-ignore
         obj.start()
