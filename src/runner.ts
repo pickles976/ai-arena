@@ -217,13 +217,16 @@ const render = function(){
 }
 
 export const run = function(){
+    console.log(`GAME STARTED: ${GAME_STARTED}`)
     if (GAME_STARTED === false){
+        console.log("Game starting!")
         initializeGameState()
         setupLoops()
     }
 }
 
 export const setupLoops = function(){
+    console.log(`Initializing game loops...`)
     clearTimeouts()
     // set multiple timeouts over interval. So one timeout at 16ms, one at 32ms, etc
     for(let i = 0; i < TICKS_PER_FRAME; i++){
