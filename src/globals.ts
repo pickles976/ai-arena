@@ -96,7 +96,6 @@ export var NODEJS = false
 export var GRAPHICS_ENABLED = true
 export var GAME_STARTED = false
 export var PAUSED : boolean = false
-export var REALTIME : boolean = true
 export var STREAMING : boolean = false // if we are showing a game running on the server
 export var USER_CODE_TIMEOUT : number = 1.0 // how many ms user code will timeout in
 export var USER_CODE_MAX_SIZE : number = 8.0 //kb
@@ -183,10 +182,6 @@ export var framerateSet = function(value : number){
 
 export var ticksPerFrameSet = function(value : number){
     TICKS_PER_FRAME = value
-}
-
-export var realTime = function(value : boolean){
-    REALTIME = value
 }
 
 export var setBaseStart = function(team: number, code : string){
