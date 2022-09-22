@@ -26,6 +26,8 @@ export const setGameState = function(goList : GameObject[]){
 
 export const initializeGameState = function(){
 
+    console.log("Initializing game state!")
+
     setGameStarted(true)
 
     // INITALIZE GAME STATE MANAGER

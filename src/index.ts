@@ -146,6 +146,7 @@ export var getUserCodeTimeout = function(){
 
 export var getGlobals = function(){
     return {
+        USER_CODE_TIMEOUT,
         NODEJS, 
         GRAPHICS_ENABLED,
         GAME_STARTED,
