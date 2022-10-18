@@ -22,7 +22,7 @@ import {
     setGameEndCallback,
     setUserCodeTimeout,
 } from './globals.js';
-import { run, setGameState, stop } from './runner.js';
+import { run, setGameState, setupLoops, stop } from './runner.js';
 import { Serializer } from './serializer.js';
 
 export var testPackage = function () {
@@ -118,6 +118,7 @@ export var setConfig = function (options: any) {
 
         if (options.ticksPerFrame != undefined) {
             setTicksPerFrame(options.ticksPerFrame);
+            setupLoops();
         }
 
         if (options.streaming != undefined) {
