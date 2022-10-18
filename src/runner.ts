@@ -3,8 +3,8 @@ import { DummyRenderer } from './dummyRenderer.js';
 import { GameObject } from './gameObject.js';
 import {
     clearRenderQueue,
-    DOMCallbacks,
-    GameEndCallbacks,
+    DOMCallback,
+    GameEndCallback,
     GameObjectList,
     GameObjectManager,
     GameStateManager,
@@ -15,7 +15,7 @@ import {
     H,
     MS,
     PAUSED,
-    PhysCallbacks,
+    PhysicsCallback,
     RenderQueue,
     resetGameState,
     setGameObjectList,
@@ -95,7 +95,7 @@ export const renderLoop = function () {
             if (!PAUSED && GAME_STARTED) {
                 render();
                 clearRenderQueue();
-                DOMCallbacks();
+                DOMCallback();
             }
 
             let elapsed = performance.now() - frameStart;
@@ -122,7 +122,7 @@ export const physicsLoop = function () {
     if (!PAUSED && GAME_STARTED) {
         clearRenderQueue();
         updateField();
-        PhysCallbacks();
+        PhysicsCallback();
     }
 
     let elapsed = performance.now() - frameStart;
@@ -203,7 +203,7 @@ const updateField = function () {
                             `Player ${value.team} ${value.type} Update code ran in an average of ${avg}ms, more than ${CODE_TIMEOUT}ms timeout`,
                         );
                         GameObjectManager.getBaseByTeam(value.team).type = 'DEAD';
-                        GameEndCallbacks(value.team);
+                        GameEndCallback(value.team);
                         break;
                     } else if (checkMemory(value)) {
                         console.log(
@@ -211,7 +211,7 @@ const updateField = function () {
                         );
                         alert(`Player ${value.team} ${value.type} Update code used more than ${USER_CODE_MAX_SIZE} kb`);
                         GameObjectManager.getBaseByTeam(value.team).type = 'DEAD';
-                        GameEndCallbacks(value.team);
+                        GameEndCallback(value.team);
                         break;
                     }
                 } catch (e) {

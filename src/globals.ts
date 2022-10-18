@@ -171,9 +171,9 @@ export var UserCompiledCode: CompiledCodeStorage[] = [
 
 // HTML ELEMENTS
 export var GlobalCanvas: HTMLCanvasElement;
-export var DOMCallbacks: Function = function () {};
-export var PhysCallbacks: Function = function () {};
-export var GameEndCallbacks: Function = function () {};
+export var DOMCallback: Function = function () {};
+export var PhysicsCallback: Function = function () {};
+export var GameEndCallback: Function = function () {};
 
 /*
     SETTERS
@@ -276,17 +276,17 @@ export const spawn = function (obj: GameObject) {
             //@ts-ignore
             console.log(`Player ${obj.team} ${obj.type} start code timed out`);
             //@ts-ignore
-            GameEndCallbacks(obj.team);
+            GameEndCallback(obj.team);
         }
     }
 };
 
 export var setUICallback = function (value: Function) {
-    DOMCallbacks = value;
+    DOMCallback = value;
 };
 
 export var setPhysicsCallback = function (value: Function) {
-    PhysCallbacks = value;
+    PhysicsCallback = value;
 };
 
 export var setGameObjectList = function (goList: GameObject[]) {
@@ -298,7 +298,7 @@ export var setIsStreaming = function (value: boolean) {
 };
 
 export var setGameEndCallback = function (value: Function) {
-    GameEndCallbacks = value;
+    GameEndCallback = value;
 };
 
 export var setNodeJS = function (value: boolean) {

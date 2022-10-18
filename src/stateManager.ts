@@ -1,4 +1,4 @@
-import { GameEndCallbacks, GameObjectList, GameObjectManager } from './globals.js';
+import { GameEndCallback, GameObjectList, GameObjectManager } from './globals.js';
 import { Ship } from './objects.js';
 
 export class StateManager {
@@ -41,7 +41,7 @@ export class StateManager {
                 GameObjectManager.getBaseByTeam(parseInt(i)).type === 'DEAD'
             ) {
                 console.log(i + ' has lost');
-                GameEndCallbacks(i);
+                GameEndCallback(i);
             }
         }
     }

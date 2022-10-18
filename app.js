@@ -19,9 +19,9 @@ setUserCode({
 })
 
 setCallbacks({
-    gameEnd: 'x',
-    ui: 'y',
-    physics: 'z',
+    // gameEnd: 'x',
+    // ui: 'y',
+    // physics: 'z',
 })
 
 runGame()
