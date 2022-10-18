@@ -2,9 +2,6 @@
 
 https://blog.risingstack.com/writing-a-javascript-framework-sandboxed-code-evaluation/
 
-Serialization after several frames is used to check for memory attacks.  
-Promise races are used to defuse infinite loops.
-
 # Game Engine 
 
 ## Game Field
@@ -34,13 +31,40 @@ haven't had any issues yet so whatever. Collisions are handled via a sweep-and-p
 then for overlap. Checking for collisions via CircleOverlap is handled similarly. After sorting, the X values of all gameObjects are cached into an array. A virtual
 circle is compared against the X array, and the indices are used to return an array of collided-with gameObjects.
 
-## TODO:
+# Config options:
 
-- [x] n-body physics
-- [x] full game engine
-- [x] Inject user AI code
-- [x] Convert to Typescript
-- [x] Safely sandbox user AI code
-- [x] Clean up and convert to ES module
-- [x] Allow users to write code in browser
-- [x] Add IDE to page
+Example:
+
+```javascript
+setConfig({
+    canvas: document.getElementById("game-canvas"),
+    graphics: true,
+    ticksPerFrame: 2,
+    framerate: 60,
+    streaming: false,
+    nodejs: false,
+    userCodeTimeout: 1.0,
+})
+```
+
+## Running in browser:
+
+```javascript
+setConfig({
+    graphics: false,
+    ticksPerFrame: 8,
+    framerate: 30,
+    nodejs: true,
+})
+```
+
+## Running in Nodejs:
+
+```javascript
+setConfig({
+    canvas: document.getElementById("game-canvas"),
+    graphics: true,
+    ticksPerFrame: 2,
+    framerate: 60,
+})
+```

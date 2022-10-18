@@ -1,40 +1,34 @@
-import { Collider, Transform } from "./physics.js"
-import { Renderer } from "./renderer.js"
+import { Collider, Transform } from './physics.js';
+import { Renderer } from './renderer.js';
 
 export class GameObject {
-    uuid : number
-    type : string
-    transform : Transform
-    collider : Collider
+    uuid: number;
+    type: string;
+    transform: Transform;
+    collider: Collider;
 
-    constructor(uuid : number,type : string,transform : Transform, collider : Collider){
-        this.uuid = uuid
-        this.type = type
-        this.transform = transform
-        this.collider = collider
+    constructor(uuid: number, type: string, transform: Transform, collider: Collider) {
+        this.uuid = uuid;
+        this.type = type;
+        this.transform = transform;
+        this.collider = collider;
     }
 
-    destroy(){
-        this.type = "DEAD"
+    destroy() {
+        this.type = 'DEAD';
     }
 
-    simulate(deltaTime : number){
-        this.transform.simulate(deltaTime)
+    simulate(deltaTime: number) {
+        this.transform.simulate(deltaTime);
     }
 
-    render(renderer : Renderer){
+    render(renderer: Renderer) {}
 
-    }
+    collide(otherObject: GameObject) {}
 
-    collide(otherObject : GameObject){
+    serialize() {}
 
-    }
-
-    serialize(){
-        
-    }
-
-    packet() : Array<any>{
-        return []
+    packet(): Array<any> {
+        return [];
     }
 }
