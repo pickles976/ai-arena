@@ -57,6 +57,7 @@ import { overlapCircle } from './collisions.js';
 
 const sharedContext = {
     console: console,
+    Math: Math,
     Vector2D: Vector2D,
     overlapCircle: overlapCircle,
     dist: dist,
