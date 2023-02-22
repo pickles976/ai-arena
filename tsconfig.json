@@ -12,7 +12,8 @@
     "sourceRoot": "./src",
     "sourceMap": true,
     "declaration": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "**/__tests__/*"]
+  "exclude": ["**/__tests__/*"]
 }

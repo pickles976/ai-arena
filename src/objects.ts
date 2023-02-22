@@ -87,9 +87,9 @@ export class Resources {
 
     getResources() {
         return {
-            metal: parseFloat(this.metal.toFixed(2)),
-            water: parseFloat(this.water.toFixed(2)),
-            energy: parseFloat(this.energy.toFixed(2)),
+            metal: parseFloat(this.metal?.toFixed(2) ?? "0"),
+            water: parseFloat(this.water?.toFixed(2)  ?? "0"),
+            energy: parseFloat(this.energy?.toFixed(2)  ?? "0"),
         };
     }
 
@@ -215,7 +215,7 @@ export class Obstacle extends GameObject {
             this.uuid,
             this.transform.position.serialize(),
             this.transform.velocity.serialize(),
-            parseFloat(this.transform.mass.toFixed(2)),
+            parseFloat(this.transform?.mass?.toFixed(2) ?? "0"),
         ]);
     }
 

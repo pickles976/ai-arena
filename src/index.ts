@@ -74,7 +74,6 @@ export var loadScorePacket = function (arr: Float32Array) {
 };
 
 // Controls
-
 export var togglePause = function () {
     if (PAUSED) {
         setPaused(false);
@@ -104,6 +103,7 @@ export var restart = function () {
 
 export var setConfig = function (options: any) {
     if (options !== null && options !== undefined) {
+
         if (options.canvas != undefined) {
             setCanvasElement(options.canvas);
         }

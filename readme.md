@@ -44,6 +44,7 @@ setConfig({
     streaming: false,
     nodejs: false,
     userCodeTimeout: 1.0,
+    seed: 1234
 })
 ```
 
@@ -55,6 +56,7 @@ setConfig({
     ticksPerFrame: 8,
     framerate: 30,
     nodejs: true,
+    seed: 1234
 })
 ```
 
@@ -66,5 +68,6 @@ setConfig({
     graphics: true,
     ticksPerFrame: 2,
     framerate: 60,
+    seed: 1234
 })
 ```
