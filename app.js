@@ -5,18 +5,21 @@ console.log(testPackage())
 setConfig({
     canvas: document.getElementById("game-canvas"),
     graphics: true,
-    ticksPerFrame: 2,
+    ticksPerFrame: 32,
     framerate: 60,
     streaming: false,
     nodejs: false,
     userCodeTimeout: 1.0,
 })
 
-setUserCode({
-    team0 : {
-        // BaseStartCode : 'seek(d)'
-    }
-})
+// setUserCode({
+//     team1 : {
+//         BaseStartCode : "", 
+//         BaseUpdateCode : "", 
+//         ShipStartCode : "",
+//         ShipUpdateCode : ""
+//     }
+// })
 
 setCallbacks({
     // gameEnd: 'x',

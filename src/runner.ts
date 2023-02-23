@@ -155,7 +155,11 @@ const updateField = function () {
         else value.simulate(MS);
     }
 
-    checkWinCondition();
+    if(isGameOver()){
+        stop()
+        return
+    }
+
 
     // SORT BY X POSITION
     sortGameObjectList();
@@ -171,6 +175,9 @@ const updateField = function () {
             const value = GameObjectList[i];
 
             if ((value.type === 'SHIP' && value instanceof Ship) || (value.type === 'BASE' && value instanceof Base)) {
+
+                
+
                 try {
                     // how long does user codde take to run?
                     const start = performance.now();
@@ -285,7 +292,7 @@ export const stop = function () {
     resetGameState();
 };
 
-const checkWinCondition = function () {
+const isGameOver = function () {
     // this checks if the base is dead and ends the game
-    GameStateManager.update();
+    return GameStateManager.update();
 };

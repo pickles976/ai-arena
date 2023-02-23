@@ -36,14 +36,18 @@ export class StateManager {
 
     update() {
         for (const i in this.deaths) {
+            let base = GameObjectManager.getBaseByTeam(parseInt(i))
             if (
-                GameObjectManager.getBaseByTeam(parseInt(i)) === undefined ||
-                GameObjectManager.getBaseByTeam(parseInt(i)).type === 'DEAD'
+                base === undefined ||
+                base.type === 'DEAD'
             ) {
-                console.log(i + ' has lost');
-                GameEndCallback(i);
+                console.log(1 - Number(i) + ' has won');
+                GameEndCallback(1 - Number(i));
+                return true
             }
         }
+
+        return false
     }
 
     getTeamInfo(team: number) {
