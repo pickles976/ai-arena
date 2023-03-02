@@ -37,9 +37,13 @@ import { Vector2D } from './physics';
 import { Renderer } from './renderer';
 import { StateManager } from '../managers/stateManager';
 import { checkMemory, clamp, create_UUID } from '../util/utils';
+import { INITIAL_SHIPS_TEAM0, INITIAL_SHIPS_TEAM1 } from '../config/gameConfig';
 
 let requestFrameID: number = null;
+
+// @ts-ignore
 let physicsTimeout: NodeJS.Timeout[] = [];
+// @ts-ignore
 let renderTimeout: NodeJS.Timeout = null;
 
 const FIRST_FRAME_TIMEOUT = USER_CODE_TIMEOUT * 10;
@@ -69,10 +73,15 @@ export const initializeGameState = function () {
 
     GameObjectManager.indexObjects(GameObjectList);
 
-    spawn(new Ship(create_UUID(), new Vector2D(W / 4, H / 4), new Vector2D(0, 0), new Vector2D(0, 0), 100, 0));
-    spawn(
-        new Ship(create_UUID(), new Vector2D((3 * W) / 4, (3 * H) / 4), new Vector2D(0, 0), new Vector2D(0, 0), 100, 1),
-    );
+    for (let i = 0; i < INITIAL_SHIPS_TEAM0; i++) 
+    {
+        spawn(new Ship(create_UUID(), new Vector2D(W / 4, i * 20 + (H / 4)), new Vector2D(0, 0), new Vector2D(0, 0), 100, 0));
+    }
+
+    for (let i = 0; i < INITIAL_SHIPS_TEAM1; i++) 
+    {
+        spawn(new Ship(create_UUID(), new Vector2D((3 * W) / 4, i * 20 + (3 * H) / 4), new Vector2D(0, 0), new Vector2D(0, 0), 100, 1),);
+    }
 
     // populate the game field
     GameObjectManager.start();

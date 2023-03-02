@@ -24,6 +24,7 @@ import {
 } from './globals.js';
 import { run, setGameState, setupLoops, stop } from './engine/runner';
 import { Serializer } from './managers/serializer';
+import { Code } from './types';
 
 export var testPackage = function () {
     Serializer.test();
@@ -33,11 +34,7 @@ export var testPackage = function () {
 // Get Game Info
 
 export var getScore = function () {
-    return JSON.parse(getScoreString());
-};
-
-export var getScoreString = function () {
-    return GameStateManager.serialize();
+    return JSON.parse(GameStateManager.serialize());
 };
 
 export var getShipsInfo = function () {
@@ -53,24 +50,6 @@ export var getBasesInfo = function () {
 
 export var getGameState = function () {
     return Serializer.deserializeGameObjectList(Serializer.serializeGameObjectList(GameObjectList));
-};
-
-// Packets
-export var getGamePacket = function () {
-    return Serializer.packetifyGameObjectList(GameObjectList);
-};
-
-export var loadGamePacket = function (gameState: Float32Array) {
-    let objList: GameObject[] = Serializer.unpacketify(gameState);
-    setGameState(objList);
-};
-
-export var getScorePacket = function () {
-    return GameStateManager.packet();
-};
-
-export var loadScorePacket = function (arr: Float32Array) {
-    GameStateManager.loadFromPacket(arr);
 };
 
 // Controls
@@ -151,40 +130,26 @@ export var setCallbacks = function (callbacks: any) {
     }
 };
 
-export var setUserCode = function (code: any) {
-    if (code !== undefined && code !== null) {
-        if (code.team0 !== undefined) {
-            let temp = code.team0;
+export function setUserCode(code: Code) {
 
-            if (temp.BaseStartCode !== undefined) {
-                setBaseStartCode(0, temp.BaseStartCode);
-            }
-            if (temp.BaseUpdateCode !== undefined) {
-                setBaseUpdateCode(0, temp.BaseUpdateCode);
-            }
-            if (temp.ShipStartCode !== undefined) {
-                setShipStartCode(0, temp.ShipStartCode);
-            }
-            if (temp.ShipUpdateCode !== undefined) {
-                setShipUpdateCode(0, temp.ShipUpdateCode);
-            }
-        }
-
-        if (code.team1 !== undefined) {
-            let temp = code.team1;
-
-            if (temp.BaseStartCode !== undefined) {
-                setBaseStartCode(1, temp.BaseStartCode);
-            }
-            if (temp.BaseUpdateCode !== undefined) {
-                setBaseUpdateCode(1, temp.BaseUpdateCode);
-            }
-            if (temp.ShipStartCode !== undefined) {
-                setShipStartCode(1, temp.ShipStartCode);
-            }
-            if (temp.ShipUpdateCode !== undefined) {
-                setShipUpdateCode(1, temp.ShipUpdateCode);
-            }
-        }
+    if (code.team0) {
+        let temp = code.team0
+        setBaseStartCode(0, temp.baseStart)
+        setBaseUpdateCode(0, temp.baseUpdate)
+        setShipStartCode(0, temp.shipStart)
+        setShipUpdateCode(0, temp.shipUpdate)
     }
-};
+
+    if (code.team1) {
+        let temp = code.team1
+        setBaseStartCode(1, temp.baseStart)
+        setBaseUpdateCode(1, temp.baseUpdate)
+        setShipStartCode(1, temp.shipStart)
+        setShipUpdateCode(1, temp.shipUpdate)
+    }
+
+}
+
+
+import { setGameConfig } from './config/gameConfig'
+export { setGameConfig }

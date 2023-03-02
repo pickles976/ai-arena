@@ -1,4 +1,11 @@
 import { FRAMERATE } from "../globals";
+import { GameConfig } from "../types";
+
+export let INITIAL_SHIPS_TEAM0 = 1
+export let INITIAL_SHIPS_TEAM1 = 1
+
+// How much energy it costs to do one point of damage
+export let DAMAGE_ENERGY_RATIO = 0.75
 
 // resources and obstacles
 export var NUM_ASTEROIDS = 15;
@@ -64,3 +71,16 @@ export var BASE_REPAIR_RATE_COST_MULTIPLIER = 1.5;
 export var BASE_INTERACT_RADIUS_COST_MULTIPLIER = 1.5;
 export var BASE_REFINING_RATE_COST_MULTIPLIER = 1.5;
 export var BASE_REFINING_EFFICIENCY_COST_MULTIPLIER = 1.5;
+
+// export function set
+export function setGameConfig(options: GameConfig) {
+
+    INITIAL_SHIPS_TEAM0 = options.team0_ships ?? INITIAL_SHIPS_TEAM0
+    INITIAL_SHIPS_TEAM1 = options.team1_ships ?? INITIAL_SHIPS_TEAM1
+    DAMAGE_ENERGY_RATIO = options.damage_ratio ?? DAMAGE_ENERGY_RATIO
+
+    NUM_ASTEROIDS = options.num_asteroids ?? NUM_ASTEROIDS
+    NUM_OBSTACLES = options.num_obstacles ?? NUM_OBSTACLES
+    NUM_ENERGY_CELLS = options.num_energy ?? NUM_ENERGY_CELLS
+
+}
