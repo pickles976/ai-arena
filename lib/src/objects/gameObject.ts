@@ -1,5 +1,5 @@
-import { Collider, Transform } from './physics.js';
-import { Renderer } from './renderer.js';
+import { Collider, Transform } from '../engine/physics';
+import { Renderer } from '../engine/renderer';
 
 export class GameObject {
     uuid: number;

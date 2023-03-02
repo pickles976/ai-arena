@@ -1,4 +1,4 @@
-import { GameObject } from './gameObject.js';
+import { GameObject } from './gameObject';
 import {
     spawn,
     BASE_HEAL_RATE_COST_MULTIPLIER,
@@ -48,12 +48,12 @@ import {
     resetGameState,
     H,
     W,
-} from './globals.js';
-import { ProxyMan } from './objectProxies.js';
-import { Collider, Transform, Vector2D } from './physics.js';
-import { Renderer } from './renderer.js';
-import { clamp, create_UUID, dist, energyDiff, validNumber, validVector } from './utils.js';
-import { overlapCircle } from './collisions.js';
+} from '../globals';
+import { ProxyMan } from './objectProxies';
+import { Collider, Transform, Vector2D } from '../engine/physics';
+import { Renderer } from '../engine/renderer';
+import { clamp, create_UUID, dist, energyDiff, validNumber, validVector } from '../util/utils';
+import { overlapCircle } from '../engine/collisions';
 
 const sharedContext = {
     console: console,

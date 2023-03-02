@@ -1,4 +1,4 @@
-import { GameObject } from './gameObject.js';
+import { GameObject } from './objects/gameObject';
 import {
     GameObjectList,
     GameObjectManager,
@@ -22,8 +22,8 @@ import {
     setGameEndCallback,
     setUserCodeTimeout,
 } from './globals.js';
-import { run, setGameState, setupLoops, stop } from './runner.js';
-import { Serializer } from './serializer.js';
+import { run, setGameState, setupLoops, stop } from './engine/runner';
+import { Serializer } from './managers/serializer';
 
 export var testPackage = function () {
     Serializer.test();

@@ -1,7 +1,7 @@
-import { GameObject } from './gameObject.js';
-import { GameObjectList, GlobalRender, H, resetGameState, W, xArray } from './globals.js';
-import { Vector2D } from './physics.js';
-import { validNumber, validVector } from './utils.js';
+import { GameObject } from '../objects/gameObject';
+import { GameObjectList, GlobalRender, H, resetGameState, W, xArray } from '../globals';
+import { Vector2D } from './physics';
+import { validNumber, validVector } from '../util/utils';
 
 /**
  * nlog(n) collision detection for sorted array of circular objects

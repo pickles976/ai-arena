@@ -1,7 +1,7 @@
 /**
  * Renderer object used in Node.js
  */
-import { Vector2D } from './physics.js';
+import { Vector2D } from './physics';
 
 export class DummyRenderer {
     H: number;

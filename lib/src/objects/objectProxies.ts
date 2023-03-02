@@ -1,9 +1,9 @@
-import { DummyRenderer } from './dummyRenderer.js';
-import { GameObject } from './gameObject.js';
-import { ObjectManager } from './objectManager.js';
-import { Base, Ship } from './objects.js';
-import { Renderer } from './renderer.js';
-import { Serializer } from './serializer.js';
+import { DummyRenderer } from '../engine/dummyRenderer';
+import { GameObject } from './gameObject';
+import { ObjectManager } from '../managers/objectManager';
+import { Base, Ship } from './objects';
+import { Renderer } from '../engine/renderer';
+import { Serializer } from '../managers/serializer';
 
 /**
  * Create a Proxy objects that we pass to user code.
