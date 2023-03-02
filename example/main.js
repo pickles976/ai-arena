@@ -1,4 +1,4 @@
-import {setEngineConfig, testPackage, runGame, setUserCode, setCallbacks, setGameConfig} from 'ai-arena'
+import {setEngineConfig, testPackage, runGame, setUserCode, setCallbacks, setGameConfig, setupLoops} from 'ai-arena'
 import { TeamCode } from 'ai-arena/dist/types'
 
 console.log(testPackage())
@@ -9,7 +9,7 @@ setGameConfig({
 setEngineConfig({
     canvas: document.getElementById("game-canvas"),
     graphics: true,
-    ticksPerFrame: 8,
+    ticksPerFrame: 2,
     framerate: 60,
     streaming: false,
     nodejs: false,

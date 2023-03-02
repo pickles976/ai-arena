@@ -19,6 +19,7 @@ import { Renderer } from './engine/renderer';
 import { compileCode } from './util/safeEval';
 import { StateManager } from './managers/stateManager';
 import { EngineConfig } from './types';
+import { setupLoops } from './engine/runner';
 
 export var W: number = 1080;
 export var H: number = 720;

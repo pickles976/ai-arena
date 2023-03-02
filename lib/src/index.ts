@@ -117,4 +117,4 @@ export function setUserCode(code: Code) {
 
 import { setGameConfig } from './config/gameConfig'
 import { setEngineConfig } from './globals.js';
-export { setGameConfig, setEngineConfig }
+export { setGameConfig, setEngineConfig, setupLoops }
