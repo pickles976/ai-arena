@@ -18,6 +18,7 @@ import { ProxyMan } from './objects/objectProxies';
 import { Renderer } from './engine/renderer';
 import { compileCode } from './util/safeEval';
 import { StateManager } from './managers/stateManager';
+import { EngineConfig } from './types';
 
 export var W: number = 1080;
 export var H: number = 720;
@@ -243,3 +244,15 @@ export var setNodeJS = function (value: boolean) {
 export var setUserCodeTimeout = function (value: number) {
     USER_CODE_TIMEOUT = value;
 };
+
+export function setEngineConfig(options: EngineConfig) {
+    
+    if (options.canvas) { setCanvasElement(options.canvas) }
+    if (options.ticksPerFrame) { setTicksPerFrame(options.ticksPerFrame)}
+    GRAPHICS_ENABLED = options.graphics ?? GRAPHICS_ENABLED
+    FRAMERATE = options.framerate ?? FRAMERATE
+    STREAMING = options.streaming ?? STREAMING
+    NODEJS = options.nodejs ?? NODEJS
+    USER_CODE_TIMEOUT = options.userCodeTimeout ?? USER_CODE_TIMEOUT
+
+}

@@ -44,7 +44,7 @@ export const ShipStartTeam1 = `
 
 export const ShipUpdateTeam1 = `
 
-const speed = 5.0
+const speed = 2.5
 ship.shootTimer--
 
 function teammateHasTarget(target){

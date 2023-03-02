@@ -1,4 +1,4 @@
-import {setConfig, testPackage, runGame, setUserCode, setCallbacks, setGameConfig} from 'ai-arena'
+import {setEngineConfig, testPackage, runGame, setUserCode, setCallbacks, setGameConfig} from 'ai-arena'
 import { TeamCode } from 'ai-arena/dist/types'
 
 console.log(testPackage())
@@ -6,7 +6,7 @@ console.log(testPackage())
 setGameConfig({
 })
 
-setConfig({
+setEngineConfig({
     canvas: document.getElementById("game-canvas"),
     graphics: true,
     ticksPerFrame: 8,
@@ -18,15 +18,6 @@ setConfig({
 
 // setUserCode({
 //     team1 : new TeamCode("","","","")
-// })
-
-// setUserCode({
-//     team1 : {
-//         BaseStartCode : "", 
-//         BaseUpdateCode : "", 
-//         ShipStartCode : "",
-//         ShipUpdateCode : ""
-//     }
 // })
 
 setCallbacks({
