@@ -42,6 +42,7 @@ import {
     BASE_REPAIR_RATE_COST_MULTIPLIER,
     BULLET_MASS,
     BULLET_SPEED,
+    DAMAGE_ENERGY_RATIO,
     ENERGY_SCALE,
     SHIP_DAMAGE_COST_MULTIPLIER,
     SHIP_INITIAL_DAMAGE,
@@ -511,7 +512,7 @@ export class Ship extends GameObject {
     shoot(direction: Vector2D) {
         if (validVector(direction)) {
             // instantiate object
-            this.resources.energy -= this.damage;
+            this.resources.energy -= this.damage * DAMAGE_ENERGY_RATIO;
             const bullet = new Bullet(
                 create_UUID(),
                 this.transform.position.add(direction.normal().multiply(Bullet.offset + this.collider.radius)),

@@ -1,0 +1,12 @@
+import { GameObject } from '../objects/gameObject';
+import { Base, Ship } from '../objects/objects';
+import { Vector2D } from './physics';
+export declare const sleep: (ms: number) => Promise<unknown>;
+export declare const clamp: (value: number, min: number, max: number) => number;
+export declare const energyDiff: (thisObject: GameObject, otherObject: GameObject) => number;
+export declare const randomInRange: (min: number, max: number) => number;
+export declare const create_UUID: () => number;
+export declare const dist: (obj1: GameObject, obj2: GameObject) => number;
+export declare const checkMemory: (obj: Ship | Base) => boolean;
+export declare const validVector: (direction: Vector2D) => boolean;
+export declare const validNumber: (num: number) => boolean;

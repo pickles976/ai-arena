@@ -1,0 +1,42 @@
+import { GameObject } from '../objects/gameObject';
+import { Asteroid, Base, Bullet, EnergyCell, Obstacle, Ship } from '../objects/objects';
+import { Vector2D } from '../engine/physics';
+export declare class ObjectManager {
+    static numAsteroids: number;
+    static numObstacles: number;
+    static numEnergyCells: number;
+    static obstacleMassRange: [number, number];
+    static asteroidMetalRange: [number, number];
+    static asteroidWaterRange: [number, number];
+    static energyCellRange: [number, number];
+    static speedRange: [number, number];
+    spawnQueue: {
+        [key: string]: Array<Generator>;
+    };
+    asteroids: Array<Asteroid>;
+    obstacles: Array<Obstacle>;
+    energyCells: Array<EnergyCell>;
+    ships: Array<Ship>;
+    bullets: Array<Bullet>;
+    bases: Array<Base>;
+    all: Array<GameObject>;
+    constructor();
+    start(): void;
+    indexObjects(gameObjectList: Array<GameObject>): void;
+    update(): void;
+    private spawnObject;
+    private queueObject;
+    getAsteroids(): Asteroid[];
+    getClosestAsteroid(position: Vector2D): {};
+    getObstacles(): Obstacle[];
+    getClosestObstacle(position: Vector2D): {};
+    getEnergyCells(): EnergyCell[];
+    getClosestEnergyCell(position: Vector2D): {};
+    getShips(): Ship[];
+    getShipsByTeam(team: number): Ship[];
+    getBullets(): Bullet[];
+    getBases(): Base[];
+    getBaseByTeam(team: number): Base;
+    getObjectFromUUID(uuid: number): GameObject;
+    refreshObject(obj: GameObject): GameObject;
+}

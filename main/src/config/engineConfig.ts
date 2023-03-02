@@ -18,6 +18,8 @@ import { ProxyMan } from '../objects/objectProxies';
 import { Renderer } from '../engine/renderer';
 import { compileCode } from '../engine/safeEval';
 import { StateManager } from '../managers/stateManager';
+import { EngineConfig } from '../types';
+import { setupLoops } from '../engine/runner';
 
 export var W: number = 1080;
 export var H: number = 720;
@@ -121,6 +123,7 @@ export var setFramerate = function (value: number) {
 
 export var setTicksPerFrame = function (value: number) {
     TICKS_PER_FRAME = value;
+    setupLoops()
 };
 
 export var setBaseStartCode = function (team: number, code: string) {
@@ -141,10 +144,6 @@ export var setShipStartCode = function (team: number, code: string) {
 export var setShipUpdateCode = function (team: number, code: string) {
     UserCode[team]['ShipUpdateCode'] = code;
     UserCompiledCode[team]['ShipUpdateCode'] = compileCode(code);
-};
-
-export var setGraphics = function (value: boolean) {
-    GRAPHICS_ENABLED = value;
 };
 
 export var setCanvasElement = function (canvasElement: HTMLCanvasElement) {
@@ -230,18 +229,18 @@ export var setGameObjectList = function (goList: GameObject[]) {
     GameObjectList = goList;
 };
 
-export var setIsStreaming = function (value: boolean) {
-    STREAMING = value;
-};
-
 export var setGameEndCallback = function (value: Function) {
     GameEndCallback = value;
 };
 
-export var setNodeJS = function (value: boolean) {
-    NODEJS = value;
-};
+export function setEngineConfig(options: EngineConfig) {
+    
+    if (options.canvas) { setCanvasElement(options.canvas) }
+    if (options.ticksPerFrame) { setTicksPerFrame(options.ticksPerFrame)}
+    GRAPHICS_ENABLED = options.graphics ?? GRAPHICS_ENABLED
+    FRAMERATE = options.framerate ?? FRAMERATE
+    STREAMING = options.streaming ?? STREAMING
+    NODEJS = options.nodejs ?? NODEJS
+    USER_CODE_TIMEOUT = options.userCodeTimeout ?? USER_CODE_TIMEOUT
 
-export var setUserCodeTimeout = function (value: number) {
-    USER_CODE_TIMEOUT = value;
-};
+}
