@@ -7,20 +7,14 @@ import {
     resetGameState,
     setBaseStartCode,
     setBaseUpdateCode,
-    setCanvasElement,
     setUICallback,
-    setGraphics,
     setPaused,
     setShipStartCode,
     setShipUpdateCode,
-    setFramerate,
-    setTicksPerFrame,
     MS,
     setPhysicsCallback,
-    setIsStreaming,
-    setNodeJS,
     setGameEndCallback,
-    setUserCodeTimeout,
+    setErrorCallback
 } from './globals.js';
 import { run, setGameState, setupLoops, stop } from './engine/runner';
 import { Serializer } from './managers/serializer';
@@ -80,40 +74,6 @@ export var restart = function () {
     resetGameState();
 };
 
-// export var setConfig = function (options: any) {
-//     if (options !== null && options !== undefined) {
-
-//         if (options.canvas != undefined) {
-//             setCanvasElement(options.canvas);
-//         }
-
-//         if (options.graphics != undefined) {
-//             setGraphics(options.graphics);
-//         }
-
-//         if (options.framerate != undefined) {
-//             setFramerate(options.framerate);
-//         }
-
-//         if (options.ticksPerFrame != undefined) {
-//             setTicksPerFrame(options.ticksPerFrame);
-//             setupLoops();
-//         }
-
-//         if (options.streaming != undefined) {
-//             setIsStreaming(options.streaming);
-//         }
-
-//         if (options.nodejs != undefined) {
-//             setNodeJS(options.nodejs);
-//         }
-
-//         if (options.userCodeTimeout != undefined) {
-//             setUserCodeTimeout(options.userCodeTimeout);
-//         }
-//     }
-// };
-
 export var setCallbacks = function (callbacks: any) {
     if (callbacks !== null && callbacks !== undefined) {
         if (callbacks.gameEnd !== undefined) {
@@ -126,6 +86,10 @@ export var setCallbacks = function (callbacks: any) {
 
         if (callbacks.physics !== undefined) {
             setPhysicsCallback(callbacks.physics);
+        }
+
+        if (callbacks.error !== undefined) {
+            setErrorCallback(callbacks.error)
         }
     }
 };

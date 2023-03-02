@@ -110,20 +110,13 @@ export var GlobalCanvas: HTMLCanvasElement;
 export var DOMCallback: Function = function () {};
 export var PhysicsCallback: Function = function () {};
 export var GameEndCallback: Function = function () {};
+export var ErrorCallback: Function = function () {};
 
 /*
     SETTERS
 */
 export var setPaused = function (value: boolean) {
     PAUSED = value;
-};
-
-export var setFramerate = function (value: number) {
-    FRAMERATE = value;
-};
-
-export var setTicksPerFrame = function (value: number) {
-    TICKS_PER_FRAME = value;
 };
 
 export var setBaseStartCode = function (team: number, code: string) {
@@ -144,10 +137,6 @@ export var setShipStartCode = function (team: number, code: string) {
 export var setShipUpdateCode = function (team: number, code: string) {
     UserCode[team]['ShipUpdateCode'] = code;
     UserCompiledCode[team]['ShipUpdateCode'] = compileCode(code);
-};
-
-export var setGraphics = function (value: boolean) {
-    GRAPHICS_ENABLED = value;
 };
 
 export var setCanvasElement = function (canvasElement: HTMLCanvasElement) {
@@ -229,6 +218,10 @@ export var setGameObjectList = function (goList: GameObject[]) {
     GameObjectList = goList;
 };
 
+export var setErrorCallback = function (value: Function) {
+    ErrorCallback = value;
+}
+
 export var setIsStreaming = function (value: boolean) {
     STREAMING = value;
 };
@@ -248,7 +241,7 @@ export var setUserCodeTimeout = function (value: number) {
 export function setEngineConfig(options: EngineConfig) {
     
     if (options.canvas) { setCanvasElement(options.canvas) }
-    if (options.ticksPerFrame) { setTicksPerFrame(options.ticksPerFrame)}
+    TICKS_PER_FRAME = options.ticksPerFrame ?? TICKS_PER_FRAME
     GRAPHICS_ENABLED = options.graphics ?? GRAPHICS_ENABLED
     FRAMERATE = options.framerate ?? FRAMERATE
     STREAMING = options.streaming ?? STREAMING

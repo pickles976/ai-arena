@@ -14,6 +14,7 @@ import {
     resetGameState,
     H,
     W,
+    ErrorCallback,
 } from '../globals';
 import {     SHIP_DAMAGE_COST_MULTIPLIER,
     SHIP_INITIAL_DAMAGE,
@@ -472,7 +473,7 @@ export class Ship extends GameObject {
                 ...sharedContext,
             });
         } catch (e) {
-            alert(`Failure in ship.start() \n Error: ${e} \n Your code failed to compile`);
+            ErrorCallback(e)
             console.log(`Failure in ship.start() \n Error: ${e} \n Your code failed to compile`);
             resetGameState();
         }
@@ -491,7 +492,7 @@ export class Ship extends GameObject {
                 ...sharedContext,
             });
         } catch (e) {
-            alert(`Failure in ship.update() \n Error: ${e} \n Your code failed to compile`);
+            ErrorCallback(e)
             console.log(`Failure in ship.update() \n Error: ${e} \n Your code failed to compile`);
             resetGameState();
         }
@@ -895,7 +896,7 @@ export class Base extends GameObject {
         try {
             startCode({ base: ProxyMan.createBaseProxy(this), ...sharedContext });
         } catch (e) {
-            alert(`Failure in base.start() \n Error: ${e} Your code failed to compile`);
+            ErrorCallback(e)
             console.log(`Failure in base.start() \n Error: ${e} Your code failed to compile`);
             resetGameState();
         }
@@ -912,7 +913,7 @@ export class Base extends GameObject {
                 ...sharedContext,
             });
         } catch (e) {
-            alert(`Failure in base.update() \n Error: ${e} \n Your code failed to compile`);
+            ErrorCallback(e)
             console.log(`Failure in base.update() \n Error: ${e} \n Your code failed to compile`);
             resetGameState();
         }
