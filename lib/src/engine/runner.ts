@@ -73,6 +73,7 @@ export const initializeGameState = function () {
 
     GameObjectManager.indexObjects(GameObjectList);
 
+    // Let users star with a X number of ships
     for (let i = 0; i < INITIAL_SHIPS_TEAM0; i++) 
     {
         spawn(new Ship(create_UUID(), new Vector2D(W / 4, i * 20 + (H / 4)), new Vector2D(0, 0), new Vector2D(0, 0), 100, 0));
