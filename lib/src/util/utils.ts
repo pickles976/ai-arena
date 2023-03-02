@@ -3,7 +3,8 @@
  */
 
 import { GameObject } from '../objects/gameObject';
-import { ENERGY_SCALE, GameObjectManager, USER_CODE_MAX_SIZE } from '../globals';
+import { GameObjectManager, USER_CODE_MAX_SIZE } from '../globals';
+import { ENERGY_SCALE } from '../config/gameConfig'
 import { Base, Ship } from '../objects/objects';
 import { Vector2D } from '../engine/physics';
 

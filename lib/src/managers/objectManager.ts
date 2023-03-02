@@ -1,23 +1,25 @@
 import { overlapCircle } from '../engine/collisions';
 import { GameObject } from '../objects/gameObject';
 import {
-    ASTEROID_METAL_RANGE,
-    ASTEROID_RESPAWN_TIME,
-    ASTEROID_WATER_RANGE,
-    ENERGY_CELL_RANGE,
-    ENERGY_CELL_RESPAWN_TIME,
     GameObjectList,
     H,
-    NUM_ASTEROIDS,
-    NUM_ENERGY_CELLS,
-    NUM_OBSTACLES,
-    OBSTACLE_MASS_RANGE,
-    OBSTACLE_RESPAWN_TIME,
     sortGameObjectList,
     spawn,
     SPEED_RANGE,
     W,
 } from '../globals';
+import { 
+    ASTEROID_METAL_RANGE,
+    ASTEROID_RESPAWN_TIME,
+    ASTEROID_WATER_RANGE,
+    ENERGY_CELL_RANGE,
+    ENERGY_CELL_RESPAWN_TIME,
+    NUM_ASTEROIDS,
+    NUM_ENERGY_CELLS,
+    NUM_OBSTACLES,
+    OBSTACLE_MASS_RANGE,
+    OBSTACLE_RESPAWN_TIME
+} from '../config/gameConfig'
 import { Asteroid, Base, Bullet, EnergyCell, Obstacle, Ship } from '../objects/objects';
 import { Vector2D } from '../engine/physics';
 import { create_UUID, randomInRange } from '../util/utils';
