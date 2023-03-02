@@ -1,4 +1,4 @@
-import {setConfig, testPackage, runGame, setUserCode, setCallbacks} from './dist/index.js'
+import {setConfig, testPackage, runGame, setUserCode, setCallbacks} from 'ai-arena'
 
 console.log(testPackage())
 
