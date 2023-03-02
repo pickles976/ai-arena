@@ -1,6 +1,6 @@
-import { checkForCollisions } from './collisions.js';
-import { DummyRenderer } from './dummyRenderer.js';
-import { GameObject } from './gameObject.js';
+import { checkForCollisions } from './collisions';
+import { DummyRenderer } from './dummyRenderer';
+import { GameObject } from '../objects/gameObject';
 import {
     clearRenderQueue,
     DOMCallback,
@@ -30,13 +30,14 @@ import {
     USER_CODE_MAX_SIZE,
     USER_CODE_TIMEOUT,
     W,
-} from './globals.js';
-import { ObjectManager } from './objectManager.js';
-import { Base, Ship } from './objects.js';
-import { Vector2D } from './physics.js';
-import { Renderer } from './renderer.js';
-import { StateManager } from './stateManager.js';
-import { checkMemory, clamp, create_UUID } from './utils.js';
+    ErrorCallback,
+} from '../config/engineConfig';
+import { ObjectManager } from '../managers/objectManager';
+import { Base, Ship } from '../objects/objects';
+import { Vector2D } from './physics';
+import { Renderer } from './renderer';
+import { StateManager } from '../managers/stateManager';
+import { checkMemory, clamp, create_UUID } from './utils';
 
 let requestFrameID: number = null;
 let physicsTimeout: NodeJS.Timeout[] = [];
@@ -106,7 +107,8 @@ export const renderLoop = function () {
                 clamp(MS - elapsed, 0, 1000),
             );
         } catch (e) {
-            alert(`Failed to render \n Error: ${e}`);
+            ErrorCallback(e)
+            console.log(`Failed to render \n Error: ${e}`);
         }
     }
 };
@@ -222,6 +224,7 @@ const updateField = function () {
                         break;
                     }
                 } catch (e) {
+                    ErrorCallback(e)
                     console.log(`User code failed with ${e}. Game exiting...`);
                     break;
                 }

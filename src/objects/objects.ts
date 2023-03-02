@@ -1,6 +1,22 @@
-import { GameObject } from './gameObject.js';
+import { GameObject } from './gameObject';
 import {
+    GameObjectManager,
+    GameObjectManagerProxy,
+    GameStateManager,
+    GlobalRenderProxy,
     spawn,
+    teamColors,
+    resourceColors,
+    obstacleColor,
+    bulletColor,
+    UserCompiledCode,
+    resetGameState,
+    H,
+    W,
+    ErrorCallback,
+    FRAMERATE,
+} from '../config/engineConfig';
+import {
     BASE_HEAL_RATE_COST_MULTIPLIER,
     BASE_INITIAL_HEAL_RATE,
     BASE_INITIAL_INTERACT_RADIUS,
@@ -27,11 +43,6 @@ import {
     BULLET_MASS,
     BULLET_SPEED,
     ENERGY_SCALE,
-    FRAMERATE,
-    GameObjectManager,
-    GameObjectManagerProxy,
-    GameStateManager,
-    GlobalRenderProxy,
     SHIP_DAMAGE_COST_MULTIPLIER,
     SHIP_INITIAL_DAMAGE,
     SHIP_INITIAL_MAX_ENERGY,
@@ -40,20 +51,12 @@ import {
     SHIP_RESPAWN_TIME,
     SHIP_UPGRADE_DAMAGE_COST,
     SHIP_UPGRADE_MAX_ENERGY_COST,
-    teamColors,
-    resourceColors,
-    obstacleColor,
-    bulletColor,
-    UserCompiledCode,
-    resetGameState,
-    H,
-    W,
-} from './globals.js';
-import { ProxyMan } from './objectProxies.js';
-import { Collider, Transform, Vector2D } from './physics.js';
-import { Renderer } from './renderer.js';
-import { clamp, create_UUID, dist, energyDiff, validNumber, validVector } from './utils.js';
-import { overlapCircle } from './collisions.js';
+} from '../config/gameConfig';
+import { ProxyMan } from './objectProxies';
+import { Collider, Transform, Vector2D } from '../engine/physics';
+import { Renderer } from '../engine/renderer';
+import { clamp, create_UUID, dist, energyDiff, validNumber, validVector } from '../engine/utils';
+import { overlapCircle } from '../engine/collisions';
 
 const sharedContext = {
     console: console,
@@ -87,9 +90,9 @@ export class Resources {
 
     getResources() {
         return {
-            metal: parseFloat(this.metal?.toFixed(2) ?? "0"),
-            water: parseFloat(this.water?.toFixed(2)  ?? "0"),
-            energy: parseFloat(this.energy?.toFixed(2)  ?? "0"),
+            metal: parseFloat(this.metal?.toFixed(2) ?? '0'),
+            water: parseFloat(this.water?.toFixed(2) ?? '0'),
+            energy: parseFloat(this.energy?.toFixed(2) ?? '0'),
         };
     }
 
@@ -215,7 +218,7 @@ export class Obstacle extends GameObject {
             this.uuid,
             this.transform.position.serialize(),
             this.transform.velocity.serialize(),
-            parseFloat(this.transform?.mass?.toFixed(2) ?? "0"),
+            parseFloat(this.transform?.mass?.toFixed(2) ?? '0'),
         ]);
     }
 
@@ -471,7 +474,7 @@ export class Ship extends GameObject {
                 ...sharedContext,
             });
         } catch (e) {
-            alert(`Failure in ship.start() \n Error: ${e} \n Your code failed to compile`);
+            ErrorCallback(e);
             console.log(`Failure in ship.start() \n Error: ${e} \n Your code failed to compile`);
             resetGameState();
         }
@@ -490,7 +493,7 @@ export class Ship extends GameObject {
                 ...sharedContext,
             });
         } catch (e) {
-            alert(`Failure in ship.update() \n Error: ${e} \n Your code failed to compile`);
+            ErrorCallback(e);
             console.log(`Failure in ship.update() \n Error: ${e} \n Your code failed to compile`);
             resetGameState();
         }
@@ -894,7 +897,7 @@ export class Base extends GameObject {
         try {
             startCode({ base: ProxyMan.createBaseProxy(this), ...sharedContext });
         } catch (e) {
-            alert(`Failure in base.start() \n Error: ${e} Your code failed to compile`);
+            ErrorCallback(e);
             console.log(`Failure in base.start() \n Error: ${e} Your code failed to compile`);
             resetGameState();
         }
@@ -911,6 +914,7 @@ export class Base extends GameObject {
                 ...sharedContext,
             });
         } catch (e) {
+            ErrorCallback(e);
             alert(`Failure in base.update() \n Error: ${e} \n Your code failed to compile`);
             console.log(`Failure in base.update() \n Error: ${e} \n Your code failed to compile`);
             resetGameState();

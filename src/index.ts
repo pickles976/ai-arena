@@ -1,4 +1,4 @@
-import { GameObject } from './gameObject.js';
+import { GameObject } from './objects/gameObject';
 import {
     GameObjectList,
     GameObjectManager,
@@ -21,9 +21,10 @@ import {
     setNodeJS,
     setGameEndCallback,
     setUserCodeTimeout,
-} from './globals.js';
-import { run, setGameState, setupLoops, stop } from './runner.js';
-import { Serializer } from './serializer.js';
+    setErrorCallback,
+} from './config/engineConfig';
+import { run, setGameState, setupLoops, stop } from './engine/runner';
+import { Serializer } from './managers/serializer.js';
 
 export var testPackage = function () {
     Serializer.test();
@@ -33,11 +34,7 @@ export var testPackage = function () {
 // Get Game Info
 
 export var getScore = function () {
-    return JSON.parse(getScoreString());
-};
-
-export var getScoreString = function () {
-    return GameStateManager.serialize();
+    return JSON.parse(GameStateManager.serialize());
 };
 
 export var getShipsInfo = function () {
@@ -53,24 +50,6 @@ export var getBasesInfo = function () {
 
 export var getGameState = function () {
     return Serializer.deserializeGameObjectList(Serializer.serializeGameObjectList(GameObjectList));
-};
-
-// Packets
-export var getGamePacket = function () {
-    return Serializer.packetifyGameObjectList(GameObjectList);
-};
-
-export var loadGamePacket = function (gameState: Float32Array) {
-    let objList: GameObject[] = Serializer.unpacketify(gameState);
-    setGameState(objList);
-};
-
-export var getScorePacket = function () {
-    return GameStateManager.packet();
-};
-
-export var loadScorePacket = function (arr: Float32Array) {
-    GameStateManager.loadFromPacket(arr);
 };
 
 // Controls
@@ -135,6 +114,18 @@ export var setConfig = function (options: any) {
     }
 };
 
+export var setGameSettings = function(options: any) {
+
+    // set starting number of ships
+
+    // export var NUM_ASTEROIDS = 15;
+    // export var NUM_OBSTACLES = 25;
+    // export var NUM_ENERGY_CELLS = 8;
+    // damage
+    //
+
+}
+
 export var setCallbacks = function (callbacks: any) {
     if (callbacks !== null && callbacks !== undefined) {
         if (callbacks.gameEnd !== undefined) {
@@ -147,6 +138,10 @@ export var setCallbacks = function (callbacks: any) {
 
         if (callbacks.physics !== undefined) {
             setPhysicsCallback(callbacks.physics);
+        }
+
+        if (callbacks.error !== undefined) {
+            setErrorCallback(callbacks.error);
         }
     }
 };

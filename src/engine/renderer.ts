@@ -12,8 +12,8 @@
  *   4 : effects in front
  *   5 : debug drawing }
  */
-import { backgroundColor, H, RenderQueue, W } from './globals.js';
-import { Vector2D } from './physics.js';
+import { backgroundColor, H, RenderQueue, W } from '../config/engineConfig';
+import { Vector2D } from './physics';
 
 export class Renderer {
     H: number;
