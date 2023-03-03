@@ -1,5 +1,5 @@
-import { FRAMERATE } from "../globals";
-import { GameConfig } from "../types";
+import { FRAMERATE } from "../globals.js";
+import { GameConfig } from "../types.js";
 
 export let INITIAL_SHIPS_TEAM0 = 1
 export let INITIAL_SHIPS_TEAM1 = 1

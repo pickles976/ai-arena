@@ -1,4 +1,4 @@
-import { GameObject } from './objects/gameObject';
+import { GameObject } from './objects/gameObject.js';
 import {
     GameObjectList,
     GameObjectManager,
@@ -16,9 +16,8 @@ import {
     setGameEndCallback,
     setErrorCallback
 } from './globals.js';
-import { run, setGameState, setupLoops, stop } from './engine/runner';
-import { Serializer } from './managers/serializer';
-import { Code } from './types';
+import { run, setGameState, setupLoops, stop } from './engine/runner.js';
+import { Serializer } from './managers/serializer.js';
 
 export var testPackage = function () {
     Serializer.test();
@@ -96,6 +95,8 @@ export var setCallbacks = function (callbacks: any) {
 
 export function setUserCode(code: Code) {
 
+    console.log(code)
+
     if (code.team0) {
         let temp = code.team0
         setBaseStartCode(0, temp.baseStart)
@@ -115,6 +116,9 @@ export function setUserCode(code: Code) {
 }
 
 
-import { setGameConfig } from './config/gameConfig'
+import { setGameConfig } from './config/gameConfig.js'
 import { setEngineConfig } from './globals.js';
 export { setGameConfig, setEngineConfig, setupLoops }
+
+import { TeamCode, Code, EngineConfig, GameConfig } from './types.js';
+export { TeamCode, Code, EngineConfig, GameConfig}

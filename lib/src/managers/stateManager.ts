@@ -1,5 +1,5 @@
-import { GameEndCallback, GameObjectList, GameObjectManager } from '../globals';
-import { Ship } from '../objects/objects';
+import { GameEndCallback, GameObjectList, GameObjectManager } from '../globals.js';
+import { Ship } from '../objects/objects.js';
 
 export class StateManager {
     deaths: [number, number];

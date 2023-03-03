@@ -11,15 +11,14 @@ import {
     ShipStartTeam1,
     ShipUpdateTeam0,
     ShipUpdateTeam1,
-} from './util/aiControls';
-import { GameObject } from './objects/gameObject';
-import { ObjectManager } from './managers/objectManager';
-import { ProxyMan } from './objects/objectProxies';
-import { Renderer } from './engine/renderer';
-import { compileCode } from './util/safeEval';
-import { StateManager } from './managers/stateManager';
-import { EngineConfig } from './types';
-import { setupLoops } from './engine/runner';
+} from './util/aiControls.js';
+import { GameObject } from './objects/gameObject.js';
+import { ObjectManager } from './managers/objectManager.js';
+import { ProxyMan } from './objects/objectProxies.js';
+import { Renderer } from './engine/renderer.js';
+import { compileCode } from './util/safeEval.js';
+import { StateManager } from './managers/stateManager.js';
+import { EngineConfig } from './types.js';
 
 export var W: number = 1080;
 export var H: number = 720;

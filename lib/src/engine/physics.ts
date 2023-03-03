@@ -1,4 +1,4 @@
-import { H, VELOCITY_FACTOR, W } from '../globals';
+import { H, VELOCITY_FACTOR, W } from '../globals.js';
 
 /**
  * ALL GAME OBJECT CLASSES WILL LIVE HERE FOR NOW

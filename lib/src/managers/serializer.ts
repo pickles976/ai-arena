@@ -1,7 +1,7 @@
-import { GameObject } from "../objects/gameObject"
-import { Asteroid, Base, Bullet, EnergyCell, Obstacle, Resources, Ship } from "../objects/objects"
-import { Collider, Transform, Vector2D } from "../engine/physics"
-import { create_UUID } from "../util/utils"
+import { GameObject } from "../objects/gameObject.js"
+import { Asteroid, Base, Bullet, EnergyCell, Obstacle, Resources, Ship } from "../objects/objects.js"
+import { Collider, Transform, Vector2D } from "../engine/physics.js"
+import { create_UUID } from "../util/utils.js"
 
 export class Serializer{
 

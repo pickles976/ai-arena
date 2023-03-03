@@ -1,6 +1,6 @@
-import { checkForCollisions } from './collisions';
-import { DummyRenderer } from './dummyRenderer';
-import { GameObject } from '../objects/gameObject';
+import { checkForCollisions } from './collisions.js';
+import { DummyRenderer } from './dummyRenderer.js';
+import { GameObject } from '../objects/gameObject.js';
 import {
     clearRenderQueue,
     DOMCallback,
@@ -30,14 +30,14 @@ import {
     USER_CODE_MAX_SIZE,
     USER_CODE_TIMEOUT,
     W,
-} from '../globals';
-import { ObjectManager } from '../managers/objectManager';
-import { Base, Ship } from '../objects/objects';
-import { Vector2D } from './physics';
-import { Renderer } from './renderer';
-import { StateManager } from '../managers/stateManager';
-import { checkMemory, clamp, create_UUID } from '../util/utils';
-import { INITIAL_SHIPS_TEAM0, INITIAL_SHIPS_TEAM1 } from '../config/gameConfig';
+} from '../globals.js';
+import { ObjectManager } from '../managers/objectManager.js';
+import { Base, Ship } from '../objects/objects.js';
+import { Vector2D } from './physics.js';
+import { Renderer } from './renderer.js';
+import { StateManager } from '../managers/stateManager.js';
+import { checkMemory, clamp, create_UUID } from '../util/utils.js';
+import { INITIAL_SHIPS_TEAM0, INITIAL_SHIPS_TEAM1 } from '../config/gameConfig.js';
 
 let requestFrameID: number = null;
 

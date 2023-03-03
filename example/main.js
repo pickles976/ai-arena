@@ -1,5 +1,5 @@
 import {setEngineConfig, testPackage, runGame, setUserCode, setCallbacks, setGameConfig, setupLoops} from 'ai-arena'
-import { TeamCode } from 'ai-arena/dist/types'
+import { Code, TeamCode } from 'ai-arena'
 
 console.log(testPackage())
 

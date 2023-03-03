@@ -1,5 +1,5 @@
-import { overlapCircle } from '../engine/collisions';
-import { GameObject } from '../objects/gameObject';
+import { overlapCircle } from '../engine/collisions.js';
+import { GameObject } from '../objects/gameObject.js';
 import {
     GameObjectList,
     H,
@@ -7,7 +7,7 @@ import {
     spawn,
     SPEED_RANGE,
     W,
-} from '../globals';
+} from '../globals.js';
 import { 
     ASTEROID_METAL_RANGE,
     ASTEROID_RESPAWN_TIME,
@@ -19,10 +19,10 @@ import {
     NUM_OBSTACLES,
     OBSTACLE_MASS_RANGE,
     OBSTACLE_RESPAWN_TIME
-} from '../config/gameConfig'
-import { Asteroid, Base, Bullet, EnergyCell, Obstacle, Ship } from '../objects/objects';
-import { Vector2D } from '../engine/physics';
-import { create_UUID, randomInRange } from '../util/utils';
+} from '../config/gameConfig.js'
+import { Asteroid, Base, Bullet, EnergyCell, Obstacle, Ship } from '../objects/objects.js';
+import { Vector2D } from '../engine/physics.js';
+import { create_UUID, randomInRange } from '../util/utils.js';
 
 export class ObjectManager {
     static numAsteroids: number = NUM_ASTEROIDS;

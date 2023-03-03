@@ -1,4 +1,4 @@
-import { GameObject } from './gameObject';
+import { GameObject } from './gameObject.js';
 import {
     spawn,
     FRAMERATE,
@@ -15,7 +15,7 @@ import {
     H,
     W,
     ErrorCallback,
-} from '../globals';
+} from '../globals.js';
 import {     SHIP_DAMAGE_COST_MULTIPLIER,
     SHIP_INITIAL_DAMAGE,
     SHIP_INITIAL_MAX_ENERGY,
@@ -50,12 +50,12 @@ import {     SHIP_DAMAGE_COST_MULTIPLIER,
     BULLET_MASS,
     BULLET_SPEED,
     ENERGY_SCALE,
-    DAMAGE_ENERGY_RATIO} from '../config/gameConfig'
-import { ProxyMan } from './objectProxies';
-import { Collider, Transform, Vector2D } from '../engine/physics';
-import { Renderer } from '../engine/renderer';
-import { clamp, create_UUID, dist, energyDiff, validNumber, validVector } from '../util/utils';
-import { overlapCircle } from '../engine/collisions';
+    DAMAGE_ENERGY_RATIO} from '../config/gameConfig.js'
+import { ProxyMan } from './objectProxies.js';
+import { Collider, Transform, Vector2D } from '../engine/physics.js';
+import { Renderer } from '../engine/renderer.js';
+import { clamp, create_UUID, dist, energyDiff, validNumber, validVector } from '../util/utils.js';
+import { overlapCircle } from '../engine/collisions.js';
 
 const sharedContext = {
     console: console,

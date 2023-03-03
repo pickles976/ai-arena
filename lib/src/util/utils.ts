@@ -2,11 +2,11 @@
  * MISC UTILITIES WITH GLOBAL SCOPE
  */
 
-import { GameObject } from '../objects/gameObject';
-import { GameObjectManager, USER_CODE_MAX_SIZE } from '../globals';
-import { ENERGY_SCALE } from '../config/gameConfig'
-import { Base, Ship } from '../objects/objects';
-import { Vector2D } from '../engine/physics';
+import { GameObject } from '../objects/gameObject.js';
+import { GameObjectManager, USER_CODE_MAX_SIZE } from '../globals.js';
+import { ENERGY_SCALE } from '../config/gameConfig.js'
+import { Base, Ship } from '../objects/objects.js';
+import { Vector2D } from '../engine/physics.js';
 
 /**
  * Sleeps for given amount of time. Synchronous.
