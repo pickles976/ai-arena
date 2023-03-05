@@ -161,7 +161,7 @@ const updateField = function () {
     for (let i = GameObjectList.length - 1; i >= 0; i--) {
         const value = GameObjectList[i];
 
-        if (value.type === 'DEAD') GameObjectList.splice(i, 1);
+        if (!value || value?.type === 'DEAD') GameObjectList.splice(i, 1);
         else value.simulate(MS);
     }
 
