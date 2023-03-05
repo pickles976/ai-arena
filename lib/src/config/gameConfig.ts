@@ -5,7 +5,7 @@ export let INITIAL_SHIPS_TEAM0 = 1
 export let INITIAL_SHIPS_TEAM1 = 1
 
 // How much energy it costs to do one point of damage
-export let DAMAGE_ENERGY_RATIO = 0.75
+export let DAMAGE_ENERGY_RATIO = 0.4
 
 // resources and obstacles
 export var NUM_ASTEROIDS = 15;
@@ -30,7 +30,7 @@ export var BULLET_SPEED = 0.125;
 
 // SHIP
 export var SHIP_MASS = 50;
-export var SHIP_INITIAL_DAMAGE = 5;
+export var SHIP_INITIAL_DAMAGE = 10;
 export var SHIP_INITIAL_MAX_ENERGY = 100;
 export var SHIP_UPGRADE_DAMAGE_COST = 50;
 export var SHIP_UPGRADE_MAX_ENERGY_COST = 50;
@@ -55,13 +55,13 @@ export var BASE_INITIAL_HEAL_RATE = 0.01; // how fast the base can heal ships
 export var BASE_INITIAL_INTERACT_RADIUS = 50;
 
 // upgrade costs
-export var BASE_INITIAL_UPGRADE_HEAL_RATE_COST = 250;
-export var BASE_INITIAL_UPGRADE_REPAIR_RATE_COST = 250;
-export var BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST = 250;
-export var BASE_INITIAL_UPGRADE_MAX_ENERGY_COST = 250;
-export var BASE_INITIAL_UPGRADE_MAX_HEALTH_COST = 250;
-export var BASE_INITIAL_UPGRADE_REFINING_RATE_COST = 250;
-export var BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST = 250;
+export var BASE_INITIAL_UPGRADE_HEAL_RATE_COST = 500;
+export var BASE_INITIAL_UPGRADE_REPAIR_RATE_COST = 500;
+export var BASE_INITIAL_UPGRADE_INTERACT_RADIUS_COST = 500;
+export var BASE_INITIAL_UPGRADE_MAX_ENERGY_COST = 500;
+export var BASE_INITIAL_UPGRADE_MAX_HEALTH_COST = 500;
+export var BASE_INITIAL_UPGRADE_REFINING_RATE_COST = 500;
+export var BASE_INITIAL_UPGRADE_REFINING_EFFICIENCY_COST = 500;
 
 // amount by which the cost of the upgrades increases
 export var BASE_MAX_ENERGY_COST_MULTIPLIER = 1.5;
