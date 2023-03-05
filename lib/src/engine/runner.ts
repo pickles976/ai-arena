@@ -184,9 +184,7 @@ const updateField = function () {
         for (let i = GameObjectList.length - 1; i >= 0; i--) {
             const value = GameObjectList[i];
 
-            if ((value.type === 'SHIP' && value instanceof Ship) || (value.type === 'BASE' && value instanceof Base)) {
-
-                
+            if ((value?.type === 'SHIP' && value instanceof Ship) || (value?.type === 'BASE' && value instanceof Base)) {
 
                 try {
                     // how long does user codde take to run?
