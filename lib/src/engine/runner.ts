@@ -221,7 +221,7 @@ const updateField = function () {
                         GameEndCallback(value.team);
                         break;
                     } else if (checkMemory(value)) {
-                        console.log(
+                        console.error(
                             `Player ${value.team} ${value.type} Update code used more than ${USER_CODE_MAX_SIZE} kb`,
                         );
                         alert(`Player ${value.team} ${value.type} Update code used more than ${USER_CODE_MAX_SIZE} kb`);
@@ -230,7 +230,7 @@ const updateField = function () {
                         break;
                     }
                 } catch (e) {
-                    console.log(`User code failed with ${e}. Game exiting...`);
+                    console.error(`User code failed with ${e}. Game exiting...`);
                     break;
                 }
             }

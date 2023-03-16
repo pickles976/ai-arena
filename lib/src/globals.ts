@@ -199,7 +199,7 @@ export const spawn = function (obj: GameObject) {
 
         if (elapsed > USER_CODE_TIMEOUT * 2) {
             //@ts-ignore
-            console.log(`Player ${obj.team} ${obj.type} start code timed out`);
+            console.error(`Player ${obj.team} ${obj.type} start code timed out`);
             //@ts-ignore
             GameEndCallback(obj.team);
         }

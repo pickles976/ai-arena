@@ -55,7 +55,7 @@ export const checkMemory = function (obj: Ship | Base) {
 
     if (kiloBytes > USER_CODE_MAX_SIZE) {
         // GameObjectManager.getBaseByTeam(obj.team)?.destroy()
-        console.log('You used up too much memory!');
+        console.error('You used up too much memory!');
         return true;
     }
 

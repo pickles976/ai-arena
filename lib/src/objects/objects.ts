@@ -474,7 +474,7 @@ export class Ship extends GameObject {
             });
         } catch (e) {
             ErrorCallback(e)
-            console.log(`Failure in ship.start() \n Error: ${e} \n Your code failed to compile`);
+            console.error(`Failure in ship.start() \n Error: ${e} \n Your code failed to compile`);
             resetGameState();
         }
     }
@@ -493,7 +493,7 @@ export class Ship extends GameObject {
             });
         } catch (e) {
             ErrorCallback(e)
-            console.log(`Failure in ship.update() \n Error: ${e} \n Your code failed to compile`);
+            console.error(`Failure in ship.update() \n Error: ${e} \n Your code failed to compile`);
             resetGameState();
         }
     }
@@ -865,7 +865,7 @@ export class Base extends GameObject {
             for (let i = 0; i < numFrames; i++) {
                 yield;
             }
-            console.log('Ship respawning');
+            console.error('Ship respawning');
             return self.trySpawnShip(10, true);
         }
 
@@ -897,7 +897,7 @@ export class Base extends GameObject {
             startCode({ base: ProxyMan.createBaseProxy(this), ...sharedContext });
         } catch (e) {
             ErrorCallback(e)
-            console.log(`Failure in base.start() \n Error: ${e} Your code failed to compile`);
+            console.error(`Failure in base.start() \n Error: ${e} Your code failed to compile`);
             resetGameState();
         }
     }
@@ -914,7 +914,7 @@ export class Base extends GameObject {
             });
         } catch (e) {
             ErrorCallback(e)
-            console.log(`Failure in base.update() \n Error: ${e} \n Your code failed to compile`);
+            console.error(`Failure in base.update() \n Error: ${e} \n Your code failed to compile`);
             resetGameState();
         }
     }

@@ -147,7 +147,7 @@ export class Serializer{
         
         for (let i in strings){
             if(strings[i].serialize() !== goArr[i].serialize()){
-                console.log("Serialization failed!")
+                console.error("Serialization failed!")
                 console.log(goArr[i])
                 console.log(strings[i])
             }
@@ -158,7 +158,7 @@ export class Serializer{
         
         for (let i in packets){
             if(packets[i].serialize() !== goArr[i].serialize()){
-                console.log("Packetification failed!")
+                console.error("Packetification failed!")
                 console.log(goArr[i])
                 console.log(packets[i])
             }
