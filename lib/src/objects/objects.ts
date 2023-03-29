@@ -865,7 +865,7 @@ export class Base extends GameObject {
             for (let i = 0; i < numFrames; i++) {
                 yield;
             }
-            console.error('Ship respawning');
+            console.log('Ship respawning');
             return self.trySpawnShip(10, true);
         }
 
